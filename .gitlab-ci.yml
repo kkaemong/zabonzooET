@@ -1,0 +1,99 @@
+stages:
+  - test
+  - build
+  - scan
+  - deploy
+
+default:
+  image: eclipse-temurin:17-jdk
+  before_script:
+    - cd BE
+    - chmod +x gradlew
+  cache:
+    key: gradle-cache
+    paths:
+      - BE/.gradle/
+
+be_test:
+  stage: test
+  rules:
+    - changes:
+        - BE/**/*
+        - infra/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - ./gradlew test --no-daemon
+  artifacts:
+    when: always
+    paths:
+      - BE/build/reports/tests/
+      - BE/build/test-results/
+    expire_in: 7 days
+
+be_build:
+  stage: build
+  needs: ["be_test"]
+  rules:
+    - changes:
+        - BE/**/*
+        - infra/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - ./gradlew clean bootJar -x test --no-daemon
+  artifacts:
+    paths:
+      - BE/build/libs/*.jar
+    expire_in: 7 days
+
+variables:
+  DOCKER_IMAGE: $CI_REGISTRY_IMAGE/backend
+  # Required CI/CD Variables to set in GitLab:
+  # - SSH_PRIVATE_KEY
+  # - EC2_IP
+  # - EC2_USER
+  # - CI_REGISTRY_IMAGE / CI_REGISTRY_USER / CI_REGISTRY_PASSWORD
+
+security_scan_template:
+  stage: scan
+  when: manual
+  allow_failure: true
+  script:
+    - echo "SCA/Container scan - Add Trivy or similar scanning tool here"
+    # Example:
+    # - trivy image $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
+
+docker_build:
+  stage: build
+  needs: ["be_build"]
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin
+  script:
+    - cd BE
+    - docker build -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA -t $DOCKER_IMAGE:latest .
+    - docker push $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
+    - docker push $DOCKER_IMAGE:latest
+
+deploy_prod:
+  stage: deploy
+  needs: ["docker_build"]
+  image: alpine:latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  before_script:
+    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $EC2_IP >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - echo "Deploying to EC2..."
+    - ssh $EC2_USER@$EC2_IP "cd /home/$EC2_USER/amagetdon/infra && ./deploy.sh $DOCKER_IMAGE:latest"
