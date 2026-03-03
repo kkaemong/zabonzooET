@@ -1,0 +1,22 @@
+# CloudWatch awslogs override
+# 사용법: docker compose -f docker-compose.prod.yml -f docker-compose.cloudwatch.yml up -d
+# 주의: EC2에 CloudWatchLogsFullAccess IAM Role이 필요합니다.
+
+services:
+  nginx:
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION:-ap-northeast-2}
+        awslogs-group: /amagetdon/nginx
+        awslogs-stream: ${HOSTNAME:-nginx}
+        awslogs-create-group: "true"
+
+  backend:
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION:-ap-northeast-2}
+        awslogs-group: /amagetdon/backend
+        awslogs-stream: ${HOSTNAME:-backend}
+        awslogs-create-group: "true"

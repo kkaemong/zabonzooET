@@ -1,0 +1,40 @@
+# HTTPS server block
+# certbot 인증서 발급 후 활성화됩니다.
+# 도메인은 setup-certbot.sh 실행 시 자동으로 치환됩니다.
+
+server {
+    listen       443 ssl;
+    server_name  DOMAIN_PLACEHOLDER;
+
+    # SSL 인증서 경로 (certbot이 생성)
+    ssl_certificate     /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/privkey.pem;
+
+    # SSL 보안 설정
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 10m;
+
+    # HSTS (HTTPS 강제)
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # Health check
+    location /health {
+        return 200 'healthy\n';
+    }
+
+    # Backend API proxy
+    location / {
+        proxy_pass http://backend_api;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}

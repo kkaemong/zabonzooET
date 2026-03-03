@@ -1,9 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+
 # Initialize an Ubuntu 24.04/22.04 LTS EC2 instance for the Amagetdon backend
 
 # 1. Update and install prerequisites
 sudo apt-get update
-sudo apt-get install -y ca-certificates curl gnupg lsb-release unzip
+sudo apt-get install -y ca-certificates curl gnupg lsb-release unzip jq
 
 # 2. Add Docker's official GPG key
 sudo mkdir -p /etc/apt/keyrings
@@ -17,6 +19,7 @@ echo \
 # 4. Install Docker Engine, containerd, and Docker Compose
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl enable --now docker
 
 # 5. Add the current user to the docker group (to run docker without sudo)
 sudo usermod -aG docker $USER
@@ -26,6 +29,9 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip awscliv2.zip
 sudo ./aws/install
 rm -rf aws awscliv2.zip
+
+# 7. Install Certbot (Let's Encrypt SSL)
+sudo apt-get install -y certbot
 
 echo "==================================="
 echo "EC2 Initialization Complete."

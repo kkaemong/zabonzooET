@@ -4,17 +4,15 @@
 
 Spring Boot에서 환경변수를 주입받는 방식은 크게 플러그인을 쓰거나 OS 환경변수로 덮는 방식이 있습니다. MVP의 안정적인 운영과 벤더 의존성을 낮추기 위해 **로컬 쉘 스크립트 기반 주입 방식**을 권장합니다.
 
-### 스크립트 주입 예제 (deploy.sh 수정 안내)
+### 스크립트 주입 방식 (현재 적용된 경로)
 
-배포 과정에서 `docker-compose`가 실행되기 전, AWS CLI명령어를 통해 보안 변수들을 호출하여 `.env` 파일을 동적으로 생성합니다.
+배포 과정에서 `docker compose`가 실행되기 전에 `infra/scripts/render-prod-env.sh`가 보안 변수들을 호출하여 `infra/.env.prod`를 동적으로 생성합니다.
 
 ```bash
-# 1. AWS CLI를 통해 Secrets Manager 값 호출 (ap-northeast-2 기준)
-SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id amagetdon/prod --query SecretString --output text --region ap-northeast-2)
-
-# 2. jq(JSON Parser)를 이용하여 .env 재생성
-echo "SPRING_DATASOURCE_PASSWORD=$(jq -r '.db_password' <<< \$SECRET_JSON)" > .env.prod
-echo "JWT_SECRET=$(jq -r '.jwt_secret' <<< \$SECRET_JSON)" >> .env.prod
+# EC2 배포 시 예시
+export AWS_SECRET_ID=amagetdon/prod
+export AWS_REGION=ap-northeast-2
+./infra/scripts/deploy.sh <registry>/<project>/backend:<tag>
 ```
 
 > [!NOTE]
@@ -26,20 +24,15 @@ echo "JWT_SECRET=$(jq -r '.jwt_secret' <<< \$SECRET_JSON)" >> .env.prod
 
 Spring Boot에서 직접 Logback appender를 통해 통신하지 않고, **Docker 데몬의 `awslogs` 로깅 드라이버**를 활용하여 인프라 레벨에서 CloudWatch로 로그를 전송합니다.
 
-### `docker-compose.prod.yml` 적용 예제
+### `docker-compose.prod.yml` 적용 상태
 
 ```yaml
 services:
   backend:
-    image: ${IMAGE_TAG:-amagetdon-backend:latest}
-    logging:
-      driver: awslogs
-      options:
-        awslogs-region: "ap-northeast-2"
-        awslogs-group: "/amagetdon/backend"
-        awslogs-stream-prefix: "prod-server"
-        awslogs-create-group: "true"
+    image: ${IMAGE_TAG:?IMAGE_TAG is required}
+    env_file:
+      - .env.prod
 ```
 
 > [!IMPORTANT]
-> `awslogs` 드라이버를 원활하게 쓰기 위해선 마찬가지로 **EC2 IAM Role에 `CloudWatchLogsFullAccess` 권한**이 연결되어 있어야 합니다.
+> CloudWatch 로그 전송(`awslogs`)은 현재 기본 compose에는 아직 미적용입니다. 적용하려면 `docker-compose.prod.yml`에 `logging.driver=awslogs`를 추가하고 EC2 IAM Role 권한을 연결하세요.
