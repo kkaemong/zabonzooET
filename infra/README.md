@@ -32,7 +32,7 @@ chmod +x infra/scripts/*.sh
 ### 2단계: 브랜치 생성 (이슈 키 포함)
 
 ```bash
-# 형식: {구분}-{작업타입}/{영문작업내용}_{JIRA-KEY}
+# 형식: {구분}-{작업타입}/{영어작업내용}_{지라이슈번호}
 git checkout -b be-feat/login-api_S14P21A507-17
 git checkout -b fe-refactor/user-service_S14P21A507-31
 git checkout -b be-infra/ci-workflow_S14P21A507-42
@@ -44,20 +44,20 @@ git checkout -b be-infra/ci-workflow_S14P21A507-42
 
 ### 3단계: 커밋 (Jira 키 자동 삽입)
 
-평소처럼 커밋하면 **훅이 자동으로** 브랜치에서 Jira 키를 읽어 메시지 앞에 붙여줍니다.
+평소처럼 커밋하면 **훅이 자동으로** 브랜치에서 Jira 키를 읽어 메시지 끝에 괄호로 붙여줍니다.
 
 ```bash
 # 이렇게 커밋하면:
 git commit -m "feat : 로그인 API 추가"
 
 # 자동으로 이렇게 됩니다:
-# → S14P21A507-17 feat : 로그인 API 추가
+# → feat : 로그인 API 추가(S14P21A507-17)
 ```
 
 직접 명시해도 됩니다:
 
 ```bash
-git commit -m "S14P21A507-17 feat : 로그인 API 추가"
+git commit -m "feat : 로그인 API 추가(S14P21A507-17)"
 ```
 
 > ⛔ **Jira 이슈 키가 없는 커밋은 거부됩니다.** 이슈 키가 브랜치에도 없고 메시지에도 없으면 커밋이 실패합니다.

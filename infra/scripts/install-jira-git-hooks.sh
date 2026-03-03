@@ -30,6 +30,6 @@ install_hook "commit-msg"
 
 cat <<'EOF'
 [install-hooks] done
-- Branch naming example: feature/A507-123-login-api
-- Commit message example: A507-123 add login API
+- 브랜치 예시: be-feat/login-api_S14P21A507-1
+- 커밋 예시: feat : 로그인 API 추가(S14P21A507-1)
 EOF

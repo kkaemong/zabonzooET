@@ -30,7 +30,8 @@ fi
 
 FIRST_LINE="$(head -n1 "$MSG_FILE")"
 if [ -n "$FIRST_LINE" ]; then
-  sed -i "1s/^/${ISSUE_KEY} /" "$MSG_FILE"
+  # 첫 번째 줄 끝에 (이슈키) 추가
+  sed -i "1s/$/($ISSUE_KEY)/" "$MSG_FILE"
 else
-  printf '%s\n' "$ISSUE_KEY" > "$MSG_FILE"
+  printf '(%s)\n' "$ISSUE_KEY" > "$MSG_FILE"
 fi

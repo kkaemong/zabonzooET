@@ -12,7 +12,7 @@ if grep -Eq "$PATTERN" "$MSG_FILE"; then
   exit 0
 fi
 
-echo "[jira-hook] Commit message must include a Jira issue key (ex: A507-123)."
+echo "[jira-hook] 커밋 메시지에 Jira 이슈 키가 필요합니다 (예: feat : 로그인 API 추가(S14P21A507-1))"
 echo "[jira-hook] Current message:"
 sed -n '1,3p' "$MSG_FILE"
 exit 1
