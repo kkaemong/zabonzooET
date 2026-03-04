@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE="${1:-}"
-if [ -z "$IMAGE" ]; then
-  echo "Usage: ./infra/scripts/deploy.sh <docker-image>"
+BACKEND_IMAGE="${1:-}"
+FRONTEND_IMAGE="${2:-${FRONTEND_IMAGE:-}}"
+
+if [ -z "$BACKEND_IMAGE" ] || [ -z "$FRONTEND_IMAGE" ]; then
+  cat <<USAGE
+Usage: ./infra/scripts/deploy.sh <backend-image> <frontend-image>
+
+or
+
+  export FRONTEND_IMAGE=<frontend-image>
+  ./infra/scripts/deploy.sh <backend-image>
+USAGE
   exit 1
 fi
 
@@ -15,13 +24,19 @@ COMPOSE_FILE="$INFRA_DIR/docker-compose.prod.yml"
 if [ ! -f "$ENV_FILE" ]; then
   cp "$INFRA_DIR/docs/templates/prod.env.example" "$ENV_FILE"
   chmod 600 "$ENV_FILE"
-  echo "[deploy] created $ENV_FILE from template. Update secrets before next deploy."
+  echo "[deploy] created $ENV_FILE from template"
 fi
 
-if ! grep -q '^IMAGE_TAG=' "$ENV_FILE"; then
-  echo "IMAGE_TAG=$IMAGE" >> "$ENV_FILE"
+if ! grep -q '^BACKEND_IMAGE=' "$ENV_FILE"; then
+  echo "BACKEND_IMAGE=$BACKEND_IMAGE" >> "$ENV_FILE"
 else
-  sed -i "s|^IMAGE_TAG=.*$|IMAGE_TAG=$IMAGE|" "$ENV_FILE"
+  sed -i "s|^BACKEND_IMAGE=.*$|BACKEND_IMAGE=$BACKEND_IMAGE|" "$ENV_FILE"
+fi
+
+if ! grep -q '^FRONTEND_IMAGE=' "$ENV_FILE"; then
+  echo "FRONTEND_IMAGE=$FRONTEND_IMAGE" >> "$ENV_FILE"
+else
+  sed -i "s|^FRONTEND_IMAGE=.*$|FRONTEND_IMAGE=$FRONTEND_IMAGE|" "$ENV_FILE"
 fi
 
 if [ -n "${CI_REGISTRY:-}" ] && [ -n "${CI_REGISTRY_USER:-}" ] && [ -n "${CI_REGISTRY_PASSWORD:-}" ]; then
@@ -32,12 +47,12 @@ cd "$INFRA_DIR"
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --remove-orphans
 
-for i in $(seq 1 20); do
+for i in $(seq 1 30); do
   if curl -fsS http://127.0.0.1/health >/dev/null; then
     echo "[deploy] health check passed"
     exit 0
   fi
-  echo "[deploy] waiting for health... ($i/20)"
+  echo "[deploy] waiting for health... ($i/30)"
   sleep 2
 done
 

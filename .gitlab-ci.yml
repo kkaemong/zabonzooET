@@ -1,76 +1,28 @@
 stages:
-  - test
-  - build
+  - validate
   - deploy
 
-default:
-  image: eclipse-temurin:17-jdk
-  before_script:
-    - cd BE
-    - chmod +x gradlew
-  cache:
-    key: gradle-cache
-    paths:
-      - BE/.gradle/
-
-variables:
-  DOCKER_IMAGE: $CI_REGISTRY_IMAGE/backend
-
-be_test:
-  stage: test
+validate_infra:
+  stage: validate
+  image: alpine:latest
   rules:
     - changes:
-        - BE/**/*
-        - .gitlab-ci.yml
-    - when: never
-  script:
-    - ./gradlew test --no-daemon
-  artifacts:
-    when: always
-    paths:
-      - BE/build/reports/tests/
-      - BE/build/test-results/
-    expire_in: 7 days
-
-be_build:
-  stage: build
-  needs: ["be_test"]
-  rules:
-    - changes:
-        - BE/**/*
         - infra/**/*
         - .gitlab-ci.yml
     - when: never
   script:
-    - ./gradlew clean bootJar -x test --no-daemon
-  artifacts:
-    paths:
-      - BE/build/libs/*.jar
-    expire_in: 7 days
-
-docker_build:
-  stage: build
-  image: docker:24.0.5
-  services:
-    - docker:24.0.5-dind
-  needs: ["be_build"]
-  rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-  before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin
-  script:
-    - docker build -f infra/Dockerfile -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA -t $DOCKER_IMAGE:latest .
-    - docker push $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
-    - docker push $DOCKER_IMAGE:latest
+    - apk add --no-cache bash
+    - bash -n infra/scripts/deploy.sh
+    - test -f infra/docker-compose.prod.yml
+    - test -f infra/nginx.conf
 
 deploy_prod:
   stage: deploy
   image: alpine:latest
-  needs: ["docker_build"]
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
   before_script:
-    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh curl )'
+    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -78,4 +30,6 @@ deploy_prod:
     - ssh-keyscan $EC2_IP >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - ssh $EC2_USER@$EC2_IP "cd /home/$EC2_USER/amagetdon/S14P21A507 && ./infra/scripts/deploy.sh $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA"
+    - |
+      ssh $EC2_USER@$EC2_IP \
+      "cd /home/$EC2_USER/amagetdon/S14P21A507 && ./infra/scripts/deploy.sh '$DEPLOY_BACKEND_IMAGE' '$DEPLOY_FRONTEND_IMAGE'"

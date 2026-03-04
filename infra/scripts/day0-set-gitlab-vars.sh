@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-GITLAB_API_BASE="${GITLAB_API_BASE:-https://gitlab.com/api/v4}"
+GITLAB_API_BASE="${GITLAB_API_BASE:-https://lab.ssafy.com/api/v4}"
 GITLAB_TOKEN="${GITLAB_TOKEN:-}"
 GITLAB_PROJECT_ID="${GITLAB_PROJECT_ID:-}"
 
 if [ -z "$GITLAB_TOKEN" ] || [ -z "$GITLAB_PROJECT_ID" ]; then
-  cat <<'EOF'
+  cat <<'USAGE'
 Usage:
   export GITLAB_TOKEN=<gitlab_pat_with_api_scope>
   export GITLAB_PROJECT_ID=<numeric_id_or_urlencoded_path>
   export EC2_IP=<ec2_public_ip_or_dns>
   export EC2_USER=<ssh_user>
   export SSH_PRIVATE_KEY="$(cat ~/.ssh/your_key)"
-  export AWS_SECRET_ID=amagetdon/prod
-  export AWS_REGION=ap-northeast-2
+  export DEPLOY_BACKEND_IMAGE=<registry/project/backend:tag>
+  export DEPLOY_FRONTEND_IMAGE=<registry/project/frontend:tag>
   ./infra/scripts/day0-set-gitlab-vars.sh
-EOF
+USAGE
   exit 1
 fi
 
 api_url() {
-  local path="$1"
-  printf '%s/projects/%s/variables/%s' "$GITLAB_API_BASE" "$GITLAB_PROJECT_ID" "$path"
+  local key="$1"
+  printf '%s/projects/%s/variables/%s' "$GITLAB_API_BASE" "$GITLAB_PROJECT_ID" "$key"
 }
 
 upsert_var() {
@@ -64,14 +64,7 @@ upsert_var() {
 upsert_var "EC2_IP" "${EC2_IP:-}" "false" "true"
 upsert_var "EC2_USER" "${EC2_USER:-}" "false" "true"
 upsert_var "SSH_PRIVATE_KEY" "${SSH_PRIVATE_KEY:-}" "true" "true"
-upsert_var "AWS_SECRET_ID" "${AWS_SECRET_ID:-}" "false" "true"
-upsert_var "AWS_REGION" "${AWS_REGION:-ap-northeast-2}" "false" "true"
+upsert_var "DEPLOY_BACKEND_IMAGE" "${DEPLOY_BACKEND_IMAGE:-}" "false" "true"
+upsert_var "DEPLOY_FRONTEND_IMAGE" "${DEPLOY_FRONTEND_IMAGE:-}" "false" "true"
 
-if [ -n "${CI_REGISTRY_USER:-}" ]; then
-  upsert_var "CI_REGISTRY_USER" "${CI_REGISTRY_USER:-}" "false" "true"
-fi
-if [ -n "${CI_REGISTRY_PASSWORD:-}" ]; then
-  upsert_var "CI_REGISTRY_PASSWORD" "${CI_REGISTRY_PASSWORD:-}" "true" "true"
-fi
-
-echo "[gitlab-vars] completed."
+echo "[gitlab-vars] completed"

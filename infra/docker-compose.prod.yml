@@ -8,18 +8,26 @@ services:
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ../FE/dist:/usr/share/nginx/html:ro
       - ./ssl.conf:/etc/nginx/conf.d/ssl.conf:ro
       - letsencrypt_certs:/etc/letsencrypt:ro
       - certbot_webroot:/var/www/certbot:ro
     depends_on:
+      frontend:
+        condition: service_started
       backend:
         condition: service_started
     networks:
       - monet-network
 
+  frontend:
+    image: ${FRONTEND_IMAGE:?FRONTEND_IMAGE is required}
+    container_name: monet-frontend
+    restart: always
+    networks:
+      - monet-network
+
   backend:
-    image: ${IMAGE_TAG:?IMAGE_TAG is required}
+    image: ${BACKEND_IMAGE:?BACKEND_IMAGE is required}
     container_name: monet-backend
     restart: always
     env_file:
