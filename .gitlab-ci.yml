@@ -20,6 +20,15 @@ validate_infra:
     - test -f infra/docker-compose.prod.yml
     - test -f infra/nginx.conf
 
+jira_transition_on_merge:
+  stage: validate
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "infra/develop" || $CI_COMMIT_BRANCH == "master") && $CI_COMMIT_TITLE =~ /^Merge branch.*/'
+    - when: never
+  allow_failure: true
+  script:
+    - sh infra/scripts/jira-transition-on-merge.sh
+
 deploy_prod:
   stage: deploy
   image: alpine:latest
