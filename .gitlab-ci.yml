@@ -1,7 +1,6 @@
 stages:
   - test
   - build
-  - scan
   - deploy
 
 default:
@@ -14,12 +13,14 @@ default:
     paths:
       - BE/.gradle/
 
+variables:
+  DOCKER_IMAGE: $CI_REGISTRY_IMAGE/backend
+
 be_test:
   stage: test
   rules:
     - changes:
         - BE/**/*
-        - infra/**/*
         - .gitlab-ci.yml
     - when: never
   script:
@@ -47,47 +48,12 @@ be_build:
       - BE/build/libs/*.jar
     expire_in: 7 days
 
-variables:
-  DOCKER_IMAGE: $CI_REGISTRY_IMAGE/backend
-  # Required CI/CD Variables to set in GitLab:
-  # - SSH_PRIVATE_KEY
-  # - EC2_IP
-  # - EC2_USER
-  # - AWS_SECRET_ID (optional but recommended for deploy.sh)
-  # - AWS_REGION (optional, default: ap-northeast-2)
-  # - CI_REGISTRY_IMAGE / CI_REGISTRY_USER / CI_REGISTRY_PASSWORD
-
-container_scan:
-  stage: scan
-  needs: ["docker_build"]
-  image: docker:24.0.5
-  services:
-    - docker:24.0.5-dind
-  rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-  allow_failure: true
-  before_script:
-    - apk add --no-cache curl
-    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin
-  script:
-    - echo "[scan] Pulling image for scanning..."
-    - docker pull $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
-    - echo "[scan] Running Trivy container scan (HIGH, CRITICAL)..."
-    - trivy image --severity HIGH,CRITICAL --format json --output trivy-report.json $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
-    - trivy image --severity HIGH,CRITICAL --exit-code 0 $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
-  artifacts:
-    when: always
-    paths:
-      - trivy-report.json
-    expire_in: 30 days
-
 docker_build:
   stage: build
-  needs: ["be_build"]
   image: docker:24.0.5
   services:
     - docker:24.0.5-dind
+  needs: ["be_build"]
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
   before_script:
@@ -99,12 +65,12 @@ docker_build:
 
 deploy_prod:
   stage: deploy
-  needs: ["docker_build"]
   image: alpine:latest
+  needs: ["docker_build"]
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
   before_script:
-    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
+    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh curl )'
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -112,5 +78,4 @@ deploy_prod:
     - ssh-keyscan $EC2_IP >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - echo "Deploying to EC2..."
-    - ssh $EC2_USER@$EC2_IP "cd /home/$EC2_USER/amagetdon/infra && AWS_SECRET_ID='${AWS_SECRET_ID:-}' AWS_REGION='${AWS_REGION:-ap-northeast-2}' ./deploy.sh $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA"
+    - ssh $EC2_USER@$EC2_IP "cd /home/$EC2_USER/amagetdon/S14P21A507 && ./infra/scripts/deploy.sh $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA"

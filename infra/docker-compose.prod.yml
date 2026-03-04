@@ -1,13 +1,14 @@
 services:
   nginx:
-    image: nginx:alpine
-    container_name: amagetdon-nginx
+    image: nginx:1.27-alpine
+    container_name: monet-nginx
     restart: always
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../FE/dist:/usr/share/nginx/html:ro
       - ./ssl.conf:/etc/nginx/conf.d/ssl.conf:ro
       - letsencrypt_certs:/etc/letsencrypt:ro
       - certbot_webroot:/var/www/certbot:ro
@@ -15,40 +16,61 @@ services:
       backend:
         condition: service_started
     networks:
-      - amagetdon-network
+      - monet-network
 
   backend:
     image: ${IMAGE_TAG:?IMAGE_TAG is required}
-    container_name: amagetdon-backend
+    container_name: monet-backend
     restart: always
     env_file:
       - .env.prod
     depends_on:
-      redis:
+      postgres:
         condition: service_healthy
     networks:
-      - amagetdon-network
+      - monet-network
 
-  redis:
-    image: redis:7
-    container_name: amagetdon-redis
+  postgres:
+    image: postgres:17-alpine
+    container_name: monet-postgres
     restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-monet}
+      POSTGRES_USER: ${POSTGRES_USER:-monet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
+      TZ: Asia/Seoul
     volumes:
-      - redis_data:/data
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-monet} -d ${POSTGRES_DB:-monet}"]
       interval: 5s
       timeout: 3s
       retries: 10
     networks:
-      - amagetdon-network
+      - monet-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: monet-redis
+    restart: always
+    profiles: ["redis"]
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - monet-network
 
 volumes:
-  redis_data:
+  pgdata:
+  redisdata:
   letsencrypt_certs:
   certbot_webroot:
 
-
 networks:
-  amagetdon-network:
+  monet-network:
     driver: bridge

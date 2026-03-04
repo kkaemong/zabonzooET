@@ -1,13 +1,12 @@
-package com.ssafy.amagetdon;
+package com.ssafy.monet;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AmagetdonApplicationTests {
+class MonetApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    void contextLoads() {
+    }
 }
