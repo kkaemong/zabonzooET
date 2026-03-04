@@ -32,4 +32,4 @@ deploy_prod:
   script:
     - |
       ssh $EC2_USER@$EC2_IP \
-      "cd /home/$EC2_USER/amagetdon/S14P21A507 && ./infra/scripts/deploy.sh '$DEPLOY_BACKEND_IMAGE' '$DEPLOY_FRONTEND_IMAGE'"
+      "cd ${DEPLOY_REPO_DIR:-/home/$EC2_USER/S14P21A507} && ./infra/scripts/deploy.sh '$DEPLOY_BACKEND_IMAGE' '$DEPLOY_FRONTEND_IMAGE'"

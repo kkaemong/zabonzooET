@@ -12,12 +12,12 @@ usage() {
 Usage: ./infra/scripts/setup-certbot.sh <domain> [email]
 
 Arguments:
-  domain    SSL 인증서를 발급할 도메인 (예: amagetdon.example.com)
+  domain    SSL 인증서를 발급할 도메인 (예: monet.example.com)
   email     Let's Encrypt 알림용 이메일 (선택, 미입력 시 --register-unsafely-without-email)
 
 Examples:
-  ./infra/scripts/setup-certbot.sh amagetdon.ssafy.io
-  ./infra/scripts/setup-certbot.sh amagetdon.ssafy.io admin@example.com
+  ./infra/scripts/setup-certbot.sh monet.ssafy.io
+  ./infra/scripts/setup-certbot.sh monet.ssafy.io admin@example.com
 EOF
 }
 
@@ -67,7 +67,7 @@ done
 
 # ── 3. certbot webroot 디렉토리 준비 ──
 # Docker 볼륨에서 webroot 경로 확인
-WEBROOT_VOLUME="$(docker volume inspect amagetdon_certbot_webroot --format '{{.Mountpoint}}' 2>/dev/null || echo '')"
+WEBROOT_VOLUME="$(docker volume inspect monet_certbot_webroot --format '{{.Mountpoint}}' 2>/dev/null || echo '')"
 if [ -z "$WEBROOT_VOLUME" ]; then
   # 볼륨 이름이 다를 수 있으므로 infra_ 프리픽스도 확인
   WEBROOT_VOLUME="$(docker volume inspect infra_certbot_webroot --format '{{.Mountpoint}}' 2>/dev/null || echo '')"
@@ -104,7 +104,7 @@ echo "[certbot] SSL nginx 설정 생성 중..."
 sed "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" "$SSL_TEMPLATE" > "$SSL_CONF"
 
 # ── 6. 인증서를 Docker 볼륨으로 복사 ──
-CERT_VOLUME="$(docker volume inspect amagetdon_letsencrypt_certs --format '{{.Mountpoint}}' 2>/dev/null || echo '')"
+CERT_VOLUME="$(docker volume inspect monet_letsencrypt_certs --format '{{.Mountpoint}}' 2>/dev/null || echo '')"
 if [ -z "$CERT_VOLUME" ]; then
   CERT_VOLUME="$(docker volume inspect infra_letsencrypt_certs --format '{{.Mountpoint}}' 2>/dev/null || echo '')"
 fi
@@ -147,7 +147,7 @@ else
 fi
 
 # ── 9. 자동 갱신 cron 설정 ──
-CRON_CMD="0 3 * * * certbot renew --quiet && cp -rL /etc/letsencrypt/* $CERT_VOLUME/ 2>/dev/null && docker exec amagetdon-nginx nginx -s reload"
+CRON_CMD="0 3 * * * certbot renew --quiet && cp -rL /etc/letsencrypt/* $CERT_VOLUME/ 2>/dev/null && docker exec monet-nginx nginx -s reload"
 if ! crontab -l 2>/dev/null | grep -q "certbot renew"; then
   echo "[certbot] 자동 갱신 cron 등록 중..."
   (crontab -l 2>/dev/null; echo "$CRON_CMD") | crontab -

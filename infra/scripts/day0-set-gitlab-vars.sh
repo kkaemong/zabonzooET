@@ -12,6 +12,7 @@ Usage:
   export GITLAB_PROJECT_ID=<numeric_id_or_urlencoded_path>
   export EC2_IP=<ec2_public_ip_or_dns>
   export EC2_USER=<ssh_user>
+  export DEPLOY_REPO_DIR=/home/<ssh_user>/S14P21A507   # optional
   export SSH_PRIVATE_KEY="$(cat ~/.ssh/your_key)"
   export DEPLOY_BACKEND_IMAGE=<registry/project/backend:tag>
   export DEPLOY_FRONTEND_IMAGE=<registry/project/frontend:tag>
@@ -63,6 +64,7 @@ upsert_var() {
 
 upsert_var "EC2_IP" "${EC2_IP:-}" "false" "true"
 upsert_var "EC2_USER" "${EC2_USER:-}" "false" "true"
+upsert_var "DEPLOY_REPO_DIR" "${DEPLOY_REPO_DIR:-}" "false" "true"
 upsert_var "SSH_PRIVATE_KEY" "${SSH_PRIVATE_KEY:-}" "true" "true"
 upsert_var "DEPLOY_BACKEND_IMAGE" "${DEPLOY_BACKEND_IMAGE:-}" "false" "true"
 upsert_var "DEPLOY_FRONTEND_IMAGE" "${DEPLOY_FRONTEND_IMAGE:-}" "false" "true"

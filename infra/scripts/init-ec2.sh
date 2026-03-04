@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Initialize an Ubuntu 24.04/22.04 LTS EC2 instance for the Amagetdon backend
+# Initialize an Ubuntu 24.04/22.04 LTS EC2 instance for MonET infra
 
 # 1. Update and install prerequisites
 sudo apt-get update
