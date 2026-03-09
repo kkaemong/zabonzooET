@@ -33,7 +33,7 @@ deploy_prod:
   stage: deploy
   image: alpine:latest
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master" && $DEPLOY_ENABLED == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master" && $DEPLOY_ENABLED == "true" && $CI_COMMIT_TITLE =~ /^Merge branch.*/'
     - when: never
   before_script:
     - |
