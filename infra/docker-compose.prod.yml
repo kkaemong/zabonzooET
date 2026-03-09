@@ -11,11 +11,6 @@ services:
       - ./ssl.conf:/etc/nginx/conf.d/ssl.conf:ro
       - letsencrypt_certs:/etc/letsencrypt:ro
       - certbot_webroot:/var/www/certbot:ro
-    depends_on:
-      frontend:
-        condition: service_started
-      backend:
-        condition: service_started
     networks:
       - monet-network
 

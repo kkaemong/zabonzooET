@@ -16,6 +16,7 @@
 
 ```bash
 curl -f http://127.0.0.1/health
+curl -f http://127.0.0.1/api/health || curl -f http://127.0.0.1/api/actuator/health
 docker compose --env-file infra/.env.prod -f infra/docker-compose.prod.yml ps
 ```
 

@@ -47,16 +47,21 @@ cd "$INFRA_DIR"
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --remove-orphans
 
+check_backend_health() {
+  curl -fsS http://127.0.0.1/api/health >/dev/null || \
+    curl -fsS http://127.0.0.1/api/actuator/health >/dev/null
+}
+
 for i in $(seq 1 30); do
-  if curl -fsS http://127.0.0.1/health >/dev/null; then
-    echo "[deploy] health check passed"
+  if check_backend_health; then
+    echo "[deploy] backend health check passed"
     exit 0
   fi
-  echo "[deploy] waiting for health... ($i/30)"
+  echo "[deploy] waiting for backend health... ($i/30)"
   sleep 2
 done
 
-echo "[deploy] health check failed"
+echo "[deploy] backend health check failed"
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" logs --tail 120
 exit 1
