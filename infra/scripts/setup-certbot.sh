@@ -35,6 +35,7 @@ SSL_TEMPLATE="$INFRA_DIR/ssl.conf.template"
 SSL_CONF="$INFRA_DIR/ssl.conf"
 COMPOSE_FILE="$INFRA_DIR/docker-compose.prod.yml"
 ENV_FILE="$INFRA_DIR/.env.prod"
+PUBLIC_HEALTH_URL="https://$DOMAIN/health"
 
 # ── 1. certbot 설치 확인 ──
 if ! command -v certbot >/dev/null 2>&1; then
@@ -88,6 +89,7 @@ CERTBOT_ARGS=(
   -d "$DOMAIN"
   --non-interactive
   --agree-tos
+  --keep-until-expiring
 )
 
 if [ -n "$EMAIL" ]; then
@@ -125,7 +127,8 @@ docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d nginx --force-rec
 echo "[certbot] HTTPS 동작 확인 중..."
 HTTPS_OK=false
 for i in $(seq 1 10); do
-  if curl -fsSk https://127.0.0.1/health >/dev/null 2>&1; then
+  if curl -fsSk https://127.0.0.1/health >/dev/null 2>&1 && \
+     curl -fsS "$PUBLIC_HEALTH_URL" >/dev/null 2>&1; then
     HTTPS_OK=true
     break
   fi
@@ -137,6 +140,7 @@ if [ "$HTTPS_OK" = true ]; then
   echo "==================================="
   echo "SSL 인증서 발급 및 HTTPS 설정 완료!"
   echo "도메인: https://$DOMAIN"
+  echo "검증: https://127.0.0.1/health, $PUBLIC_HEALTH_URL"
   echo "==================================="
 else
   echo "==================================="
@@ -147,11 +151,19 @@ else
 fi
 
 # ── 9. 자동 갱신 cron 설정 ──
-CRON_CMD="0 3 * * * certbot renew --quiet && cp -rL /etc/letsencrypt/* $CERT_VOLUME/ 2>/dev/null && docker exec monet-nginx nginx -s reload"
-if ! crontab -l 2>/dev/null | grep -q "certbot renew"; then
-  echo "[certbot] 자동 갱신 cron 등록 중..."
-  (crontab -l 2>/dev/null; echo "$CRON_CMD") | crontab -
-  echo "[certbot] cron 등록 완료 (매일 03:00 자동 갱신)"
+if [ -n "$CERT_VOLUME" ]; then
+  RENEW_ACTION="cp -rL /etc/letsencrypt/* $CERT_VOLUME/ 2>/dev/null && docker exec monet-nginx nginx -s reload"
 else
-  echo "[certbot] 자동 갱신 cron이 이미 등록되어 있습니다."
+  RENEW_ACTION="docker exec monet-nginx nginx -s reload"
+fi
+
+CRON_CMD="0 3 * * * certbot renew --quiet && $RENEW_ACTION"
+ROOT_CRONTAB="$(sudo crontab -l 2>/dev/null || true)"
+
+if printf '%s\n' "$ROOT_CRONTAB" | grep -Fq "certbot renew --quiet"; then
+  echo "[certbot] root crontab에 자동 갱신 설정이 이미 존재합니다."
+else
+  echo "[certbot] root crontab 자동 갱신 등록 중..."
+  printf '%s\n' "$ROOT_CRONTAB" "$CRON_CMD" | sudo crontab -
+  echo "[certbot] root crontab 등록 완료 (도메인: $DOMAIN)"
 fi

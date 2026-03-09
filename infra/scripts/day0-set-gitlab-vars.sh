@@ -16,6 +16,7 @@ Usage:
   export SSH_PRIVATE_KEY="$(cat ~/.ssh/your_key)"
   export DEPLOY_BACKEND_IMAGE=<registry/project/backend:tag>
   export DEPLOY_FRONTEND_IMAGE=<registry/project/frontend:tag>
+  export DEPLOY_ENABLED=true
   ./infra/scripts/day0-set-gitlab-vars.sh
 USAGE
   exit 1
@@ -31,6 +32,7 @@ upsert_var() {
   local value="$2"
   local masked="${3:-false}"
   local protected="${4:-false}"
+  local raw="${5:-true}"
 
   if [ -z "$value" ]; then
     echo "[gitlab-vars] skip empty: $key"
@@ -48,6 +50,7 @@ upsert_var() {
       --form "value=$value" \
       --form "masked=$masked" \
       --form "protected=$protected" \
+      --form "raw=$raw" \
       "$(api_url "$key")" >/tmp/gitlab_var_put.out
     echo "[gitlab-vars] updated: $key"
   else
@@ -57,16 +60,19 @@ upsert_var() {
       --form "value=$value" \
       --form "masked=$masked" \
       --form "protected=$protected" \
+      --form "raw=$raw" \
       "$GITLAB_API_BASE/projects/$GITLAB_PROJECT_ID/variables" >/tmp/gitlab_var_post.out
     echo "[gitlab-vars] created: $key"
   fi
 }
 
+# Minimum contract for master merge auto-deploy.
 upsert_var "EC2_IP" "${EC2_IP:-}" "false" "true"
 upsert_var "EC2_USER" "${EC2_USER:-}" "false" "true"
 upsert_var "DEPLOY_REPO_DIR" "${DEPLOY_REPO_DIR:-}" "false" "true"
-upsert_var "SSH_PRIVATE_KEY" "${SSH_PRIVATE_KEY:-}" "true" "true"
+upsert_var "SSH_PRIVATE_KEY" "${SSH_PRIVATE_KEY:-}" "false" "true"
 upsert_var "DEPLOY_BACKEND_IMAGE" "${DEPLOY_BACKEND_IMAGE:-}" "false" "true"
 upsert_var "DEPLOY_FRONTEND_IMAGE" "${DEPLOY_FRONTEND_IMAGE:-}" "false" "true"
+upsert_var "DEPLOY_ENABLED" "${DEPLOY_ENABLED:-}" "false" "true"
 
 echo "[gitlab-vars] completed"
