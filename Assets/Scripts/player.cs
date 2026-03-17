@@ -1,45 +1,64 @@
 using UnityEngine;
+using System.Collections;
 
 public class player : MonoBehaviour
 {
-    public float jumpForce = 12f; // 점프 힘 (중력을 높였을 때를 대비해 기본값을 올림)
-    public int maxJumps = 2; // 최대 점프 횟수 (2면 더블 점프)
-    public float groundCheckDistance = 1.2f; // 바닥에 닿기 얼마나 전부터 착지 애니메이션을 틀지 (수치 조절 가능)
+    public float firstJumpForce = 14f; // 1단 점프력 (높게)
+    public float secondJumpForce = 10f; // 2단 점프력 (낮게)
+    public int maxJumps = 2;
+    public float groundCheckDistance = 1.2f; 
+    public int health = 3; 
+
     private Rigidbody2D rb;
-    private int jumpCount = 0; // 현재 점프 횟수 기록
-    private Animator anim; // 애니메이터 컴포넌트
+    private int jumpCount = 0; 
+    private Animator anim; 
+    private SpriteRenderer spriteRenderer; 
+    private bool isInvincible = false; // 무적 상태 확인용 플래그
+    private Coroutine landingCoroutine; // 💡 착지 코루틴 추적용 변수 추가
 
     void Start()
     {
-        // Rigidbody2D 컴포넌트를 가져옵니다. (3D인 경우 Rigidbody로 변경하세요)
         rb = GetComponent<Rigidbody2D>();
-        // 파라미터 제어를 위해 Animator 컴포넌트를 가져옵니다.
         anim = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // 캐릭터가 물리 충돌로 인해 회전(꼬꾸라짐)하지 않도록 고정
+        if (rb != null)
+        {
+            rb.freezeRotation = true;
+        }
     }
 
     void Update()
     {
-        // 스페이스바를 눌렀을 때 && 점프 횟수가 최대 횟수보다 적을 때만 점프
-        if (Input.GetKeyDown(KeyCode.Space) && jumpCount < maxJumps)
+        // 💡 3번째 누르면 점프는 안 하지만, 카운트는 올라가야 "이미 다 뛰었다"라는 정보를 확실하게 처리할 수 있습니다.
+        // maxJumps를 넘어가는 입력이 와도 카운트만 늘리고, 실제 점프 실행(Jump)은 안 하도록 변경
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            Jump();
+            if (jumpCount < maxJumps)
+            {
+                Jump();
+            }
+            else
+            {
+                jumpCount++; // 점프 이펙트는 없지만 카운트를 올려 입력이 방금 들어왔음을 기록
+            }
         }
 
-        // 공중에 떠있는 상태(점프 횟수가 0보다 클 때)에서 캐릭터가 아래로 떨어질 때
-        // 땅에 닿기 "조금 전"에 착지 애니메이션으로 넘어가도록 바닥과의 거리를 검사합니다.
         if (jumpCount > 0 && rb != null && rb.linearVelocity.y < 0f && anim != null)
         {
-            // 발밑 방향으로 가상의 레이저(Raycast)를 쏩니다.
-            // 주의: 플레이어 중심점에서 구하는 방식이므로, 캐릭터 크기에 따라 groundCheckDistance 값을 조절해야 합니다.
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance);
+            // 💡 단일 Raycast가 아닌, 광선을 쏘아 닿는 '모든' 물체를 검사하도록 변경 (동전에 광선이 막히는 현상 방지)
+            RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, Vector2.down, groundCheckDistance);
 
-            // 레이저가 "Ground" 태그가 달린 바닥에 닿았다면 (즉, 바닥이 가까워졌다면)
-            if (hit.collider != null && hit.collider.CompareTag("Ground"))
+            foreach (var hit in hits)
             {
-                // 현재 애니메이션 상태가 이미 착지(2)가 아닐 때만 2로 변경합니다.
-                if (anim.GetInteger("state") != 2)
+                if (hit.collider != null && hit.collider.CompareTag("Ground"))
                 {
-                    anim.SetInteger("state", 2);
+                    if (anim.GetInteger("state") != 2)
+                    {
+                        anim.SetInteger("state", 2);
+                    }
+                    break; // 바닥을 찾았으므로 더 이상 검사할 필요 없음
                 }
             }
         }
@@ -49,46 +68,91 @@ public class player : MonoBehaviour
     {
         if (rb != null)
         {
-            // 점프 속도를 더 빠르고 즉각적으로 만들기 위해 AddForce 대신 속도(velocity)를 직접 변경합니다.
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-            jumpCount++; // 점프할 때마다 횟수 증가
+            // 점프 횟수에 따라 점프력을 다르게 적용 (1단 점프는 높게, 2단 점프는 낮게)
+            float force = (jumpCount == 0) ? firstJumpForce : secondJumpForce;
             
-            // 애니메이터 파라미터 "state"를 1(점프)로 설정합니다.
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, force);
+            jumpCount++; 
+            
             if (anim != null)
             {
-                anim.SetInteger("state", 1);
+                // 💡 만약 점프를 했는데 아직 착지 코루틴이 돌고 있다면 꺼버림
+                if (landingCoroutine != null)
+                {
+                    StopCoroutine(landingCoroutine);
+                    landingCoroutine = null;
+                }
+
+                if (jumpCount == 1)
+                {
+                    anim.SetInteger("state", 1);
+                }
+                else if (jumpCount == 2)
+                {
+                    anim.SetInteger("state", 3);
+                }
             }
         }
     }
 
-    // 오브젝트가 무언가와 충돌했을 때 호출되는 함수
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // 충돌한 오브젝트의 태그가 "Ground"일 때 다시 점프 횟수 초기화
-        // (주의: 유니티 에디터에서 바닥 오브젝트의 태그를 "Ground"로 설정해주어야 합니다)
         if (collision.gameObject.CompareTag("Ground"))
         {
-            jumpCount = 0; // 바닥에 닿으면 점프 횟수를 초기화하여 다시 점프할 수 있게 설정
+            jumpCount = 0; 
             
-            // 바닥에 닿았을 때(착지 시) 착지 애니메이션을 재생하는 코루틴을 시작합니다.
             if (anim != null)
             {
-                StartCoroutine(PlayLandingAnimation());
+                // 💡 이전 코루틴이 돌고 있으면 종료하고 새 코루틴 시작
+                if (landingCoroutine != null) StopCoroutine(landingCoroutine);
+                landingCoroutine = StartCoroutine(PlayLandingAnimation());
             }
         }
     }
 
-    // 착지 애니메이션이 너무 빨리 끝나는 것을 방지하기 위해 
-    // 일정 시간(예: 0.2초) 동안 유지했다가 기본 상태(대기 또는 달리기 등)로 되돌리는 코루틴
-    System.Collections.IEnumerator PlayLandingAnimation()
+    IEnumerator PlayLandingAnimation()
     {
-        anim.SetInteger("state", 2); // 착지 상태로 변환
-        
-        // n초 동안 대기합니다. (착지 애니메이션 길이에 맞춰 이 숫자를 조절하세요. 예: 0.15f ~ 0.3f)
+        anim.SetInteger("state", 2); 
         yield return new WaitForSeconds(0.2f); 
         
-        // 착지 애니메이션이 끝난 후 다시 기본 상태(예: 0)로 되돌립니다.
-        // 현재 게임의 "가만히 서있는 상태"나 "달리는 상태"에 맞는 state 번호로 변경해주세요. (예: idle이 0이라면 0으로 둡니다)
-        anim.SetInteger("state", 0); 
+        // 💡 0.2초 뒤에 캐릭터가 여전히 바닥에 있을 때만 달리기(0)로 바꿉니다.
+        // 그 사이에 점프를 눌러서 jumpCount가 올라갔다면 0으로 바꾸지 않습니다!
+        if (jumpCount == 0)
+        {
+            anim.SetInteger("state", 0); 
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (isInvincible) return; // 무적 상태라면 데미지를 받지 않음
+
+        health -= damage; 
+        Debug.Log("Health: " + health);
+
+        if (health <= 0)
+        {
+            Debug.Log("Game Over!");
+        }
+
+        if (spriteRenderer != null)
+        {
+            StartCoroutine(OnHitEffect());
+        }
+    }
+
+    IEnumerator OnHitEffect()
+    {
+        isInvincible = true; // 무적 시작
+        
+        // 빨간색이고 반투명한 상태로 변경
+        spriteRenderer.color = new Color(1f, 0.2f, 0.2f, 0.5f);
+        
+        yield return new WaitForSeconds(1.5f); // 1.5초 동안 지속
+        
+        // 원래 색상(흰색, 불투명)으로 복구
+        spriteRenderer.color = Color.white;
+        
+        isInvincible = false; // 무적 종료
     }
 }
