@@ -1,39 +1,48 @@
 using UnityEngine;
+using UnityEngine.UI; 
 using System.Collections;
 
 public class player : MonoBehaviour
 {
-    public float firstJumpForce = 14f; // 1단 점프력 (높게)
-    public float secondJumpForce = 10f; // 2단 점프력 (낮게)
+    public float firstJumpForce = 14f;
+    public float secondJumpForce = 10f;
     public int maxJumps = 2;
     public float groundCheckDistance = 1.2f; 
     public int health = 3; 
 
+    [Header("Health UI")]
+    public Image[] hearts; 
+    public Sprite fullHeart;
+    public Sprite emptyHeart; 
+
     private Rigidbody2D rb;
     private int jumpCount = 0; 
-    private Animator anim; 
-    private SpriteRenderer spriteRenderer; 
-    private bool isInvincible = false; // 무적 상태 확인용 플래그
-    private Coroutine landingCoroutine; // 💡 착지 코루틴 추적용 변수 추가
+    private Animator anim;
+    private SpriteRenderer spriteRenderer;
+    private bool isInvincible = false;
+    private Coroutine landingCoroutine;
+    private bool isDead = false;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponent<SpriteRenderer>(); // 깜빡임 연출용
 
-        // 캐릭터가 물리 충돌로 인해 회전(꼬꾸라짐)하지 않도록 고정
         if (rb != null)
         {
             rb.freezeRotation = true;
         }
+
+        UpdateHealthUI();
     }
 
     void Update()
     {
-        // 💡 3번째 누르면 점프는 안 하지만, 카운트는 올라가야 "이미 다 뛰었다"라는 정보를 확실하게 처리할 수 있습니다.
-        // maxJumps를 넘어가는 입력이 와도 카운트만 늘리고, 실제 점프 실행(Jump)은 안 하도록 변경
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (isDead) return;
+
+        // 💡 게임 정지 중(퀴즈 등)일 때는 점프 입력 무시
+        if (Input.GetKeyDown(KeyCode.Space) && !GameManager.IsGamePaused)
         {
             if (jumpCount < maxJumps)
             {
@@ -41,13 +50,12 @@ public class player : MonoBehaviour
             }
             else
             {
-                jumpCount++; // 점프 이펙트는 없지만 카운트를 올려 입력이 방금 들어왔음을 기록
+                jumpCount++;
             }
         }
 
         if (jumpCount > 0 && rb != null && rb.linearVelocity.y < 0f && anim != null)
         {
-            // 💡 단일 Raycast가 아닌, 광선을 쏘아 닿는 '모든' 물체를 검사하도록 변경 (동전에 광선이 막히는 현상 방지)
             RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, Vector2.down, groundCheckDistance);
 
             foreach (var hit in hits)
@@ -58,7 +66,7 @@ public class player : MonoBehaviour
                     {
                         anim.SetInteger("state", 2);
                     }
-                    break; // 바닥을 찾았으므로 더 이상 검사할 필요 없음
+                    break;
                 }
             }
         }
@@ -66,17 +74,17 @@ public class player : MonoBehaviour
 
     void Jump()
     {
+        if (isDead) return;
+
         if (rb != null)
         {
-            // 점프 횟수에 따라 점프력을 다르게 적용 (1단 점프는 높게, 2단 점프는 낮게)
             float force = (jumpCount == 0) ? firstJumpForce : secondJumpForce;
-            
+
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, force);
-            jumpCount++; 
-            
+            jumpCount++;
+
             if (anim != null)
             {
-                // 💡 만약 점프를 했는데 아직 착지 코루틴이 돌고 있다면 꺼버림
                 if (landingCoroutine != null)
                 {
                     StopCoroutine(landingCoroutine);
@@ -97,62 +105,175 @@ public class player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (isDead) return;
+
         if (collision.gameObject.CompareTag("Ground"))
         {
-            jumpCount = 0; 
-            
+            jumpCount = 0;
+
             if (anim != null)
             {
-                // 💡 이전 코루틴이 돌고 있으면 종료하고 새 코루틴 시작
                 if (landingCoroutine != null) StopCoroutine(landingCoroutine);
                 landingCoroutine = StartCoroutine(PlayLandingAnimation());
             }
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (isDead) return;
+
+
+    }
+
     IEnumerator PlayLandingAnimation()
     {
-        anim.SetInteger("state", 2); 
-        yield return new WaitForSeconds(0.2f); 
-        
-        // 💡 0.2초 뒤에 캐릭터가 여전히 바닥에 있을 때만 달리기(0)로 바꿉니다.
-        // 그 사이에 점프를 눌러서 jumpCount가 올라갔다면 0으로 바꾸지 않습니다!
+        anim.SetInteger("state", 2);
+        yield return new WaitForSeconds(0.2f);
+
         if (jumpCount == 0)
         {
-            anim.SetInteger("state", 0); 
+            anim.SetInteger("state", 0);
         }
     }
 
     public void TakeDamage(int damage)
     {
-        if (isInvincible) return; // 무적 상태라면 데미지를 받지 않음
+        if (isDead || isInvincible) return; 
 
-        health -= damage; 
+        health -= damage;
         Debug.Log("Health: " + health);
+
+        // 💡 피격 시 카메라 흔들림 연출 (쿠구궁)
+        CameraShake.Shake(0.3f, 0.4f);
+
+        UpdateHealthUI();
 
         if (health <= 0)
         {
-            Debug.Log("Game Over!");
+            Die();
+        }
+        else
+        {
+            if (spriteRenderer != null)
+            {
+                StartCoroutine(OnHitEffect());
+            }
+        }
+    }
+
+    public void AddLife(int amount)
+    {
+        if (isDead) return;
+        health += amount;
+        if (health > hearts.Length) health = hearts.Length; // 최대 체력 초과 방지
+        UpdateHealthUI();
+    }
+
+    public void TriggerQuizInvincibility(float duration)
+    {
+        StartCoroutine(InvincibilityCoroutine(duration));
+    }
+
+    IEnumerator InvincibilityCoroutine(float duration)
+    {
+        isInvincible = true;
+        float blinkInterval = 0.15f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            if (isDead) break;
+            spriteRenderer.color = new Color(1f, 1f, 1f, 0.3f);
+            yield return new WaitForSeconds(blinkInterval);
+            elapsed += blinkInterval;
+
+            if (isDead) break;
+            spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+            yield return new WaitForSeconds(blinkInterval);
+            elapsed += blinkInterval;
+        }
+        if (!isDead) spriteRenderer.color = Color.white;
+        isInvincible = false;
+    }
+
+    void Die()
+    {
+        isDead = true;
+        Debug.Log("Game Over!");
+
+        // 1. 방금 설정한 상태 번호 4번으로 강제 전환
+        if (anim != null)
+        {
+            anim.SetInteger("state", 4);
         }
 
-        if (spriteRenderer != null)
+        // 2. 물리 운동 제거 (위로 튀지 않고 멈춤)
+        if (rb != null)
         {
-            StartCoroutine(OnHitEffect());
+            rb.linearVelocity = Vector2.zero;
+        }
+
+        // 3. 글로벌 스크롤 속도를 0으로 만들어 배경, 코인, 장애물의 이동 멈춤
+        GameManager.globalSpeed = 0f;
+        GameManager.isGameOver = true; // 게임 오버 선언 (속도 증가 영구 중단)
+
+        // 💡 4. 화면 크기가 멈췄음에도 스포너가 계속 작동해 물체가 겹치는 현상 방지
+        GameObject[] allObjects = FindObjectsOfType<GameObject>();
+        foreach (GameObject obj in allObjects)
+        {
+            if (obj.name.ToLower().Contains("spawn"))
+            {
+                obj.SetActive(false); // 이름에 'spawn'이 들어간 스포너들(coin, building, obstacle)을 모두 끕니다
+            }
+        }
+    }
+
+    void UpdateHealthUI()
+    {
+        for (int i = 0; i < hearts.Length; i++)
+        {
+            if (hearts[i] == null) continue;
+            if (i < health)
+            {
+                hearts[i].sprite = fullHeart;
+            }
+            else
+            {
+                hearts[i].sprite = emptyHeart;
+            }
         }
     }
 
     IEnumerator OnHitEffect()
     {
-        isInvincible = true; // 무적 시작
+        isInvincible = true;
         
-        // 빨간색이고 반투명한 상태로 변경
-        spriteRenderer.color = new Color(1f, 0.2f, 0.2f, 0.5f);
+        float blinkDuration = 1.5f; // 총 깜빡이는 시간
+        float blinkInterval = 0.15f; // 한 번 깜빡이는(켜고 끄기) 주기
+        float elapsed = 0f;
+
+        // 깜빡깜빡 (반투명 <-> 원래색)
+        while (elapsed < blinkDuration)
+        {
+            if (isDead) break; // 죽으면 깜빡임 중지
+
+            // 반투명하게 (알파값 0.3)
+            spriteRenderer.color = new Color(1f, 1f, 1f, 0.3f);
+            yield return new WaitForSeconds(blinkInterval);
+            elapsed += blinkInterval;
+
+            if (isDead) break;
+
+            // 다시 원래대로 (알파값 1.0)
+            spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+            yield return new WaitForSeconds(blinkInterval);
+            elapsed += blinkInterval;
+        }
+
+        // 혹시 투명 상태로 끝났을 수 있으니 원상복구
+        if(!isDead) spriteRenderer.color = Color.white;
         
-        yield return new WaitForSeconds(1.5f); // 1.5초 동안 지속
-        
-        // 원래 색상(흰색, 불투명)으로 복구
-        spriteRenderer.color = Color.white;
-        
-        isInvincible = false; // 무적 종료
+        isInvincible = false;
     }
 }

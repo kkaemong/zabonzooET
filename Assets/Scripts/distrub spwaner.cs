@@ -21,6 +21,9 @@ public class distrubspwaner : MonoBehaviour
 
     void Update()
     {
+        // 게임이 멈춰있으면 추가 소환도 멈춤
+        if (GameManager.IsGamePaused) return;
+
         timer += Time.deltaTime;
 
         if (timer >= currentInterval)
