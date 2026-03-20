@@ -14,6 +14,10 @@ public class player : MonoBehaviour
     public Image[] hearts; 
     public Sprite fullHeart;
     public Sprite emptyHeart; 
+    [Header("Effects")]
+    public GameObject hitEffectPrefab;
+    public GameObject shieldEffectPrefab;
+    private GameObject activeShield; // 쉴드 유지용
 
     private Rigidbody2D rb;
     private int jumpCount = 0; 
@@ -28,6 +32,12 @@ public class player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>(); // 깜빡임 연출용
+
+        // 💡 플레이어의 렌더링 순서를 5로 강제 고정하여 배경(0)보다 무조건 앞에 나오도록 설정
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.sortingOrder = 5;
+        }
 
         if (rb != null)
         {
@@ -155,6 +165,32 @@ public class player : MonoBehaviour
         }
         else
         {
+            // 💡 피격 이펙트 생성
+            if (hitEffectPrefab != null)
+            {
+                // 방해물(disturb) 등 피격 시 이펙트를 더 앞쪽으로 (1.2 -> 1.8)
+                Vector3 hitOffset = new Vector3(1.8f, 0f, 0f);
+
+                GameObject hit = Instantiate(hitEffectPrefab, transform.position + hitOffset, Quaternion.identity);
+                
+                // 크기를 조금 더 줄임 (0.5 -> 0.35)
+                hit.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
+
+                // 💡 투명도 낮추기 (반투명하게)
+                SpriteRenderer[] hitSrs = hit.GetComponentsInChildren<SpriteRenderer>();
+                foreach (var sr in hitSrs) {
+                    Color c = sr.color; c.a = 0.6f; sr.color = c;
+                }
+                ParticleSystem[] hitPss = hit.GetComponentsInChildren<ParticleSystem>();
+                foreach (var ps in hitPss) {
+                    var main = ps.main;
+                    main.startColor = new Color(1f, 1f, 1f, 0.6f);
+                }
+                
+                // 💡 반복재생 방지: 0.6초 뒤에 강제로 이펙트 삭제
+                Destroy(hit, 0.6f);
+            }
+
             if (spriteRenderer != null)
             {
                 StartCoroutine(OnHitEffect());
@@ -173,6 +209,35 @@ public class player : MonoBehaviour
     public void TriggerQuizInvincibility(float duration)
     {
         StartCoroutine(InvincibilityCoroutine(duration));
+        
+        // 💡 쉴드 이펙트 생성 (자식 오브젝트로 생성하여 따라다니게 적용)
+        if (shieldEffectPrefab != null && activeShield == null)
+        {
+            activeShield = Instantiate(shieldEffectPrefab, transform.position, Quaternion.identity, transform);
+            
+            // 쉴드 크기 더 작게 줄임 (0.5 -> 0.4)
+            activeShield.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+
+            // 💡 쉴드는 4번으로 강제 고정! (배경 0번보다 앞에, 플레이어 5번보다 뒤에 위치하게 함)
+            SpriteRenderer[] shieldSrs = activeShield.GetComponentsInChildren<SpriteRenderer>();
+            foreach (var sr in shieldSrs) {
+                sr.sortingLayerID = spriteRenderer.sortingLayerID; 
+                sr.sortingOrder = 4; // 플레이어(5)보다 1칸 뒤
+                Color c = sr.color; c.a = 0.6f; sr.color = c; // 반투명
+            }
+            ParticleSystemRenderer[] shieldPsrs = activeShield.GetComponentsInChildren<ParticleSystemRenderer>();
+            foreach (var psr in shieldPsrs) {
+                psr.sortingLayerID = spriteRenderer.sortingLayerID;
+                psr.sortingOrder = 4;
+            }
+            ParticleSystem[] shieldPss = activeShield.GetComponentsInChildren<ParticleSystem>();
+            foreach (var ps in shieldPss) {
+                var main = ps.main;
+                main.startColor = new Color(1f, 1f, 1f, 0.6f); // 반투명
+            }
+
+            Destroy(activeShield, duration); // duration 시간 후 자동 삭제
+        }
     }
 
     IEnumerator InvincibilityCoroutine(float duration)

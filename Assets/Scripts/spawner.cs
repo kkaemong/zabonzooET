@@ -92,8 +92,8 @@ public class spawner : MonoBehaviour
             string objName = h.gameObject.name.ToLower();
             string objTag = h.gameObject.tag.ToLower();
             
-            if (objName.Contains("disturb") || objName.Contains("obstacle") || objName.Contains("coin") ||
-                objTag.Contains("disturb") || objTag.Contains("obstacle") || objTag.Contains("coin"))
+            if (objName.Contains("disturb") || objName.Contains("obstacle") || objName.Contains("coin") || objName.Contains("soldier") ||
+                objTag.Contains("disturb") || objTag.Contains("obstacle") || objTag.Contains("coin") || objTag.Contains("soldier"))
             {
                 isOverlap = true;
                 break;

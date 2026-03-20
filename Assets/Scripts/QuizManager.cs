@@ -195,6 +195,9 @@ public class QuizManager : MonoBehaviour
                 gm.AddCoin(5);
                 gm.AddLife(1); // 💡 목숨 1개 추가
                 gm.ResumeGame();
+                
+                // 💡 맞추면 일시적으로 부스터 효과 발동!
+                gm.ApplyTemporarySpeedBoost(boostMultiplier, boostDuration);
             }
             
             // 💡 정답 시 3초 무적 효과 부여

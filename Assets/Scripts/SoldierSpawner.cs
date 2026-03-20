@@ -11,6 +11,9 @@ public class SoldierSpawner : MonoBehaviour
     public LayerMask avoidLayer; // 피하고 싶은 레이어 (장애물, 코인 등)
     public Vector2 checkBoxSize = new Vector2(3f, 4f); // 감지 상자 크기 (가로, 세로)
 
+    [Header("--- [ Emoji Settings ] ---")]
+    public Vector3 emojiOffset = new Vector3(0, 1.8f, 0); // 이모지 위치 조절 (현재 머리 위 1.8)
+
     void Start()
     {
         // 이제 타이머로 소환하지 않고 GameManager가 특정 거리에 도달했을 때만 1마리씩 소환합니다.
@@ -27,28 +30,36 @@ public class SoldierSpawner : MonoBehaviour
         // 물리 엔진 동기화 (생성 직후 감지 확률 높임)
         Physics2D.SyncTransforms();
 
-        // 폭넓게 감지하여 겹침을 철저하게 방지합니다
+        // 폭넓게 감지하여 겹치는 방해물이 있다면 파괴 (군인은 무조건 소환되어야 함!)
         Collider2D[] hits = Physics2D.OverlapBoxAll(spawnPosition, checkBoxSize, 0f);
-        bool isOverlap = false;
         foreach (var h in hits)
         {
             if (h.gameObject == this.gameObject) continue;
             string objName = h.gameObject.name.ToLower();
-            if (objName.Contains("disturb") || objName.Contains("obstacle") || objName.Contains("coin") || objName.Contains("soldier"))
+            string objTag = h.gameObject.tag.ToLower();
+            
+            // 만약 군인 소환 자리에 코인이나 방해물이 있다면 무조건 파괴해서 자리를 확보함
+            if (objName.Contains("disturb") || objName.Contains("obstacle") || objName.Contains("coin") ||
+                objTag.Contains("disturb") || objTag.Contains("obstacle") || objTag.Contains("coin"))
             {
-                isOverlap = true;
-                break;
+                Destroy(h.gameObject);
             }
         }
         
-        if (!isOverlap) // 아무것도 겹치지 않을 때만 생성
+        int randomIndex = Random.Range(0, soldierPrefabs.Length);
+        GameObject selectedPrefab = soldierPrefabs[randomIndex];
+        
+        if (selectedPrefab != null)
         {
-            int randomIndex = Random.Range(0, soldierPrefabs.Length);
-            GameObject selectedPrefab = soldierPrefabs[randomIndex];
+            GameObject soldier = Instantiate(selectedPrefab, spawnPosition, Quaternion.identity);
             
-            if (selectedPrefab != null)
+            // 💡 느낌표(말풍선) 프리팹 동적 로드 및 군인 머리 위 부착
+            GameObject emojiPrefab = Resources.Load<GameObject>("ExclamationEmoji");
+            if (emojiPrefab != null)
             {
-                Instantiate(selectedPrefab, spawnPosition, Quaternion.identity);
+                GameObject emojiObj = Instantiate(emojiPrefab, soldier.transform);
+                // 인스펙터에서 설정한 위치값(emojiOffset) 적용
+                emojiObj.transform.localPosition = emojiOffset; 
             }
         }
     }

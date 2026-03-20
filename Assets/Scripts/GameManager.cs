@@ -26,6 +26,10 @@ public class GameManager : MonoBehaviour
     public static float distanceTraveled = 0f;
     public Text distanceText;
     
+    [Header("Distance Progress UI")]
+    private UnityEngine.UI.Slider distanceProgressBar;
+    private RectTransform playerIconRect;
+    
     
     [Header("Level Up UI")]
     public Text levelUpText; // 퀴즈 정답 시 띄울 레벨업 텍스트
@@ -79,6 +83,13 @@ public class GameManager : MonoBehaviour
         UpdateScoreUI();
         UpdateDistanceUI();
         UpdateSpeedUI();
+
+        // 💡 자동 생성된 달리기 게이지 바(Distance ProgressBar) 연결
+        GameObject barObj = GameObject.Find("DistanceProgressBarUI");
+        if (barObj != null) distanceProgressBar = barObj.GetComponent<UnityEngine.UI.Slider>();
+        
+        GameObject pIcon = GameObject.Find("PlayerHandle");
+        if (pIcon != null) playerIconRect = pIcon.GetComponent<RectTransform>();
     }
 
     void Update()
@@ -115,11 +126,25 @@ public class GameManager : MonoBehaviour
                 Debug.Log("<color=green>[Game Clear]</color> 1000m 돌파! 게임 종료!");
             }
 
+            // 💡 프로그레스 바(게이지 바) 및 플레이어 아이콘 UI 실시간 업데이트
+            if (distanceProgressBar != null)
+            {
+                float progress = Mathf.Clamp01(distanceTraveled / 1000f);
+                distanceProgressBar.value = progress;
+                
+                if (playerIconRect != null)
+                {
+                    playerIconRect.anchorMin = new Vector2(progress, 0.5f);
+                    playerIconRect.anchorMax = new Vector2(progress, 0.5f);
+                    playerIconRect.anchoredPosition = Vector2.zero;
+                }
+            }
+
             UpdateDistanceUI();
             UpdateSpeedUI();
 
-            // 💡 퀴즈 계속 띄워서 UI 테스트 하도록 카운트 제한 해제 (원래는 quizCount < 2)
-            if (quizCount < 999 && distanceTraveled >= nextQuizDistance)
+            // 💡 원래 기획대로 1000m 완주 중 딱 2번만 나오도록 제한 (quizCount < 2)
+            if (quizCount < 2 && distanceTraveled >= nextQuizDistance)
             {
                 TriggerBreakingNews();
             }
