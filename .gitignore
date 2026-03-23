@@ -70,3 +70,11 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# AI and MCP Editor Tools Config / Cache
+/.mcp/
+/.ai/
+/.cursor/
+/.gemini/
+mcp_logs/
+ai_logs/

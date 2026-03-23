@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -44,6 +45,10 @@ public class GameManager : MonoBehaviour
     {
         IsGamePaused = false; // 💡 씬 재시작 시 정지 상태 초기화 (매우 중요)
         isGameOver = false;
+
+        // 💡 씬 시작 시 실수로 켜져있을 수 있는 결과창을 강제로 꺼서 어두워지는 현상 방지!!
+        if (victoryPanel != null) victoryPanel.SetActive(false);
+        if (losePanel != null) losePanel.SetActive(false);
 
         coinCount = 0; 
         distanceTraveled = 0f;
@@ -124,6 +129,29 @@ public class GameManager : MonoBehaviour
                 isGameOver = true;
                 globalSpeed = 0f;
                 Debug.Log("<color=green>[Game Clear]</color> 1000m 돌파! 게임 종료!");
+
+                // 💡 플레이어 달리기 정지 (애니메이션 및 물리력 멈춤)
+                player p = FindObjectOfType<player>();
+                if (p != null)
+                {
+                    Animator pAnim = p.GetComponent<Animator>();
+                    if (pAnim != null) pAnim.speed = 0f; // 제자리 멈춤
+                    
+                    Rigidbody2D pRb = p.GetComponent<Rigidbody2D>();
+                    if (pRb != null) pRb.linearVelocity = Vector2.zero; 
+                }
+
+                // 💡 화면 밖에서 장애물이 계속 안 나오게 모든 스포너 끄기
+                GameObject[] allObjects = FindObjectsOfType<GameObject>();
+                foreach (GameObject obj in allObjects)
+                {
+                    if (obj.name.ToLower().Contains("spawn"))
+                    {
+                        obj.SetActive(false); 
+                    }
+                }
+
+                ShowVictoryPanel(); // 승리 패널 띄우기
             }
 
             // 💡 프로그레스 바(게이지 바) 및 플레이어 아이콘 UI 실시간 업데이트
@@ -240,6 +268,14 @@ public class GameManager : MonoBehaviour
         if (scoreUI != null) scoreUI.SetActive(false);
         if (distanceText != null) distanceText.gameObject.SetActive(false);
         if (speedText != null) speedText.gameObject.SetActive(false);
+        
+        // 💡 설정 버튼 숨기기
+        GameObject canvasObj = GameObject.Find("GameControlUI");
+        if (canvasObj != null)
+        {
+            Transform sBtn = canvasObj.transform.Find("Btn_Settings");
+            if (sBtn != null) sBtn.gameObject.SetActive(false);
+        }
     }
 
     // 모달 창이 꺼졌을 때 기본 속도로 복귀
@@ -253,6 +289,14 @@ public class GameManager : MonoBehaviour
         if (scoreUI != null) scoreUI.SetActive(true);
         if (distanceText != null) distanceText.gameObject.SetActive(true);
         if (speedText != null) speedText.gameObject.SetActive(true);
+
+        // 💡 설정 버튼 다시 표시
+        GameObject canvasObj = GameObject.Find("GameControlUI");
+        if (canvasObj != null)
+        {
+            Transform sBtn = canvasObj.transform.Find("Btn_Settings");
+            if (sBtn != null) sBtn.gameObject.SetActive(true);
+        }
 
         // 멈춰있던 플레이어 애니메이션 복구
         player p = FindObjectOfType<player>();
@@ -343,6 +387,128 @@ public class GameManager : MonoBehaviour
             levelUpText.color = startColor;
             rect.anchoredPosition = Vector2.Lerp(currentPos, finalPos, t);
             yield return null;
+            yield return null;
         }
+    }
+
+    // ---------------------------------------------------------------------
+    // [ 4. UI 버튼 제어 함수들 (인스펙터 OnClick에서 연결) ]
+    // ---------------------------------------------------------------------
+
+    [Header("음악 토글 아이콘 설정")]
+    public UnityEngine.UI.Image musicButtonImage;
+    public Sprite musicOnSprite;
+    public Sprite musicOffSprite;
+
+    // 타임스케일 복구용 안전 변수
+    private float defaultTimeScaleBackup = 0f;
+
+    // [다시하기 버튼] 용도
+    public void RestartGame()
+    {
+        if (defaultTimeScaleBackup > 0f) Time.timeScale = defaultTimeScaleBackup;
+        else if (Time.timeScale == 0f) Time.timeScale = 1f;
+
+        IsGamePaused = false;
+        isGameOver = false;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    // [설정 버튼] 및 [일시정지] 용도 
+    public void TogglePanelAndPause(GameObject panel)
+    {
+        if (panel != null)
+        {
+            bool isOpening = !panel.activeSelf;
+            panel.SetActive(isOpening);
+            
+            if (isOpening)
+            {
+                // 정지할 때 현재 속도 백업
+                if (Time.timeScale > 0f) defaultTimeScaleBackup = Time.timeScale;
+                Time.timeScale = 0f;
+            }
+            else
+            {
+                // 정지 풀 때 원래 속도로 복구
+                Time.timeScale = defaultTimeScaleBackup > 0f ? defaultTimeScaleBackup : 1f;
+            }
+        }
+    }
+
+    // [바깥으로 나가기 - 씬 이름 지정] 용도
+    // Unity Inspector의 버튼에서 이 함수를 고르고, 이동하고 싶은 씬 이름(문자열, 예: "MainMenu")을 적어주세요.
+    public void GoToScene(string sceneName)
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(sceneName);
+    }
+
+    // [게임 완전히 끄기 / 나가기 버튼] 용도
+    public void QuitGame()
+    {
+        Debug.Log("앱을 종료합니다.");
+        Application.Quit();
+    }
+
+    // [음악 켜기/끄기 토글] 용도
+    public void ToggleMusic()
+    {
+        // 배경음, 효과음 등 전체 시스템 사운드를 켜고 끕니다.
+        AudioListener.pause = !AudioListener.pause;
+        
+        // 버튼 이미지가 들어있다면 ON/OFF 상태에 따라 교체
+        if (musicButtonImage != null && musicOnSprite != null && musicOffSprite != null)
+        {
+            musicButtonImage.sprite = AudioListener.pause ? musicOffSprite : musicOnSprite;
+        }
+    }
+
+    // [음악 볼륨 슬라이더] 조절 용도
+    public void SetVolume(float volume)
+    {
+        AudioListener.volume = volume;
+    }
+
+    // [승리 / 패배 UI 패널 띄우기 기능]
+    public GameObject victoryPanel;
+    public GameObject losePanel;
+    public Text victoryCoinText;
+    public Text loseCoinText;
+
+    public void ShowVictoryPanel()
+    {
+        if (victoryPanel != null)
+        {
+            victoryPanel.SetActive(true);
+            if (victoryCoinText != null) StartCoroutine(CountUpCoins(victoryCoinText, coinCount));
+        }
+    }
+
+    public void ShowLosePanel()
+    {
+        if (losePanel != null)
+        {
+            losePanel.SetActive(true);
+            if (loseCoinText != null) StartCoroutine(CountUpCoins(loseCoinText, coinCount));
+        }
+    }
+
+    // [숫자 라라락 올라가는 애니메이션 연출]
+    System.Collections.IEnumerator CountUpCoins(Text targetText, int targetScore)
+    {
+        targetText.text = " x 0"; // 연출 전 0으로 초기화
+        yield return new WaitForSecondsRealtime(1.5f); // 💡 결과창 뜨고 1.5초 대기 (너무 바로 올라가서 정신없는 현상 방지)
+
+        float duration = 1.0f; // 1초 동안 숫자 올라감
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            int currentScore = Mathf.FloorToInt(Mathf.Lerp(0, targetScore, elapsed / duration));
+            targetText.text = " x " + currentScore.ToString();
+            yield return null;
+        }
+        targetText.text = " x " + targetScore.ToString();
     }
 }

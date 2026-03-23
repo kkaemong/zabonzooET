@@ -40,8 +40,8 @@ public class spawner : MonoBehaviour
 
     void Update()
     {
-        // 게임이 멈춰있으면 장애물 생성 원천 차단
-        if (GameManager.IsGamePaused) return;
+        // 게임이 멈춰있거나 강제 종료상태(클리어/패배)면 장애물 생성 원천 차단
+        if (GameManager.IsGamePaused || GameManager.isGameOver) return;
 
         // 💡 장애물 스포너일 때만 코인 타이머를 눈치 봄 (건물 스포너는 간섭받지 않음!)
         if (isObstacle)

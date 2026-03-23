@@ -1,0 +1,1196 @@
+fileFormatVersion: 2
+guid: 068bc8c2e1f736c4a962c82a486694d8
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1135112129639667522
+    second: lose_0
+  - first:
+      213: 8875718442503512415
+    second: lose_1
+  - first:
+      213: -8390199439895473014
+    second: lose_2
+  - first:
+      213: 8923441785786600931
+    second: lose_3
+  - first:
+      213: 4100222492586098704
+    second: lose_4
+  - first:
+      213: 2434553889130296176
+    second: lose_5
+  - first:
+      213: -6979351457777605792
+    second: lose_6
+  - first:
+      213: 7542473160524251783
+    second: lose_7
+  - first:
+      213: -5572762895134492091
+    second: lose_8
+  - first:
+      213: -7620801386827941842
+    second: lose_9
+  - first:
+      213: -4700250858834468698
+    second: lose_10
+  - first:
+      213: 6728475138007063911
+    second: lose_11
+  - first:
+      213: 2835420329292549436
+    second: lose_12
+  - first:
+      213: 6074374991209776550
+    second: lose_13
+  - first:
+      213: -2337213088527611506
+    second: lose_14
+  - first:
+      213: -8204613214873697354
+    second: lose_15
+  - first:
+      213: 7667677363404506038
+    second: lose_16
+  - first:
+      213: -7045419582270598873
+    second: lose_17
+  - first:
+      213: -8162486479463228325
+    second: lose_18
+  - first:
+      213: -8174567399213377204
+    second: lose_19
+  - first:
+      213: 503158842160514809
+    second: lose_20
+  - first:
+      213: 6608516885590060013
+    second: lose_21
+  - first:
+      213: -1147922255468054611
+    second: lose_22
+  - first:
+      213: -803587217758758799
+    second: lose_23
+  - first:
+      213: 7779826495149226677
+    second: lose_24
+  - first:
+      213: -2831690323717753341
+    second: lose_25
+  - first:
+      213: -4034740048452308545
+    second: lose_26
+  - first:
+      213: -4652128453581962537
+    second: lose_27
+  - first:
+      213: 2622344549221805667
+    second: lose_28
+  - first:
+      213: 4854864384162769856
+    second: lose_29
+  - first:
+      213: 5623246311727859581
+    second: lose_30
+  - first:
+      213: -8372449557854209871
+    second: lose_31
+  - first:
+      213: -7766909852146367306
+    second: lose_32
+  - first:
+      213: -6024539253022390204
+    second: lose_33
+  - first:
+      213: 5116868627203320029
+    second: lose_34
+  - first:
+      213: 6472118967981612130
+    second: lose_35
+  - first:
+      213: 2817620471562235969
+    second: lose_36
+  - first:
+      213: 2285991447075269587
+    second: lose_37
+  - first:
+      213: 7749893981152519704
+    second: lose_38
+  - first:
+      213: -8894267920522521880
+    second: lose_39
+  - first:
+      213: -4943486040518322786
+    second: lose_40
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: lose_0
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 390
+        width: 53
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 247d863c77ab0cf00800000000000000
+      internalID: 1135112129639667522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_1
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 423
+        width: 48
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f512ecbd5e2ec2b70800000000000000
+      internalID: 8875718442503512415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_2
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 423
+        width: 47
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8459560016009b80800000000000000
+      internalID: -8390199439895473014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_3
+      rect:
+        serializedVersion: 2
+        x: 962
+        y: 460
+        width: 112
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ed00b7960f66db70800000000000000
+      internalID: 8923441785786600931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_4
+      rect:
+        serializedVersion: 2
+        x: 1046
+        y: 423
+        width: 45
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01049a212aae6e830800000000000000
+      internalID: 4100222492586098704
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_5
+      rect:
+        serializedVersion: 2
+        x: 1106
+        y: 449
+        width: 174
+        height: 158
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07338240dd549c120800000000000000
+      internalID: 2434553889130296176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_6
+      rect:
+        serializedVersion: 2
+        x: 967
+        y: 423
+        width: 24
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 063af8cc3dc542f90800000000000000
+      internalID: -6979351457777605792
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_7
+      rect:
+        serializedVersion: 2
+        x: 1138
+        y: 407
+        width: 22
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78247f4b06f3ca860800000000000000
+      internalID: 7542473160524251783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_8
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 248
+        width: 495
+        height: 159
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54af7023ca199a2b0800000000000000
+      internalID: -5572762895134492091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_9
+      rect:
+        serializedVersion: 2
+        x: 659
+        y: 248
+        width: 490
+        height: 159
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e28f052f3897d3690800000000000000
+      internalID: -7620801386827941842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_10
+      rect:
+        serializedVersion: 2
+        x: 1160
+        y: 375
+        width: 43
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a062f33fba55ceb0800000000000000
+      internalID: -4700250858834468698
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_11
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 305
+        width: 48
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76d55f03d78506d50800000000000000
+      internalID: 6728475138007063911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_12
+      rect:
+        serializedVersion: 2
+        x: 1201
+        y: 305
+        width: 48
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3d476c44cf695720800000000000000
+      internalID: 2835420329292549436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_13
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 252
+        width: 25
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a5439ffed38c4450800000000000000
+      internalID: 6074374991209776550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_14
+      rect:
+        serializedVersion: 2
+        x: 1147
+        y: 209
+        width: 68
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e890bed341d809fd0800000000000000
+      internalID: -2337213088527611506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_15
+      rect:
+        serializedVersion: 2
+        x: 1176
+        y: 274
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b34aff30cb532e80800000000000000
+      internalID: -8204613214873697354
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_16
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 199
+        width: 47
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b3870adfef096a60800000000000000
+      internalID: 7667677363404506038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_17
+      rect:
+        serializedVersion: 2
+        x: 221
+        y: 192
+        width: 52
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7211e29d734a93e90800000000000000
+      internalID: -7045419582270598873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_18
+      rect:
+        serializedVersion: 2
+        x: 983
+        y: 220
+        width: 13
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5c5aab2bc509be80800000000000000
+      internalID: -8162486479463228325
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_19
+      rect:
+        serializedVersion: 2
+        x: 1020
+        y: 186
+        width: 51
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c49d569d24a1e8e80800000000000000
+      internalID: -8174567399213377204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_20
+      rect:
+        serializedVersion: 2
+        x: 1113
+        y: 215
+        width: 15
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f603941d449bf600800000000000000
+      internalID: 503158842160514809
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_21
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 82
+        width: 109
+        height: 117
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: deb24c1181b26bb50800000000000000
+      internalID: 6608516885590060013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_22
+      rect:
+        serializedVersion: 2
+        x: 147
+        y: 113
+        width: 58
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da7bf056ac2c110f0800000000000000
+      internalID: -1147922255468054611
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_23
+      rect:
+        serializedVersion: 2
+        x: 270
+        y: 119
+        width: 58
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 178d17bdea519d4f0800000000000000
+      internalID: -803587217758758799
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_24
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 119
+        width: 59
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5baba816afe77fb60800000000000000
+      internalID: 7779826495149226677
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_25
+      rect:
+        serializedVersion: 2
+        x: 387
+        y: 119
+        width: 58
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30674ec47a0d3b8d0800000000000000
+      internalID: -2831690323717753341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_26
+      rect:
+        serializedVersion: 2
+        x: 445
+        y: 119
+        width: 48
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb135fa8d49b108c0800000000000000
+      internalID: -4034740048452308545
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_27
+      rect:
+        serializedVersion: 2
+        x: 493
+        y: 119
+        width: 54
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d282cac1d1507fb0800000000000000
+      internalID: -4652128453581962537
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_28
+      rect:
+        serializedVersion: 2
+        x: 547
+        y: 119
+        width: 58
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 36e2c074970746420800000000000000
+      internalID: 2622344549221805667
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_29
+      rect:
+        serializedVersion: 2
+        x: 606
+        y: 119
+        width: 101
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0cba7ba6f61ff5340800000000000000
+      internalID: 4854864384162769856
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_30
+      rect:
+        serializedVersion: 2
+        x: 707
+        y: 119
+        width: 58
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d77801f2ab8c90e40800000000000000
+      internalID: 5623246311727859581
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_31
+      rect:
+        serializedVersion: 2
+        x: 765
+        y: 119
+        width: 54
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b8393c7c751fcb80800000000000000
+      internalID: -8372449557854209871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_32
+      rect:
+        serializedVersion: 2
+        x: 856
+        y: 119
+        width: 59
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b4855ce3a4663490800000000000000
+      internalID: -7766909852146367306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_33
+      rect:
+        serializedVersion: 2
+        x: 915
+        y: 119
+        width: 21
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44804300879846ca0800000000000000
+      internalID: -6024539253022390204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_34
+      rect:
+        serializedVersion: 2
+        x: 936
+        y: 119
+        width: 53
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd86bc6f7e4c20740800000000000000
+      internalID: 5116868627203320029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_35
+      rect:
+        serializedVersion: 2
+        x: 990
+        y: 119
+        width: 20
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26c9c9e19e591d950800000000000000
+      internalID: 6472118967981612130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_36
+      rect:
+        serializedVersion: 2
+        x: 1075
+        y: 113
+        width: 58
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 140f557f3e23a1720800000000000000
+      internalID: 2817620471562235969
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_37
+      rect:
+        serializedVersion: 2
+        x: 1175
+        y: 81
+        width: 105
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3dba0820c1979bf10800000000000000
+      internalID: 2285991447075269587
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_38
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 33
+        width: 33
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 816a881e3872d8b60800000000000000
+      internalID: 7749893981152519704
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_39
+      rect:
+        serializedVersion: 2
+        x: 189
+        y: 29
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e25a1c3376319480800000000000000
+      internalID: -8894267920522521880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lose_40
+      rect:
+        serializedVersion: 2
+        x: 1138
+        y: 17
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e959dca43a5356bb0800000000000000
+      internalID: -4943486040518322786
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      lose_0: 1135112129639667522
+      lose_1: 8875718442503512415
+      lose_10: -4700250858834468698
+      lose_11: 6728475138007063911
+      lose_12: 2835420329292549436
+      lose_13: 6074374991209776550
+      lose_14: -2337213088527611506
+      lose_15: -8204613214873697354
+      lose_16: 7667677363404506038
+      lose_17: -7045419582270598873
+      lose_18: -8162486479463228325
+      lose_19: -8174567399213377204
+      lose_2: -8390199439895473014
+      lose_20: 503158842160514809
+      lose_21: 6608516885590060013
+      lose_22: -1147922255468054611
+      lose_23: -803587217758758799
+      lose_24: 7779826495149226677
+      lose_25: -2831690323717753341
+      lose_26: -4034740048452308545
+      lose_27: -4652128453581962537
+      lose_28: 2622344549221805667
+      lose_29: 4854864384162769856
+      lose_3: 8923441785786600931
+      lose_30: 5623246311727859581
+      lose_31: -8372449557854209871
+      lose_32: -7766909852146367306
+      lose_33: -6024539253022390204
+      lose_34: 5116868627203320029
+      lose_35: 6472118967981612130
+      lose_36: 2817620471562235969
+      lose_37: 2285991447075269587
+      lose_38: 7749893981152519704
+      lose_39: -8894267920522521880
+      lose_4: 4100222492586098704
+      lose_40: -4943486040518322786
+      lose_5: 2434553889130296176
+      lose_6: -6979351457777605792
+      lose_7: 7542473160524251783
+      lose_8: -5572762895134492091
+      lose_9: -7620801386827941842
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

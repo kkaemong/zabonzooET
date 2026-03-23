@@ -283,6 +283,12 @@ public class player : MonoBehaviour
         GameManager.globalSpeed = 0f;
         GameManager.isGameOver = true; // 게임 오버 선언 (속도 증가 영구 중단)
 
+        GameManager gm = FindObjectOfType<GameManager>();
+        if (gm != null)
+        {
+            gm.ShowLosePanel(); // 게임 오버 UI 띄우기
+        }
+
         // 💡 4. 화면 크기가 멈췄음에도 스포너가 계속 작동해 물체가 겹치는 현상 방지
         GameObject[] allObjects = FindObjectsOfType<GameObject>();
         foreach (GameObject obj in allObjects)
