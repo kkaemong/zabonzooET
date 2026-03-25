@@ -6,11 +6,20 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/1980.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
+    path: Assets/Scenes/Lobby.unity
+    guid: 58843f64983111f40aee672f0db7a52d
   - enabled: 1
-    path: Assets/Scenes/Mainpage.unity
-    guid: 6fbccc93520a1f44ba8787d944037b05
+    path: Assets/Scenes/StageSelect.unity
+    guid: d2609c7b2fc1ec94d8fed67e21917e22
+  - enabled: 1
+    path: Assets/Scenes/1980s.unity
+    guid: 4de5728f48efb4a478f8434efdce2e99
+  - enabled: 1
+    path: Assets/Scenes/2000s.unity
+    guid: 0d8e17cc91b2faf4ba63e070ff29ec81
+  - enabled: 1
+    path: Assets/Scenes/2020s.unity
+    guid: de58a5870153e824d87f2878434b9ec3
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

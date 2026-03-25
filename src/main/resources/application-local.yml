@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:amagetdon}
+    username: ${POSTGRES_USER:A507}
+    password: ${POSTGRES_PASSWORD:change_me}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+logging:
+  level:
+    org.hibernate.SQL: debug

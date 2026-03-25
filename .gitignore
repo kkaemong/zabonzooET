@@ -78,3 +78,13 @@ crashlytics-build.properties
 /.gemini/
 mcp_logs/
 ai_logs/
+/.agents/
+/.codex/
+unity_compile_check.log
+unity_be_check.log
+stage_select_integration_compile.log
+
+# Backend / Infra local secrets
+.env
+infra/.env.prod
+infra/ssl.conf

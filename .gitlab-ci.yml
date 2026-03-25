@@ -1,0 +1,65 @@
+stages:
+  - validate
+  - deploy
+
+validate_infra:
+  stage: validate
+  image: alpine:latest
+  rules:
+    - changes:
+        - infra/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - |
+      if command -v apk >/dev/null 2>&1; then
+        apk add --no-cache bash
+      fi
+    - command -v bash >/dev/null 2>&1 || { echo "bash is required but not installed"; exit 1; }
+    - bash -n infra/scripts/deploy.sh
+    - bash -n infra/scripts/setup-certbot.sh
+    - bash -n infra/scripts/day0-set-gitlab-vars.sh
+    - test -f infra/docker-compose.prod.yml
+    - test -f infra/nginx.conf
+    - test -f infra/ssl.conf.template
+
+jira_transition_on_merge:
+  stage: validate
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "infra/develop" && $CI_COMMIT_TITLE =~ /^Merge branch.*/'
+    - when: never
+  allow_failure: true
+  script:
+    - sh infra/scripts/jira-transition-on-merge.sh
+
+deploy_prod:
+  stage: deploy
+  image: alpine:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "infra/develop" && $DEPLOY_ENABLED == "true"'
+    - when: never
+  before_script:
+    - |
+      if ! command -v ssh-agent >/dev/null 2>&1; then
+        if command -v apk >/dev/null 2>&1; then
+          apk add --no-cache openssh-client
+        elif command -v apt-get >/dev/null 2>&1; then
+          apt-get update && apt-get install -y openssh-client
+        else
+          echo "ssh-agent is required but no supported package manager is available"
+          exit 1
+        fi
+      fi
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $EC2_IP >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - |
+      DEPLOY_BASE_DIR="${DEPLOY_REPO_DIR:-/home/$EC2_USER/S14P21A507}"
+      tar --exclude='infra/.env.prod' --exclude='infra/ssl.conf' -czf /tmp/monet-infra.tgz infra
+      scp /tmp/monet-infra.tgz "$EC2_USER@$EC2_IP:/tmp/monet-infra.tgz"
+      rm -f /tmp/monet-infra.tgz
+      ssh "$EC2_USER@$EC2_IP" "bash -lc 'set -euo pipefail; mkdir -p \"$DEPLOY_BASE_DIR\"; tar -xzf /tmp/monet-infra.tgz -C \"$DEPLOY_BASE_DIR\"; rm -f /tmp/monet-infra.tgz; cd \"$DEPLOY_BASE_DIR\"; ./infra/scripts/deploy.sh \"$DEPLOY_BACKEND_IMAGE\" \"$DEPLOY_FRONTEND_IMAGE\"'"

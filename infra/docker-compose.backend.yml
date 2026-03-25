@@ -1,0 +1,69 @@
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: amagetdon-nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.backend.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - amagetdon-net
+
+  backend:
+    image: ${BACKEND_IMAGE:?BACKEND_IMAGE is required}
+    container_name: amagetdon-backend
+    restart: always
+    env_file:
+      - .env.backend.prod
+    depends_on:
+      local-postgres:
+        condition: service_healthy
+      local-redis:
+        condition: service_healthy
+    networks:
+      - amagetdon-net
+
+  local-postgres:
+    image: postgres:17-alpine
+    container_name: local-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-amagetdon}
+      POSTGRES_USER: ${POSTGRES_USER:-A507}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      TZ: Asia/Seoul
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-A507} -d ${POSTGRES_DB:-amagetdon}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - amagetdon-net
+
+  local-redis:
+    image: redis:7-alpine
+    container_name: local-redis
+    restart: always
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - amagetdon-net
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  amagetdon-net:
+    driver: bridge

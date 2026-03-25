@@ -51,6 +51,31 @@ public class player : MonoBehaviour
     {
         if (isDead) return;
 
+        // 💡 달리기 발소리 재생 (고정된 효과음 1개 반복 & 배속)
+        bool isRunning = (jumpCount == 0 && !GameManager.isGameOver && !GameManager.IsGamePaused && GameManager.globalSpeed > 0f);
+        
+        if (GameManager.Instance != null && GameManager.Instance.runSource != null && GameManager.Instance.runSound != null)
+        {
+            if (isRunning)
+            {
+                if (!GameManager.Instance.runSource.isPlaying)
+                {
+                    // 상태가 변할때만 사운드 정보 세팅 후 시작
+                    GameManager.Instance.runSource.clip = GameManager.Instance.runSound;
+                    GameManager.Instance.runSource.volume = GameManager.Instance.runVolume;
+                    GameManager.Instance.runSource.Play();
+                }
+                
+                // 달리는 속도에 맞춰 소리의 빠르기(Pitch) 즉각 조절 (기본속도 5f 기준)
+                float speedRatio = GameManager.globalSpeed / 5f;
+                GameManager.Instance.runSource.pitch = speedRatio * GameManager.Instance.runSoundSpeedMultiplier;
+            }
+            else
+            {
+                if (GameManager.Instance.runSource.isPlaying) GameManager.Instance.runSource.Stop();
+            }
+        }
+
         // 💡 게임 정지 중(퀴즈 등)일 때는 점프 입력 무시
         if (Input.GetKeyDown(KeyCode.Space) && !GameManager.IsGamePaused)
         {
@@ -85,6 +110,11 @@ public class player : MonoBehaviour
     void Jump()
     {
         if (isDead) return;
+
+        if (GameManager.Instance != null && GameManager.Instance.jumpSound != null)
+        {
+            GameManager.Instance.PlaySFX(GameManager.Instance.jumpSound, GameManager.Instance.jumpVolume);
+        }
 
         if (rb != null)
         {
@@ -150,6 +180,11 @@ public class player : MonoBehaviour
     public void TakeDamage(int damage)
     {
         if (isDead || isInvincible) return; 
+
+        if (GameManager.Instance != null && GameManager.Instance.hitSound != null)
+        {
+            GameManager.Instance.PlaySFX(GameManager.Instance.hitSound, GameManager.Instance.hitVolume);
+        }
 
         health -= damage;
         Debug.Log("Health: " + health);

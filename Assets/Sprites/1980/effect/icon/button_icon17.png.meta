@@ -5,7 +5,7 @@ AssetOrigin:
   productId: 37251
   packageName: 5000 Flat Buttons Pack
   packageVersion: 1.0
-  assetPath: Assets/Sprites/effect/icon/button_icon17.png
+  assetPath: Assets/Sprites/1980/effect/icon/button_icon17.png
   uploadId: 69048
 TextureImporter:
   internalIDToNameTable: []
@@ -89,19 +89,6 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: Standalone
-    maxTextureSize: 1024
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
     maxTextureSize: 1024
     resizeAlgorithm: 0
     textureFormat: -1

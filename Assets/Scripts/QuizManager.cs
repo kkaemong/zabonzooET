@@ -115,6 +115,12 @@ public class QuizManager : MonoBehaviour
         if (gm == null) gm = FindObjectOfType<GameManager>();
         if (gm != null) gm.PauseGame(); 
 
+        // 군인과 부딪혀 퀴즈 팝업이 뜨는 순간 소리 재생
+        if (GameManager.Instance != null && GameManager.Instance.sfxSource != null && GameManager.Instance.quizPopSound != null)
+        {
+            GameManager.Instance.sfxSource.PlayOneShot(GameManager.Instance.quizPopSound, GameManager.Instance.quizPopVolume);
+        }
+
         if (quizDatabase == null || quizDatabase.Count == 0) return;
 
         // 랜덤 문제 출제
@@ -179,6 +185,15 @@ public class QuizManager : MonoBehaviour
 
     System.Collections.IEnumerator ShowExplanationCoroutine(bool isCorrect)
     {
+        // 💡 정답/오답 판정 사운드 즉시 재생
+        if (GameManager.Instance != null)
+        {
+            if (isCorrect && GameManager.Instance.quizCorrectSound != null)
+                GameManager.Instance.PlaySFX(GameManager.Instance.quizCorrectSound, GameManager.Instance.quizCorrectVolume);
+            else if (!isCorrect && GameManager.Instance.quizWrongSound != null)
+                GameManager.Instance.PlaySFX(GameManager.Instance.quizWrongSound, GameManager.Instance.quizWrongVolume);
+        }
+
         // 💡 1. 텍스트를 해설 모드로 변경
         string resultWord = isCorrect ? "<color=#00FF00>정답입니다!</color>" : "<color=#FF0000>오답입니다!</color>";
         SetText(questionTextObj, $"{resultWord}\n\n<size=50>{currentQuiz.explanation}</size>");

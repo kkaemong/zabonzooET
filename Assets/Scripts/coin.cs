@@ -13,6 +13,10 @@ public class coin : MonoBehaviour
             GameManager gm = FindObjectOfType<GameManager>();
             if (gm != null)
             {
+                if (GameManager.Instance != null && GameManager.Instance.coinSound != null)
+                {
+                    GameManager.Instance.PlaySFX(GameManager.Instance.coinSound, GameManager.Instance.coinVolume);
+                }
                 gm.AddCoin(1);
             }
             
