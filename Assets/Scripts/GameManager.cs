@@ -538,6 +538,27 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
+    // [금융상품 선택하기 버튼] 용도 (이겼을 때 누르는 버튼)
+    public void SelectFinanceProduct()
+    {
+        Debug.Log("<color=yellow>[GameManager]</color> 금융상품 선택하기 버튼 클릭!");
+        
+        // 1. 여기서 게임이 완전히 끝난 것이므로 최종 코인을 전송할 수도 있고
+        // APIManager.Instance.SendGameResult(coinCount, SceneManager.GetActiveScene().name);
+
+        // 2. 백엔드에서 금융상품 선택지를 가져옵니다.
+        if (APIManager.Instance != null)
+        {
+            APIManager.Instance.GetFinanceOptions();
+        }
+        else
+        {
+            Debug.LogError("APIManager가 없습니다! 씬에 추가해주세요.");
+        }
+        
+        // TODO: UI 패널을 띄워서(financePanel 등) 선택지를 보여주는 코드를 추가해야 합니다.
+    }
+
     // [설정 버튼] 및 [일시정지] 용도 
     public void TogglePanelAndPause(GameObject panel)
     {

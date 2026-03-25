@@ -1,13 +1,10 @@
 fileFormatVersion: 2
-guid: fb5963c9db6eeef41ac0c76f26affcec
+guid: f860bd44cdb363b4aa78e3255c41d0e3
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7986151226533192315
-    second: disturb1_0
-  - first:
-      213: -2175151719383925084
-    second: disturb1_1
+      213: -8586693324203152019
+    second: select_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -49,11 +46,11 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
-  spritePivot: {x: 1, y: 0.5}
+  spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
@@ -116,45 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: disturb1_0
+      name: select_0
       rect:
         serializedVersion: 2
-        x: 37
-        y: 38
-        width: 450
-        height: 262
+        x: 80
+        y: 192
+        width: 905
+        height: 398
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b72af046a3284de60800000000000000
-      internalID: 7986151226533192315
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: disturb1_1
-      rect:
-        serializedVersion: 2
-        x: 240
-        y: 24
-        width: 57
-        height: 48
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 4ae7a81290f40d1e0800000000000000
-      internalID: -2175151719383925084
+      spriteID: d6d27a77aefe5d880800000000000000
+      internalID: -8586693324203152019
       vertices: []
       indices: 
       edges: []
@@ -163,8 +138,8 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
-    internalID: 1537655665
+    spriteID: 
+    internalID: 0
     vertices: []
     indices: 
     edges: []
@@ -173,8 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      disturb1_0: 7986151226533192315
-      disturb1_1: -2175151719383925084
+      select_0: -8586693324203152019
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

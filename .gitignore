@@ -83,6 +83,7 @@ ai_logs/
 unity_compile_check.log
 unity_be_check.log
 stage_select_integration_compile.log
+real_frontend_merge_compile.log
 
 # Backend / Infra local secrets
 .env
