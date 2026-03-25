@@ -92,7 +92,7 @@ public class StageSelectManager : MonoBehaviour
             return;
         }
 
-        if (!UserDataManager.Instance.IsStageUnlocked(stageInfo.StageId))
+        if (!IsStageUnlocked(stageInfo))
         {
             Debug.LogWarning($"StageSelectManager: Stage '{stageInfo.StageId}' is locked.", this);
             return;
@@ -110,6 +110,8 @@ public class StageSelectManager : MonoBehaviour
 
     private void InitializeCards()
     {
+        bool hasAnyUnlockedStage = false;
+
         for (int i = 0; i < stageCards.Count; i++)
         {
             StageCardUI card = stageCards[i];
@@ -122,10 +124,31 @@ public class StageSelectManager : MonoBehaviour
             if (card.StageInfo != null)
             {
                 UserDataManager.Instance.EnsureStageRegistered(card.StageInfo);
+                if (card.StageInfo.DefaultUnlocked && !UserDataManager.Instance.IsStageUnlocked(card.StageInfo.StageId))
+                {
+                    UserDataManager.Instance.UnlockStage(card.StageInfo.StageId);
+                }
+
+                hasAnyUnlockedStage |= UserDataManager.Instance.IsStageUnlocked(card.StageInfo.StageId);
             }
 
             card.Initialize(this);
             card.RefreshContent();
+        }
+
+        if (!hasAnyUnlockedStage)
+        {
+            for (int i = 0; i < stageCards.Count; i++)
+            {
+                StageCardUI card = stageCards[i];
+                if (card?.StageInfo == null)
+                {
+                    continue;
+                }
+
+                UserDataManager.Instance.UnlockStage(card.StageInfo.StageId);
+                card.RefreshContent();
+            }
         }
     }
 
@@ -194,7 +217,7 @@ public class StageSelectManager : MonoBehaviour
         for (int i = 0; i < stageCards.Count; i++)
         {
             StageCardUI card = stageCards[i];
-            if (card != null && card.StageInfo != null && UserDataManager.Instance.IsStageUnlocked(card.StageInfo.StageId))
+            if (card != null && card.StageInfo != null && IsStageUnlocked(card.StageInfo))
             {
                 return i;
             }
@@ -217,5 +240,16 @@ public class StageSelectManager : MonoBehaviour
     private bool IsValidIndex(int index)
     {
         return index >= 0 && index < stageCards.Count;
+    }
+
+    private static bool IsStageUnlocked(StageInfo stageInfo)
+    {
+        if (stageInfo == null)
+        {
+            return false;
+        }
+
+        return stageInfo.DefaultUnlocked
+            || (UserDataManager.Instance != null && UserDataManager.Instance.IsStageUnlocked(stageInfo.StageId));
     }
 }

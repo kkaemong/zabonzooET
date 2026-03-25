@@ -110,6 +110,8 @@ public sealed class LobbyAuthApi
                 coin,
                 coin,
                 hp,
+                userStat.baseSpeed,
+                userStat.boosterBonusSec,
                 "ERA_1980"));
             yield break;
         }
@@ -152,6 +154,54 @@ public sealed class LobbyAuthApi
             }
 
             onSuccess?.Invoke(new GameShopData(items));
+            yield break;
+        }
+
+        onError?.Invoke(CreateError(request));
+    }
+
+    public IEnumerator GetInventory(Action<GameInventoryData> onSuccess, Action<ApiError> onError)
+    {
+        ApiError userError = null;
+        yield return EnsureCurrentUser(error => userError = error);
+        if (userError != null)
+        {
+            onError?.Invoke(userError);
+            yield break;
+        }
+
+        using UnityWebRequest request = BuildRequest($"/api/game/inventory?userId={_currentUserId}", UnityWebRequest.kHttpVerbGET, null);
+        if (!TrySend(request, onError, out UnityWebRequestAsyncOperation operation))
+        {
+            yield break;
+        }
+
+        yield return operation;
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            MarkSessionAuthenticated();
+            GameInventoryBody inventory = TryParse<GameInventoryBody>(request.downloadHandler.text);
+            if (inventory == null || inventory.items == null)
+            {
+                onSuccess?.Invoke(new GameInventoryData(Array.Empty<InventoryItemData>()));
+                yield break;
+            }
+
+            InventoryItemData[] items = new InventoryItemData[inventory.items.Length];
+            for (int index = 0; index < inventory.items.Length; index++)
+            {
+                InventoryItemBody item = inventory.items[index];
+                items[index] = item == null
+                    ? null
+                    : new InventoryItemData(
+                        item.itemId,
+                        item.itemName,
+                        item.quantity,
+                        item.description);
+            }
+
+            onSuccess?.Invoke(new GameInventoryData(items));
             yield break;
         }
 
@@ -294,7 +344,16 @@ public sealed class LobbyAuthApi
 
     public sealed class GameProfileData
     {
-        public GameProfileData(long userId, string loginId, string nickname, int coin, int totalCoin, int hp, string currentStage)
+        public GameProfileData(
+            long userId,
+            string loginId,
+            string nickname,
+            int coin,
+            int totalCoin,
+            int hp,
+            float baseSpeed,
+            int boosterBonusSec,
+            string currentStage)
         {
             UserId = userId;
             LoginId = loginId;
@@ -302,6 +361,8 @@ public sealed class LobbyAuthApi
             Coin = coin;
             TotalCoin = totalCoin;
             Hp = hp;
+            BaseSpeed = baseSpeed;
+            BoosterBonusSec = boosterBonusSec;
             CurrentStage = currentStage;
         }
 
@@ -317,7 +378,40 @@ public sealed class LobbyAuthApi
 
         public int Hp { get; }
 
+        public float BaseSpeed { get; }
+
+        public int BoosterBonusSec { get; }
+
         public string CurrentStage { get; }
+    }
+
+    public sealed class GameInventoryData
+    {
+        public GameInventoryData(InventoryItemData[] items)
+        {
+            Items = items ?? Array.Empty<InventoryItemData>();
+        }
+
+        public InventoryItemData[] Items { get; }
+    }
+
+    public sealed class InventoryItemData
+    {
+        public InventoryItemData(long itemId, string itemName, int quantity, string description)
+        {
+            ItemId = itemId;
+            ItemName = itemName;
+            Quantity = quantity;
+            Description = description;
+        }
+
+        public long ItemId { get; }
+
+        public string ItemName { get; }
+
+        public int Quantity { get; }
+
+        public string Description { get; }
     }
 
     public sealed class GameShopData
@@ -457,6 +551,12 @@ public sealed class LobbyAuthApi
     }
 
     [Serializable]
+    private sealed class GameInventoryBody
+    {
+        public InventoryItemBody[] items;
+    }
+
+    [Serializable]
     private sealed class ShopItemBody
     {
         public long itemId;
@@ -464,6 +564,15 @@ public sealed class LobbyAuthApi
         public int price;
         public string description;
         public bool purchasable;
+    }
+
+    [Serializable]
+    private sealed class InventoryItemBody
+    {
+        public long itemId;
+        public string itemName;
+        public int quantity;
+        public string description;
     }
 
     [Serializable]

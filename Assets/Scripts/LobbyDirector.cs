@@ -89,10 +89,14 @@ public class LobbyDirector : MonoBehaviour
     private Text _shopHintText;
     private readonly Dictionary<GaragePart, GarageUpgradeCard> _garageCards = new Dictionary<GaragePart, GarageUpgradeCard>();
     private readonly Dictionary<string, ShopItemCard> _shopCards = new Dictionary<string, ShopItemCard>(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, int> _ownedItemCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
     private GarageUpgradeState _garageState = GarageUpgradeState.CreateDefault(3000);
     private string _currentLoginId = string.Empty;
     private string _currentNickname = string.Empty;
     private long _currentUserId = -1;
+    private int _currentBaseHp = 100;
+    private float _currentBaseSpeed = 2f;
+    private int _currentBoosterBonusSec;
 
     private enum AuthMode
     {
@@ -122,6 +126,7 @@ public class LobbyDirector : MonoBehaviour
         public Text SubtitleText;
         public Text DescriptionText;
         public Text PriceText;
+        public Text OwnedCountText;
         public Button BuyButton;
         public Text BuyButtonLabel;
         public Image BuyButtonImage;
@@ -132,8 +137,8 @@ public class LobbyDirector : MonoBehaviour
     {
         public int coinBalance = -1;
         public int engineLevel = 1;
-        public int wheelLevel = 3;
-        public int armorLevel = 2;
+        public int wheelLevel = 1;
+        public int armorLevel = 1;
         public int magnetLevel = 1;
 
         public static GarageUpgradeState CreateDefault(int coinBalance)
@@ -142,8 +147,8 @@ public class LobbyDirector : MonoBehaviour
             {
                 coinBalance = coinBalance,
                 engineLevel = 1,
-                wheelLevel = 3,
-                armorLevel = 2,
+                wheelLevel = 1,
+                armorLevel = 1,
                 magnetLevel = 1,
             };
         }
@@ -250,6 +255,7 @@ public class LobbyDirector : MonoBehaviour
         if (HasAuthenticatedSession())
         {
             StartCoroutine(SyncShopCatalogFlow(true));
+            StartCoroutine(SyncInventoryFlow(true));
         }
 
         StartCoroutine(TransitionScreen(canvasLobby, canvasShop, false));
@@ -507,10 +513,64 @@ public class LobbyDirector : MonoBehaviour
             SubtitleText = FindComponent<Text>(cardRoot, "CardOverlay/SubtitleText"),
             DescriptionText = descriptionText,
             PriceText = FindComponent<Text>(cardRoot, "CardOverlay/PriceChip/PriceText"),
+            OwnedCountText = EnsureOwnedCountText(cardRoot),
             BuyButton = FindComponent<Button>(cardRoot, $"CardOverlay/{buttonName}"),
             BuyButtonLabel = FindComponent<Text>(cardRoot, $"CardOverlay/{buttonName}/Label"),
             BuyButtonImage = FindComponent<Image>(cardRoot, $"CardOverlay/{buttonName}"),
         };
+    }
+
+    private Text EnsureOwnedCountText(Transform cardRoot)
+    {
+        if (cardRoot == null)
+        {
+            return null;
+        }
+
+        Text existing = FindComponent<Text>(cardRoot, "CardOverlay/OwnedCountText");
+        Transform overlay = cardRoot.Find("CardOverlay");
+        if (overlay == null)
+        {
+            return null;
+        }
+
+        Text styleSource = FindComponent<Text>(cardRoot, "CardOverlay/PriceChip/PriceText")
+            ?? FindComponent<Text>(cardRoot, "CardOverlay/Tag/Label")
+            ?? FindComponent<Text>(cardRoot, "CardOverlay/SubtitleText");
+
+        Text text = existing;
+        if (text == null)
+        {
+            GameObject textGo = new GameObject("OwnedCountText", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+            textGo.transform.SetParent(overlay, false);
+            text = textGo.GetComponent<Text>();
+        }
+
+        RectTransform rect = text.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0.5f, 0f);
+        rect.anchorMax = new Vector2(0.5f, 0f);
+        rect.pivot = new Vector2(0.5f, 0f);
+        rect.anchoredPosition = new Vector2(0f, 166f);
+        rect.sizeDelta = new Vector2(220f, 24f);
+
+        if (styleSource != null)
+        {
+            text.font = styleSource.font;
+            text.fontStyle = styleSource.fontStyle;
+            text.material = styleSource.material;
+            text.fontSize = Mathf.Max(16, styleSource.fontSize - 4);
+        }
+        else
+        {
+            text.fontSize = 16;
+        }
+
+        text.alignment = TextAnchor.MiddleCenter;
+        text.horizontalOverflow = HorizontalWrapMode.Overflow;
+        text.verticalOverflow = VerticalWrapMode.Overflow;
+        text.color = new Color(0.20f, 0.24f, 0.32f, 0.92f);
+        text.text = "보유 x0";
+        return text;
     }
 
     private void BindShopButtons()
@@ -575,12 +635,22 @@ public class LobbyDirector : MonoBehaviour
                 card.PriceText.text = $"{card.Price:N0}";
             }
 
-            if (card.BuyButtonLabel != null)
+            if (card.OwnedCountText != null)
             {
-                card.BuyButtonLabel.text = _shopBusy ? "처리 중" : (card.Purchasable ? "구매" : "잠김");
+                card.OwnedCountText.text = $"보유 x{GetOwnedItemCount(card.ItemKey)}";
             }
 
-            bool canBuy = hasSession && !_shopBusy && card.Purchasable && card.ItemId > 0;
+            bool canAfford = card.Price <= 0 || playerCoins >= card.Price;
+            if (card.BuyButtonLabel != null)
+            {
+                card.BuyButtonLabel.text = _shopBusy
+                    ? "처리 중"
+                    : (!card.Purchasable
+                        ? "잠김"
+                        : (canAfford ? "구매" : "코인 부족"));
+            }
+
+            bool canBuy = hasSession && !_shopBusy && card.Purchasable && card.ItemId > 0 && canAfford;
             if (card.BuyButton != null)
             {
                 card.BuyButton.interactable = canBuy;
@@ -729,6 +799,85 @@ public class LobbyDirector : MonoBehaviour
         }
     }
 
+    private IEnumerator SyncInventoryFlow(bool silent)
+    {
+        if (!HasAuthenticatedSession())
+        {
+            _ownedItemCounts.Clear();
+            RefreshShopUi(silent ? null : "로그인 후 상점을 이용할 수 있습니다.", !silent);
+            yield break;
+        }
+
+        LobbyAuthApi.GameInventoryData inventoryData = null;
+        LobbyAuthApi.ApiError inventoryError = null;
+
+        yield return StartCoroutine(_authApi.GetInventory(
+            data => inventoryData = data,
+            error => inventoryError = error));
+
+        if (inventoryError != null)
+        {
+            if (!silent)
+            {
+                RefreshShopUi(inventoryError.Message, true);
+            }
+
+            yield break;
+        }
+
+        ApplyInventory(inventoryData);
+        RefreshShopUi(silent ? null : "보유 아이템 수량을 동기화했습니다.", false);
+    }
+
+    private void ApplyInventory(LobbyAuthApi.GameInventoryData inventoryData)
+    {
+        _ownedItemCounts.Clear();
+
+        if (inventoryData?.Items == null)
+        {
+            return;
+        }
+
+        foreach (LobbyAuthApi.InventoryItemData item in inventoryData.Items)
+        {
+            if (item == null || string.IsNullOrWhiteSpace(item.ItemName))
+            {
+                continue;
+            }
+
+            string normalizedName = NormalizeShopItemKey(item.ItemName);
+            if (string.IsNullOrWhiteSpace(normalizedName))
+            {
+                continue;
+            }
+
+            _ownedItemCounts[normalizedName] = Mathf.Max(0, item.Quantity);
+        }
+    }
+
+    private int GetOwnedItemCount(string itemKey)
+    {
+        if (string.IsNullOrWhiteSpace(itemKey))
+        {
+            return 0;
+        }
+
+        return _ownedItemCounts.TryGetValue(NormalizeShopItemKey(itemKey), out int count)
+            ? count
+            : 0;
+    }
+
+    private static string NormalizeShopItemKey(string itemKey)
+    {
+        if (string.IsNullOrWhiteSpace(itemKey))
+        {
+            return string.Empty;
+        }
+
+        string normalized = itemKey.Trim().ToLowerInvariant();
+        return normalized == "magnet" ? "coin_magnet" : normalized;
+    }
+
     private bool TryGetShopCard(string backendItemName, out ShopItemCard card)
     {
         card = null;
@@ -737,15 +886,13 @@ public class LobbyDirector : MonoBehaviour
             return false;
         }
 
-        string normalizedName = backendItemName.Trim().ToLowerInvariant();
+        string normalizedName = NormalizeShopItemKey(backendItemName);
         switch (normalizedName)
         {
             case "shield":
             case "booster":
             case "coin_magnet":
                 return _shopCards.TryGetValue(normalizedName, out card);
-            case "magnet":
-                return _shopCards.TryGetValue("coin_magnet", out card);
             default:
                 return _shopCards.TryGetValue(normalizedName, out card);
         }
@@ -816,7 +963,9 @@ public class LobbyDirector : MonoBehaviour
         playerCoins = purchaseData.RemainingCoin;
         UpdateCoinLabels(playerCoins);
         StoreLastKnownCoin(playerCoins);
+        _ownedItemCounts[NormalizeShopItemKey(card.ItemKey)] = GetOwnedItemCount(card.ItemKey) + Mathf.Max(1, purchaseData.PurchasedQuantity);
         RefreshGarageUi();
+        StartCoroutine(SyncInventoryFlow(true));
         RefreshShopUi($"{card.DisplayName} 구매 완료 · 남은 코인 {playerCoins:N0}", false);
     }
 
@@ -1028,6 +1177,7 @@ public class LobbyDirector : MonoBehaviour
             }
 
             card.Root.SetActive(true);
+            int currentLevel = GetGarageLevel(card.Part);
 
             if (card.TitleText != null)
             {
@@ -1036,12 +1186,12 @@ public class LobbyDirector : MonoBehaviour
 
             if (card.DescriptionText != null)
             {
-                card.DescriptionText.text = card.EffectText;
+                card.DescriptionText.text = GetGarageDescription(card.Part, currentLevel);
             }
 
             if (card.LevelText != null)
             {
-                card.LevelText.text = "영구 적용";
+                card.LevelText.text = $"Lv {currentLevel}";
             }
 
             if (card.PriceText != null)
@@ -1049,19 +1199,23 @@ public class LobbyDirector : MonoBehaviour
                 card.PriceText.text = $"{card.RepairCost:N0} 코인";
             }
 
+            bool canRepair = !_garageBusy && hasRepairSession && playerCoins >= card.RepairCost;
+
             if (card.UpgradeButtonLabel != null)
             {
-                card.UpgradeButtonLabel.text = _garageBusy ? "처리 중" : "수리";
+                card.UpgradeButtonLabel.text = _garageBusy
+                    ? "처리 중"
+                    : (playerCoins >= card.RepairCost ? "수리" : "코인 부족");
             }
 
             if (card.UpgradeButton != null)
             {
-                card.UpgradeButton.interactable = !_garageBusy && hasRepairSession;
+                card.UpgradeButton.interactable = canRepair;
             }
 
             if (card.UpgradeButtonImage != null)
             {
-                card.UpgradeButtonImage.color = !_garageBusy && hasRepairSession
+                card.UpgradeButtonImage.color = canRepair
                     ? new Color(0.18f, 0.15f, 0.18f, 0.96f)
                     : new Color(0.27f, 0.27f, 0.30f, 0.86f);
             }
@@ -1185,6 +1339,7 @@ public class LobbyDirector : MonoBehaviour
 
         playerCoins = repairData.RemainingCoin;
         UpdateCoinLabels(playerCoins);
+        SetGarageLevel(card.Part, GetGarageLevel(card.Part) + 1);
         StoreLastKnownCoin(playerCoins);
         RefreshGarageUi($"{card.DisplayName} 수리 완료 · {repairData.Effect}");
     }
@@ -1210,11 +1365,21 @@ public class LobbyDirector : MonoBehaviour
     private void LoadPlayerState(int fallbackCoin)
     {
         playerCoins = fallbackCoin;
+        _garageState = GarageUpgradeState.CreateDefault(fallbackCoin);
+        _garageState.coinBalance = fallbackCoin;
+        ClampGarageState();
         UpdateCoinLabels(playerCoins);
     }
 
     private void PersistPlayerState()
     {
+        if (_garageState == null)
+        {
+            _garageState = GarageUpgradeState.CreateDefault(playerCoins);
+        }
+
+        _garageState.coinBalance = playerCoins;
+        ClampGarageState();
     }
 
     private void RegisterGarageCard(Transform garageRoot, GaragePart part, string displayName, string cardPath, string buttonName)
@@ -1223,44 +1388,126 @@ public class LobbyDirector : MonoBehaviour
 
     private string BuildPlayerStateKey()
     {
-        return string.IsNullOrWhiteSpace(_currentLoginId) ? "unused" : _currentLoginId;
+        string normalizedLoginId = string.IsNullOrWhiteSpace(_currentLoginId)
+            ? GuestPlayerId
+            : _currentLoginId.Trim().ToLowerInvariant();
+
+        return PlayerStatePrefsPrefix + normalizedLoginId;
     }
 
     private void ClampGarageState()
     {
+        if (_garageState == null)
+        {
+            return;
+        }
+
+        _garageState.engineLevel = Mathf.Clamp(_garageState.engineLevel, 1, GarageMaxLevel);
+        _garageState.wheelLevel = Mathf.Clamp(_garageState.wheelLevel, 1, GarageMaxLevel);
+        _garageState.armorLevel = Mathf.Clamp(_garageState.armorLevel, 1, GarageMaxLevel);
+        _garageState.magnetLevel = Mathf.Clamp(_garageState.magnetLevel, 1, GarageMaxLevel);
     }
 
     private bool HasUpgradeableGaragePart()
     {
+        foreach (GaragePart part in GetGarageUpgradeOrder())
+        {
+            if (_garageCards.TryGetValue(part, out GarageUpgradeCard card) && card != null && playerCoins >= card.RepairCost)
+            {
+                return true;
+            }
+        }
+
         return false;
     }
 
     private void TryBulkUpgradeGarage()
     {
+        foreach (GaragePart part in GetGarageUpgradeOrder())
+        {
+            if (_garageCards.TryGetValue(part, out GarageUpgradeCard card) && card != null && playerCoins >= card.RepairCost)
+            {
+                TryUpgradeGaragePart(part);
+                return;
+            }
+        }
     }
 
     private static GaragePart[] GetGarageUpgradeOrder()
     {
-        return Array.Empty<GaragePart>();
+        return new[]
+        {
+            GaragePart.Engine,
+            GaragePart.Wheel,
+            GaragePart.Armor,
+        };
     }
 
     private int GetGarageLevel(GaragePart part)
     {
-        return 1;
+        return part switch
+        {
+            GaragePart.Engine => _garageState != null ? _garageState.engineLevel : 1,
+            GaragePart.Wheel => _garageState != null ? _garageState.wheelLevel : 1,
+            GaragePart.Armor => _garageState != null ? _garageState.armorLevel : 1,
+            GaragePart.Magnet => _garageState != null ? _garageState.magnetLevel : 1,
+            _ => 1,
+        };
     }
 
     private void SetGarageLevel(GaragePart part, int level)
     {
+        if (_garageState == null)
+        {
+            _garageState = GarageUpgradeState.CreateDefault(playerCoins);
+        }
+
+        int clampedLevel = Mathf.Clamp(level, 1, GarageMaxLevel);
+        switch (part)
+        {
+            case GaragePart.Engine:
+                _garageState.engineLevel = clampedLevel;
+                break;
+            case GaragePart.Wheel:
+                _garageState.wheelLevel = clampedLevel;
+                break;
+            case GaragePart.Armor:
+                _garageState.armorLevel = clampedLevel;
+                break;
+            case GaragePart.Magnet:
+                _garageState.magnetLevel = clampedLevel;
+                break;
+        }
     }
 
     private static int GetGarageUpgradePrice(int currentLevel)
     {
-        return currentLevel;
+        return currentLevel switch
+        {
+            <= 1 => 1000,
+            2 => 1500,
+            _ => 2000,
+        };
     }
 
     private static string GetGarageDescription(GaragePart part, int level)
     {
-        return string.Empty;
+        int appliedLevel = Mathf.Max(level - 1, 0);
+
+        return part switch
+        {
+            GaragePart.Engine => appliedLevel > 0
+                ? $"부스터 지속시간 +{appliedLevel * 2}초"
+                : "부스터 지속시간 증가",
+            GaragePart.Wheel => appliedLevel > 0
+                ? $"기본 속도 +{appliedLevel * 1f:0.0} 증가"
+                : "기본 속도 증가",
+            GaragePart.Armor => appliedLevel > 0
+                ? $"최대 HP +{appliedLevel * 20} 증가"
+                : "최대 HP 증가",
+            GaragePart.Magnet => "보유 효과 없음",
+            _ => string.Empty,
+        };
     }
 
     private void ResolveGarageUiReferencesLegacy()
@@ -1655,6 +1902,7 @@ public class LobbyDirector : MonoBehaviour
         if (HasAuthenticatedSession())
         {
             StartCoroutine(SyncShopCatalogFlow(true));
+            StartCoroutine(SyncInventoryFlow(true));
         }
 
         SetAuthBusy(false, successMessageOverride ?? loginMessage?.Message ?? "\ub85c\uadf8\uc778\uc774 \uc644\ub8cc\ub418\uc5c8\uc2b5\ub2c8\ub2e4.", false);
@@ -1680,7 +1928,16 @@ public class LobbyDirector : MonoBehaviour
 
         if (profile != null)
         {
+            _currentBaseHp = Mathf.Max(100, profile.Hp);
+            _currentBaseSpeed = Mathf.Max(2f, profile.BaseSpeed);
+            _currentBoosterBonusSec = Mathf.Max(0, profile.BoosterBonusSec);
             playerCoins = profile.Coin;
+            _garageState.coinBalance = playerCoins;
+            _garageState.engineLevel = 1 + Mathf.Max(0, _currentBoosterBonusSec / 2);
+            _garageState.wheelLevel = 1 + Mathf.Max(0, Mathf.FloorToInt((_currentBaseSpeed - 2f) + 0.01f));
+            _garageState.armorLevel = 1 + Mathf.Max(0, Mathf.FloorToInt(((_currentBaseHp - 100f) / 20f) + 0.01f));
+            _garageState.magnetLevel = 1;
+            ClampGarageState();
             UpdateCoinLabels(playerCoins);
             StoreLastKnownCoin(playerCoins);
         }

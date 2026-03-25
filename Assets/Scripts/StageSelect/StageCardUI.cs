@@ -72,7 +72,7 @@ public class StageCardUI : MonoBehaviour, IPointerEnterHandler, IPointerClickHan
             return;
         }
 
-        bool isUnlocked = UserDataManager.Instance != null && UserDataManager.Instance.IsStageUnlocked(stageInfo.StageId);
+        bool isUnlocked = IsStageUnlocked();
         bool isCleared = UserDataManager.Instance != null && UserDataManager.Instance.IsStageCleared(stageInfo.StageId);
 
         if (titleText != null)
@@ -152,7 +152,7 @@ public class StageCardUI : MonoBehaviour, IPointerEnterHandler, IPointerClickHan
 
         if (manager.IsSelected(this))
         {
-            if (!UserDataManager.Instance.IsStageUnlocked(stageInfo.StageId))
+            if (!IsStageUnlocked())
             {
                 Debug.Log($"StageCardUI.OnClick: '{name}' is locked.", this);
                 return;
@@ -163,6 +163,17 @@ public class StageCardUI : MonoBehaviour, IPointerEnterHandler, IPointerClickHan
         }
 
         manager.RequestSelect(this);
+    }
+
+    private bool IsStageUnlocked()
+    {
+        if (stageInfo == null)
+        {
+            return false;
+        }
+
+        return stageInfo.DefaultUnlocked
+            || (UserDataManager.Instance != null && UserDataManager.Instance.IsStageUnlocked(stageInfo.StageId));
     }
 
     private void AutoBind()
