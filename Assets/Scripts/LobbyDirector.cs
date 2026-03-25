@@ -11,6 +11,7 @@ public class LobbyDirector : MonoBehaviour
     [SerializeField] private GameObject bgCrashed;
     [SerializeField] private SpriteRenderer bgPlainRenderer;
     [SerializeField] private SpriteRenderer bgCrashedRenderer;
+    [SerializeField] private float backgroundOverscan = 1.02f;
 
     [Header("UFO")]
     [SerializeField] private GameObject ufoFlying;
@@ -179,6 +180,7 @@ public class LobbyDirector : MonoBehaviour
 
     private void Start()
     {
+        FitLobbyBackgroundsToCamera();
         SetupInitialState();
         BindNavigationButtons();
         BindAuthButtons();
@@ -188,6 +190,42 @@ public class LobbyDirector : MonoBehaviour
         UpdateCoinLabels(playerCoins);
         RefreshShopUi();
         RefreshGarageUi();
+    }
+
+    private void FitLobbyBackgroundsToCamera()
+    {
+        Camera targetCamera = Camera.main;
+        if (targetCamera == null || !targetCamera.orthographic)
+        {
+            return;
+        }
+
+        FitBackgroundRenderer(bgPlainRenderer, targetCamera);
+        FitBackgroundRenderer(bgCrashedRenderer, targetCamera);
+    }
+
+    private void FitBackgroundRenderer(SpriteRenderer renderer, Camera targetCamera)
+    {
+        if (renderer == null || renderer.sprite == null)
+        {
+            return;
+        }
+
+        Vector2 spriteSize = renderer.sprite.bounds.size;
+        if (spriteSize.x <= 0f || spriteSize.y <= 0f)
+        {
+            return;
+        }
+
+        float worldHeight = targetCamera.orthographicSize * 2f;
+        float worldWidth = worldHeight * targetCamera.aspect;
+        float scale = Mathf.Max(worldWidth / spriteSize.x, worldHeight / spriteSize.y) * Mathf.Max(backgroundOverscan, 1f);
+
+        Vector3 currentScale = renderer.transform.localScale;
+        renderer.transform.localScale = new Vector3(
+            Mathf.Sign(currentScale.x) * scale,
+            Mathf.Sign(currentScale.y) * scale,
+            currentScale.z);
     }
 
     public void OnLoginComplete()
