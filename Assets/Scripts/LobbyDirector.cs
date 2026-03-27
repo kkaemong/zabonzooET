@@ -192,9 +192,12 @@ public class LobbyDirector : MonoBehaviour
         BindShopButtons();
         BindGarageButtons();
         ApplyAuthMode(AuthMode.Login);
+        TryResumeLobbyMainFromPendingReturn();
+        RestoreAuthStateFromKnownUser();
         UpdateCoinLabels(playerCoins);
         RefreshShopUi();
         RefreshGarageUi();
+        StartCoroutine(ResumeLobbyMainFromPendingReturnNextFrame());
     }
 
     private void FitLobbyBackgroundsToCamera()
@@ -299,6 +302,9 @@ public class LobbyDirector : MonoBehaviour
             return;
         }
 
+        TryResumeLobbyMainFromPendingReturn();
+        RestoreAuthStateFromKnownUser();
+
         if (!HasAuthenticatedSession())
         {
             SetStatus("로그인 후 스테이지를 선택할 수 있습니다.", true);
@@ -310,7 +316,14 @@ public class LobbyDirector : MonoBehaviour
             ? _currentNickname
             : (!string.IsNullOrWhiteSpace(fallbackNickname) ? fallbackNickname : _currentLoginId);
 
-        LobbyStageFlowBridge.EnterStageSelect(_currentLoginId, nickname, playerCoins);
+        BackendRuntimeSession.Configure(
+            backendBaseUrl,
+            _currentUserId,
+            _authApi != null ? _authApi.SessionCookie : null,
+            _currentLoginId,
+            nickname);
+
+        LobbyStageFlowBridge.EnterStageSelect(_currentLoginId, nickname, playerCoins, _currentUserId);
     }
 
     public void SpendCoin(int amount, string itemName)
@@ -971,7 +984,114 @@ public class LobbyDirector : MonoBehaviour
 
     private bool HasAuthenticatedSession()
     {
-        return _authApi != null && _authApi.HasSession;
+        if (_authApi != null && _authApi.HasSession)
+        {
+            return true;
+        }
+
+        return TryGetKnownAuthenticatedUser(out _, out _, out _, out _);
+    }
+
+    private void RestoreAuthStateFromKnownUser()
+    {
+        if (_authApi != null && _authApi.HasSession)
+        {
+            return;
+        }
+
+        if (!TryGetKnownAuthenticatedUser(
+                out string loginId,
+                out string nickname,
+                out long userId,
+                out int coinBalance))
+        {
+            return;
+        }
+
+        _currentLoginId = loginId;
+        _currentNickname = nickname;
+        _currentUserId = userId;
+        playerCoins = coinBalance;
+
+        string restoredBaseUrl = !string.IsNullOrWhiteSpace(BackendRuntimeSession.BaseUrl)
+            ? BackendRuntimeSession.BaseUrl
+            : backendBaseUrl;
+        string restoredCookie = _authApi != null && !string.IsNullOrWhiteSpace(_authApi.SessionCookie)
+            ? _authApi.SessionCookie
+            : BackendRuntimeSession.SessionCookie;
+
+        _authApi?.RestoreSession(restoredCookie, _currentUserId, _currentLoginId, _currentNickname);
+        BackendRuntimeSession.Configure(
+            restoredBaseUrl,
+            _currentUserId,
+            restoredCookie,
+            _currentLoginId,
+            _currentNickname);
+
+        if (UserDataManager.Instance != null)
+        {
+            UserDataManager.Instance.SetUser(_currentLoginId, _currentNickname, playerCoins, _currentUserId);
+        }
+
+        _garageState.coinBalance = playerCoins;
+        StoreLastKnownCoin(playerCoins);
+        UpdateCoinLabels(playerCoins);
+
+        if (!_hasCompletedLogin)
+        {
+            ApplyLobbyMainState();
+            SetStatus(string.Empty, false);
+            _hasCompletedLogin = true;
+        }
+    }
+
+    private bool TryGetKnownAuthenticatedUser(
+        out string loginId,
+        out string nickname,
+        out long userId,
+        out int coinBalance)
+    {
+        UserData currentUser = UserDataManager.Instance != null ? UserDataManager.Instance.CurrentUser : null;
+
+        loginId = !string.IsNullOrWhiteSpace(_currentLoginId)
+            ? _currentLoginId.Trim()
+            : (!string.IsNullOrWhiteSpace(BackendRuntimeSession.LoginId)
+                ? BackendRuntimeSession.LoginId.Trim()
+                : string.Empty);
+
+        nickname = !string.IsNullOrWhiteSpace(_currentNickname)
+            ? _currentNickname.Trim()
+            : (!string.IsNullOrWhiteSpace(BackendRuntimeSession.Nickname)
+                ? BackendRuntimeSession.Nickname.Trim()
+                : (currentUser != null &&
+                   string.Equals(currentUser.userId, loginId, StringComparison.Ordinal)
+                    ? currentUser.nickname
+                    : string.Empty));
+
+        userId = _currentUserId > 0
+            ? _currentUserId
+            : (BackendRuntimeSession.UserId > 0
+                ? BackendRuntimeSession.UserId
+                : -1);
+
+        coinBalance = currentUser != null &&
+            string.Equals(currentUser.userId, loginId, StringComparison.Ordinal)
+            ? Mathf.Max(currentUser.coin, 0)
+            : Mathf.Max(playerCoins, 0);
+
+        if (string.IsNullOrWhiteSpace(loginId) ||
+            string.Equals(loginId, "guest", StringComparison.OrdinalIgnoreCase) ||
+            userId <= 0)
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(nickname))
+        {
+            nickname = loginId;
+        }
+
+        return true;
     }
 
     private void EnsureGeneratedGarageUi()
@@ -1607,6 +1727,66 @@ public class LobbyDirector : MonoBehaviour
         SetStatus(string.Empty, false);
     }
 
+    private void ApplyLobbyMainState()
+    {
+        SetActiveSafe(bgPlain, false);
+        SetActiveSafe(bgCrashed, true);
+        SetActiveSafe(ufoFlying, false);
+        SetActiveSafe(ufoCrashed, false);
+        SetParticleActive(fxImpactDust, false);
+
+        if (bgCrashedRenderer != null)
+        {
+            bgCrashedRenderer.color = Color.white;
+        }
+
+        if (fxSmokeA != null)
+        {
+            fxSmokeA.gameObject.SetActive(true);
+            if (!fxSmokeA.isPlaying)
+            {
+                fxSmokeA.Play();
+            }
+        }
+
+        if (fxSmokeB != null)
+        {
+            fxSmokeB.gameObject.SetActive(true);
+            if (!fxSmokeB.isPlaying)
+            {
+                fxSmokeB.Play();
+            }
+        }
+
+        if (canvasLogin != null)
+        {
+            canvasLogin.SetActive(false);
+        }
+
+        if (_loginCanvasGroup != null)
+        {
+            _loginCanvasGroup.alpha = 0f;
+            _loginCanvasGroup.interactable = false;
+            _loginCanvasGroup.blocksRaycasts = false;
+        }
+
+        if (canvasLobby != null)
+        {
+            canvasLobby.SetActive(true);
+        }
+
+        if (_lobbyCanvasGroup != null)
+        {
+            _lobbyCanvasGroup.alpha = 1f;
+            _lobbyCanvasGroup.interactable = true;
+            _lobbyCanvasGroup.blocksRaycasts = true;
+        }
+
+        HideCanvas(canvasShop);
+        HideCanvas(canvasGarage);
+        BindNavigationButtons();
+    }
+
     private void BindNavigationButtons()
     {
         if (_btnGameStart == null && canvasLobby != null)
@@ -1942,8 +2122,84 @@ public class LobbyDirector : MonoBehaviour
             StoreLastKnownCoin(playerCoins);
         }
 
+        BackendRuntimeSession.Configure(
+            backendBaseUrl,
+            _currentUserId,
+            _authApi != null ? _authApi.SessionCookie : null,
+            _currentLoginId,
+            _currentNickname);
+
         RefreshGarageUi();
         RefreshShopUi();
+    }
+
+    private IEnumerator ResumeLobbyMainFromPendingReturnNextFrame()
+    {
+        yield return null;
+        TryResumeLobbyMainFromPendingReturn();
+        RestoreAuthStateFromKnownUser();
+    }
+
+    private void TryResumeLobbyMainFromPendingReturn()
+    {
+        if (!LobbyReturnFlowBridge.TryConsumePendingReturn(
+                out string pendingBaseUrl,
+                out long pendingUserId,
+                out string pendingSessionCookie,
+                out string pendingLoginId,
+                out string pendingNickname,
+                out int pendingCoin))
+        {
+            return;
+        }
+
+        UserData currentUser = UserDataManager.Instance != null ? UserDataManager.Instance.CurrentUser : null;
+
+        _currentLoginId = !string.IsNullOrWhiteSpace(pendingLoginId)
+            ? pendingLoginId.Trim()
+            : (currentUser != null ? currentUser.userId : string.Empty);
+        _currentNickname = !string.IsNullOrWhiteSpace(pendingNickname)
+            ? pendingNickname.Trim()
+            : (currentUser != null ? currentUser.nickname : string.Empty);
+        _currentUserId = pendingUserId > 0
+            ? pendingUserId
+            : (currentUser != null ? currentUser.backendUserId : -1);
+        playerCoins = pendingCoin >= 0
+            ? pendingCoin
+            : (currentUser != null ? Mathf.Max(currentUser.coin, 0) : playerCoins);
+
+        if (!string.IsNullOrWhiteSpace(_currentLoginId) && UserDataManager.Instance != null)
+        {
+            UserDataManager.Instance.SetUser(_currentLoginId, _currentNickname, playerCoins, _currentUserId);
+        }
+
+        string runtimeBaseUrl = !string.IsNullOrWhiteSpace(pendingBaseUrl)
+            ? pendingBaseUrl
+            : BackendRuntimeSession.BaseUrl;
+
+        if (_authApi != null)
+        {
+            _authApi.RestoreSession(pendingSessionCookie, _currentUserId, _currentLoginId, _currentNickname);
+        }
+
+        BackendRuntimeSession.Configure(
+            runtimeBaseUrl,
+            _currentUserId,
+            pendingSessionCookie,
+            _currentLoginId,
+            _currentNickname);
+
+        _garageState.coinBalance = playerCoins;
+        StoreLastKnownCoin(playerCoins);
+        ApplyLobbyMainState();
+        SetStatus(string.Empty, false);
+        _hasCompletedLogin = true;
+
+        if (HasAuthenticatedSession())
+        {
+            StartCoroutine(SyncShopCatalogFlow(true));
+            StartCoroutine(SyncInventoryFlow(true));
+        }
     }
 
     private void SetAuthBusy(bool busy, string message, bool isError)
@@ -2493,13 +2749,41 @@ public class LobbyDirector : MonoBehaviour
 
     private static void RebindButton(Button button, UnityEngine.Events.UnityAction action)
     {
-        if (button == null)
+        if (button == null || action == null)
         {
             return;
         }
 
         button.onClick.RemoveListener(action);
+
+        if (HasPersistentListener(button, action.Method.Name))
+        {
+            return;
+        }
+
         button.onClick.AddListener(action);
+    }
+
+    private static bool HasPersistentListener(Button button, string methodName)
+    {
+        if (button == null || string.IsNullOrWhiteSpace(methodName))
+        {
+            return false;
+        }
+
+        int persistentCount = button.onClick.GetPersistentEventCount();
+        for (int index = 0; index < persistentCount; index++)
+        {
+            if (string.Equals(
+                    button.onClick.GetPersistentMethodName(index),
+                    methodName,
+                    StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static void SetAnchors(RectTransform rectTransform, float minX, float minY, float maxX, float maxY)

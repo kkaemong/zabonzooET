@@ -6,9 +6,9 @@ public static class LobbyStageFlowBridge
     private const string PreferredStageSelectSceneName = "StageSelect";
     private const string LegacyStageSelectSceneName = "StageSelectScene";
 
-    public static void EnterStageSelect(string loginId, string nickname, int coin)
+    public static void EnterStageSelect(string loginId, string nickname, int coin, long backendUserId = -1)
     {
-        EnsureUserDataManager(loginId, nickname, coin);
+        EnsureUserDataManager(loginId, nickname, coin, backendUserId);
 
         if (Application.CanStreamedLevelBeLoaded(PreferredStageSelectSceneName))
         {
@@ -27,7 +27,7 @@ public static class LobbyStageFlowBridge
             $"Requested by loginId='{loginId}', nickname='{nickname}', coin={coin}.");
     }
 
-    private static void EnsureUserDataManager(string loginId, string nickname, int coin)
+    private static void EnsureUserDataManager(string loginId, string nickname, int coin, long backendUserId)
     {
         if (UserDataManager.Instance == null)
         {
@@ -35,6 +35,6 @@ public static class LobbyStageFlowBridge
             managerObject.AddComponent<UserDataManager>();
         }
 
-        UserDataManager.Instance.SetUser(loginId, nickname, coin);
+        UserDataManager.Instance.SetUser(loginId, nickname, coin, backendUserId);
     }
 }

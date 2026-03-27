@@ -38,7 +38,7 @@ public class UserDataManager : MonoBehaviour
         NotifyChanged();
     }
 
-    public void SetUser(string userId, string nickname, int coin)
+    public void SetUser(string userId, string nickname, int coin, long backendUserId = -1)
     {
         string normalizedUserId = string.IsNullOrWhiteSpace(userId) ? "guest" : userId.Trim();
         string targetSaveKey = BuildSaveKey(normalizedUserId);
@@ -59,6 +59,7 @@ public class UserDataManager : MonoBehaviour
         }
 
         CurrentUser.userId = normalizedUserId;
+        CurrentUser.backendUserId = backendUserId > 0 ? backendUserId : CurrentUser.backendUserId;
         CurrentUser.nickname = nickname;
         CurrentUser.coin = Mathf.Max(coin, 0);
 
@@ -197,6 +198,10 @@ public class UserDataManager : MonoBehaviour
     {
         CurrentUser ??= CreateDefaultUser();
         CurrentUser.userId = string.IsNullOrWhiteSpace(CurrentUser.userId) ? "guest" : CurrentUser.userId.Trim();
+        if (CurrentUser.backendUserId == 0)
+        {
+            CurrentUser.backendUserId = -1;
+        }
         CurrentUser.nickname ??= "Guest";
         CurrentUser.clearedStageIds ??= new List<string>();
         CurrentUser.unlockedStageIds ??= new List<string>();
@@ -243,6 +248,7 @@ public class UserDataManager : MonoBehaviour
         return new UserData
         {
             userId = "guest",
+            backendUserId = -1,
             nickname = "Guest",
             coin = 0
         };

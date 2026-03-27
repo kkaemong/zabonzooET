@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class UserData
 {
     public string userId;
+    public long backendUserId = -1;
     public string nickname;
     public int coin;
     public List<string> clearedStageIds = new List<string>();

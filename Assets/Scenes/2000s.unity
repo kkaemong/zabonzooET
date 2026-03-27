@@ -470,7 +470,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 116713750}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1731295434}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: GoToStageSelect
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &116713750
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1008,14 +1020,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1731295434}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: GoToScene
-        m_Mode: 5
+        m_MethodName: SelectFinanceProduct
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: 
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Mainpage
+          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &229670454
@@ -1446,6 +1458,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::APIManager
   baseUrl: http://j14a507.p.ssafy.io
+  authToken: 
 --- !u!4 &479661355
 Transform:
   m_ObjectHideFlags: 0
@@ -5548,6 +5561,7 @@ MonoBehaviour:
   baseSpeed: 5
   maxSpeed: 15
   accelerationRate: 0.05
+  currentRunId: -1
   scoreText: {fileID: 1663298500}
   distanceText: {fileID: 0}
   levelUpText: {fileID: 0}

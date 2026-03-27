@@ -1,141 +1,426 @@
+using System;
 using System.Collections;
 using System.Text;
+using System.Text.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
 /// <summary>
-/// 서버(백엔드)와의 HTTP 통신만을 전담하는 매니저 스크립트입니다.
+/// Handles ingame HTTP communication with the backend.
 /// </summary>
 public class APIManager : MonoBehaviour
 {
-    // 어디서든 APIManager.Instance.함수명() 으로 쉽게 부르기 위한 싱글톤
+    private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true,
+        IncludeFields = true
+    };
+
     public static APIManager Instance { get; private set; }
 
-    [Header("서버 설정")]
-    [Tooltip("백엔드 서버의 기본 주소 (예: http://3.33.22.11:8080)")]
-    public string baseUrl = "http://j14a507.p.ssafy.io"; // TODO: 실제 배포된 서버 주소로 변경하세요!
+    [Header("Server")]
+    [Tooltip("Fallback backend URL. Runtime session data can override this value.")]
+    public string baseUrl = LobbyAuthApi.DefaultBaseUrl;
+
+    [Tooltip("Optional bearer token for isolated ingame API tests.")]
+    public string authToken = string.Empty;
+
+    [Serializable]
+    public class RunResultRequest
+    {
+        public string stageId;
+        public long runId;
+        public int playTime;
+        public int distance;
+        public int collectedCoin;
+        public int remainingHp;
+        public bool quizCorrect;
+        public string financeChoice;
+        public bool cleared;
+        public string[] usedItems;
+    }
+
+    [Serializable]
+    public class QuizChoiceResponse
+    {
+        public long quizChoiceId;
+        public string choiceText;
+    }
+
+    [Serializable]
+    public class QuizQuestionResponse
+    {
+        public long quizQuestionId;
+        public string questionText;
+        public int timeLimitSec;
+        public QuizChoiceResponse[] choices;
+    }
+
+    [Serializable]
+    public class QuizResultRequest
+    {
+        public string stageId;
+        public long quizId;
+        public int selectedAnswer;
+        public double responseTime;
+        public bool timeOver;
+        public long runId;
+    }
+
+    [Serializable]
+    public class QuizResultResponse
+    {
+        public bool correct;
+        public string effectType;
+        public double speedMultiplier;
+        public int hpChange;
+        public string monsterAction;
+        public string message;
+        public int currentLife;
+        public int maxLife;
+        public int quizCount;
+    }
+
+    [Serializable]
+    public class GameStartRequest
+    {
+        public string stageCode;
+    }
+
+    [Serializable]
+    public class GameStartResponse
+    {
+        public long runId;
+        public long stageId;
+        public string stageCode;
+        public string stageName;
+        public int targetDistance;
+        public int life;
+        public int maxLife;
+        public string status;
+    }
+
+    [Serializable]
+    public class FinanceSubOptionResponse
+    {
+        public string subOptionId;
+        public string subOptionName;
+        public string description;
+        public int expectedReturn;
+    }
+
+    [Serializable]
+    public class FinanceOptionResponse
+    {
+        public string optionId;
+        public string optionName;
+        public string description;
+        public FinanceSubOptionResponse[] subOptions;
+    }
+
+    [Serializable]
+    public class FinanceOptionsResponse
+    {
+        public FinanceOptionResponse[] options;
+    }
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // 씬이 넘어가도 매니저가 파괴되지 않음
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
+            return;
         }
+
+        SyncRuntimeSession();
     }
 
-    // ====================================================
-    // 1. [게임 결과 및 획득 코인 전송] (POST /api/game/run-result)
-    // 👉 사용법: GameManager에서 플레이어 사망 시 APIManager.Instance.SendGameResult(코인개수); 호출
-    // ====================================================
-    
-    // (보낼 데이터를 JSON 형식에 맞게 묶어주는 클래스)
-    [System.Serializable]
-    public class RunResultRequest
+    public void StartGame(string stageCode, Action<GameStartResponse> onSuccess, Action<string> onError)
     {
-        public int earnedCoins;
-        public string stageId;
-        // 백엔드 명세서에 따라 userId 등 필요한 항목을 여기에 더 추가하면 됩니다.
+        SyncRuntimeSession();
+
+        GameStartRequest body = new GameStartRequest { stageCode = stageCode };
+        string json = JsonUtility.ToJson(body);
+
+        StartCoroutine(PostRequestWithCallback(
+            BuildUrl("/api/game/start"),
+            json,
+            responseJson =>
+            {
+                if (TryDeserialize(responseJson, out GameStartResponse response, onError, "game/start"))
+                {
+                    onSuccess?.Invoke(response);
+                }
+            },
+            onError));
     }
 
-    public void SendGameResult(int coins, string currentStage = "2000s")
+    public void SendGameResult(
+        long runId,
+        int coins,
+        int distance,
+        int hp,
+        bool cleared,
+        string currentStage = "ERA_1980",
+        string financeChoice = "NONE")
     {
-        RunResultRequest data = new RunResultRequest 
-        { 
-            earnedCoins = coins,
-            stageId = currentStage
+        SyncRuntimeSession();
+
+        long backendUserId = ResolveBackendUserId();
+        if (backendUserId <= 0)
+        {
+            Debug.LogWarning("[APIManager] Cannot send run-result because backend user id is missing.");
+            return;
+        }
+
+        RunResultRequest body = new RunResultRequest
+        {
+            stageId = currentStage,
+            runId = runId,
+            playTime = 0,
+            distance = distance,
+            collectedCoin = coins,
+            remainingHp = hp,
+            quizCorrect = false,
+            financeChoice = string.IsNullOrWhiteSpace(financeChoice) ? "NONE" : financeChoice,
+            cleared = cleared,
+            usedItems = Array.Empty<string>()
         };
-        
-        // C# 객체를 JSON 글자(String)로 예쁘게 변환
-        string jsonString = JsonUtility.ToJson(data); 
 
-        // 코루틴으로 서버에 전송 시작
-        StartCoroutine(PostRequest(baseUrl + "/api/game/run-result", jsonString));
+        string url = BuildUrl($"/api/game/run-result?userId={backendUserId}");
+        StartCoroutine(PostRequest(url, JsonUtility.ToJson(body)));
     }
 
-    // ====================================================
-    // 2. [스테이지 정보 (퀴즈 등) 조회] (GET /api/game/stage/{stageId})
-    // 👉 사용법: 게임 시작 전 또는 씬 로드 시 APIManager.Instance.GetStageInfo("스테이지번호"); 호출
-    // ====================================================
-    public void GetStageInfo(string stageId)
+    public void GetStageInfo(string stageCode, Action<string> onSuccess = null, Action<string> onError = null)
     {
-        StartCoroutine(GetRequest(baseUrl + $"/api/game/stage/{stageId}"));
+        SyncRuntimeSession();
+        StartCoroutine(GetRequestWithCallback(
+            BuildUrl($"/api/game/stage?stageCode={UnityWebRequest.EscapeURL(stageCode)}"),
+            onSuccess,
+            onError));
     }
 
+    public void GetFinanceOptions(string stageCode, Action<FinanceOptionsResponse> onSuccess, Action<string> onError)
+    {
+        SyncRuntimeSession();
+        string normalizedStageCode = string.IsNullOrWhiteSpace(stageCode)
+            ? ResolveCurrentStageCode()
+            : stageCode;
 
-    // ====================================================
-    // 3. [금융 이벤트 선택지 조회] (GET /api/game/finance-options)
-    // 👉 사용법: 게임 클리어 후 금융상품 선택 버튼 누를 때 호출
-    // ====================================================
+        StartCoroutine(GetRequestWithCallback(
+            BuildUrl($"/api/game/finance-options?stageCode={UnityWebRequest.EscapeURL(normalizedStageCode)}"),
+            responseJson =>
+            {
+                if (TryDeserialize(responseJson, out FinanceOptionsResponse response, onError, "game/finance-options"))
+                {
+                    onSuccess?.Invoke(response);
+                }
+            },
+            onError));
+    }
+
     public void GetFinanceOptions()
     {
-        StartCoroutine(GetRequest(baseUrl + "/api/game/finance-options"));
+        GetFinanceOptions(ResolveCurrentStageCode(), null, error =>
+        {
+            Debug.LogError($"[APIManager] Failed to get finance options: {error}");
+        });
     }
 
-    // ====================================================
-    // [공통 HTTP 통신 내부 로직] (이 아래는 수정할 필요가 거의 없습니다)
-    // ====================================================
+    public void GetQuiz(long runId, Action<QuizQuestionResponse> onSuccess, Action<string> onError)
+    {
+        SyncRuntimeSession();
+        StartCoroutine(GetRequestWithCallback(
+            BuildUrl($"/api/game/quiz?runId={runId}"),
+            responseJson =>
+            {
+                if (TryDeserialize(responseJson, out QuizQuestionResponse response, onError, "game/quiz"))
+                {
+                    onSuccess?.Invoke(response);
+                }
+            },
+            onError));
+    }
 
-    // POST 방식 (내 데이터를 서버에 저장해 달라고 보낼 때)
+    public void SubmitQuizResult(QuizResultRequest requestData, Action<QuizResultResponse> onSuccess, Action<string> onError)
+    {
+        SyncRuntimeSession();
+        string json = JsonUtility.ToJson(requestData);
+
+        StartCoroutine(PostRequestWithCallback(
+            BuildUrl("/api/game/quiz-result"),
+            json,
+            responseJson =>
+            {
+                if (TryDeserialize(responseJson, out QuizResultResponse response, onError, "game/quiz-result"))
+                {
+                    onSuccess?.Invoke(response);
+                }
+            },
+            onError));
+    }
+
+    private string BuildUrl(string path)
+    {
+        string normalizedBaseUrl = string.IsNullOrWhiteSpace(baseUrl)
+            ? LobbyAuthApi.DefaultBaseUrl
+            : baseUrl.TrimEnd('/');
+
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return normalizedBaseUrl;
+        }
+
+        return path.StartsWith("/", StringComparison.Ordinal)
+            ? normalizedBaseUrl + path
+            : normalizedBaseUrl + "/" + path;
+    }
+
+    private long ResolveBackendUserId()
+    {
+        if (BackendRuntimeSession.UserId > 0)
+        {
+            return BackendRuntimeSession.UserId;
+        }
+
+        if (UserDataManager.Instance != null && UserDataManager.Instance.CurrentUser != null && UserDataManager.Instance.CurrentUser.backendUserId > 0)
+        {
+            return UserDataManager.Instance.CurrentUser.backendUserId;
+        }
+
+        return -1;
+    }
+
+    private string ResolveCurrentStageCode()
+    {
+        return GameManager.Instance != null
+            ? GameManager.Instance.CurrentStageCode
+            : "ERA_1980";
+    }
+
+    private void SyncRuntimeSession()
+    {
+        if (!string.IsNullOrWhiteSpace(BackendRuntimeSession.BaseUrl))
+        {
+            baseUrl = BackendRuntimeSession.BaseUrl;
+        }
+    }
+
+    private bool TryDeserialize<T>(string json, out T result, Action<string> onError, string endpoint)
+    {
+        try
+        {
+            result = JsonSerializer.Deserialize<T>(json, JsonOptions);
+            if (result == null)
+            {
+                onError?.Invoke($"Failed to parse response from {endpoint}: empty payload");
+                return false;
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[APIManager] Failed to deserialize {endpoint} response.\n{ex}\nPayload: {json}");
+            onError?.Invoke($"Failed to parse response from {endpoint}: {ex.Message}");
+            result = default;
+            return false;
+        }
+    }
+
+    private void ApplyCommonHeaders(UnityWebRequest request, bool includeJsonContentType)
+    {
+        if (includeJsonContentType)
+        {
+            request.SetRequestHeader("Content-Type", "application/json");
+        }
+
+        if (!string.IsNullOrWhiteSpace(authToken))
+        {
+            request.SetRequestHeader("Authorization", "Bearer " + authToken);
+        }
+
+        if (!string.IsNullOrWhiteSpace(BackendRuntimeSession.SessionCookie))
+        {
+            request.SetRequestHeader("Cookie", BackendRuntimeSession.SessionCookie);
+        }
+    }
+
     private IEnumerator PostRequest(string url, string jsonBody)
     {
-        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        using UnityWebRequest request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
+        byte[] body = Encoding.UTF8.GetBytes(jsonBody ?? string.Empty);
+        request.uploadHandler = new UploadHandlerRaw(body);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        ApplyCommonHeaders(request, includeJsonContentType: true);
+
+        Debug.Log($"<color=cyan>[API POST]</color> {url}\n{jsonBody}");
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
         {
-            // JSON 글자를 컴퓨터가 읽을 수 있는 바이트(Byte)로 변환
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            
-            // "나 지금 JSON 보낸다!" 라고 서버에 미리 알려주는 헤더
-            request.SetRequestHeader("Content-Type", "application/json"); 
-
-            // 💡 만약 백엔드에서 로그인 토큰(JWT)이 필요하다고 하면 아래 주석을 풀고 추가하세요.
-            // request.SetRequestHeader("Authorization", "Bearer " + "여기에유저토큰값");
-
-            Debug.Log($"<color=cyan>[API POST 요청]</color> 주소: {url}\n보낸 데이터: {jsonBody}");
-
-            // 통신 끝날 때까지 대기
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-            {
-                Debug.LogError($"<color=red>[API POST 에러]</color> {request.error}");
-            }
-            else
-            {
-                Debug.Log($"<color=green>[API POST 성공!]</color> 서버 응답: {request.downloadHandler.text}");
-            }
+            Debug.LogError($"<color=red>[API POST ERROR]</color> {request.responseCode} {request.error}\n{request.downloadHandler.text}");
+            yield break;
         }
+
+        Debug.Log($"<color=green>[API POST OK]</color> {request.downloadHandler.text}");
     }
 
-    // GET 방식 (서버에서 데이터를 가져오라고 시킬 때)
-    private IEnumerator GetRequest(string url)
+    private IEnumerator GetRequestWithCallback(string url, Action<string> onSuccess, Action<string> onError)
     {
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        using UnityWebRequest request = UnityWebRequest.Get(url);
+        ApplyCommonHeaders(request, includeJsonContentType: false);
+
+        Debug.Log($"<color=cyan>[API GET]</color> {url}");
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
         {
-            // 💡 만약 백엔드에서 로그인 토큰(JWT)이 필요하다고 하면 아래 주석을 풀고 추가하세요.
-            // request.SetRequestHeader("Authorization", "Bearer " + "여기에유저토큰값");
-
-            Debug.Log($"<color=cyan>[API GET 요청]</color> 주소: {url}");
-
-            // 통신 끝날 때까지 대기
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+            string errorMessage = $"{request.responseCode} {request.error}";
+            if (!string.IsNullOrWhiteSpace(request.downloadHandler.text))
             {
-                Debug.LogError($"<color=red>[API GET 에러]</color> {request.error}");
+                errorMessage += $"\n{request.downloadHandler.text}";
             }
-            else
-            {
-                Debug.Log($"<color=green>[API GET 성공!]</color> 서버 데이터: {request.downloadHandler.text}");
-                
-                // TODO: 받아온 JSON 텍스트(request.downloadHandler.text)를 파싱해서
-                // 퀴즈 매니저 등에 넘겨주는 코드를 나중에 여기에 한 줄 추가하시면 됩니다!
-            }
+
+            Debug.LogError($"<color=red>[API GET ERROR]</color> {url}\n{errorMessage}");
+            onError?.Invoke(errorMessage);
+            yield break;
         }
+
+        Debug.Log($"<color=green>[API GET OK]</color> {request.downloadHandler.text}");
+        onSuccess?.Invoke(request.downloadHandler.text);
+    }
+
+    private IEnumerator PostRequestWithCallback(string url, string jsonBody, Action<string> onSuccess, Action<string> onError)
+    {
+        using UnityWebRequest request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
+        byte[] body = Encoding.UTF8.GetBytes(jsonBody ?? string.Empty);
+        request.uploadHandler = new UploadHandlerRaw(body);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        ApplyCommonHeaders(request, includeJsonContentType: true);
+
+        Debug.Log($"<color=cyan>[API POST]</color> {url}\n{jsonBody}");
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+        {
+            string errorMessage = $"{request.responseCode} {request.error}";
+            if (!string.IsNullOrWhiteSpace(request.downloadHandler.text))
+            {
+                errorMessage += $"\n{request.downloadHandler.text}";
+            }
+
+            Debug.LogError($"<color=red>[API POST ERROR]</color> {url}\n{errorMessage}");
+            onError?.Invoke(errorMessage);
+            yield break;
+        }
+
+        Debug.Log($"<color=green>[API POST OK]</color> {request.downloadHandler.text}");
+        onSuccess?.Invoke(request.downloadHandler.text);
     }
 }

@@ -23,6 +23,19 @@ public sealed class LobbyAuthApi
     public bool HasSession => _hasSession || !string.IsNullOrEmpty(_sessionCookie);
 
     public long CurrentUserId => _currentUserId;
+    public string SessionCookie => _sessionCookie;
+    public string BaseUrl => _baseUrl;
+
+    public void RestoreSession(string sessionCookie, long userId, string loginId, string nickname)
+    {
+        _sessionCookie = string.IsNullOrWhiteSpace(sessionCookie) ? null : sessionCookie.Trim();
+        _currentUserId = userId > 0 ? userId : -1;
+        _currentLoginId = loginId ?? string.Empty;
+        _currentNickname = nickname ?? string.Empty;
+        _hasSession =
+            !string.IsNullOrEmpty(_sessionCookie) ||
+            (_currentUserId > 0 && !string.IsNullOrWhiteSpace(_currentLoginId));
+    }
 
     public IEnumerator SignUp(
         string loginId,

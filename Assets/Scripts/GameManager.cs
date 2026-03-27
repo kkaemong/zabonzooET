@@ -73,6 +73,8 @@ public class GameManager : MonoBehaviour
     private Color originalSpeedTextColor = Color.white;
 
     // --- [ 2. 점수 로직 (코인 & 거리) ] ---
+    public long currentRunId = -1; // 💡 백엔드에서 발급받을 고유 시퀀스 번호
+    public string CurrentStageCode => ResolveCurrentStageCode();
     public static int coinCount = 0;
     public Text scoreText; 
     
@@ -164,6 +166,25 @@ public class GameManager : MonoBehaviour
         
         GameObject pIcon = GameObject.Find("PlayerHandle");
         if (pIcon != null) playerIconRect = pIcon.GetComponent<RectTransform>();
+
+        // 💡 게임 시작 시 백엔드에서 고유 runId를 받아옵니다
+        string currentStageCode = ResolveCurrentStageCode();
+        IsGamePaused = true; // API 응답이 올 때까지 잠시 정지
+        
+        if (APIManager.Instance != null)
+        {
+            APIManager.Instance.StartGame(currentStageCode, (res) => {
+                currentRunId = res.runId;
+                Debug.Log("<color=green>[RunId 발급 완료]</color> 판 번호: " + currentRunId);
+                IsGamePaused = false; // 받아오면 출발!
+            }, (err) => {
+                IsGamePaused = false; // 실패해도 일단 로컬 동작되게 출발
+            });
+        }
+        else
+        {
+            IsGamePaused = false; // 매니저가 없으면 바로 알아서 출발
+        }
     }
 
     void Update()
@@ -345,6 +366,56 @@ public class GameManager : MonoBehaviour
         Instance = this;
         heartUI = GameObject.Find("heart");
         scoreUI = GameObject.Find("Score");
+        BindPauseMenuHomeButton();
+    }
+
+    private void BindPauseMenuHomeButton()
+    {
+        GameObject canvasObj = GameObject.Find("GameControlUI");
+        if (canvasObj == null)
+        {
+            return;
+        }
+
+        Transform homeTransform = canvasObj.transform.Find("SettingsPanel/home");
+        if (homeTransform == null)
+        {
+            return;
+        }
+
+        Button homeButton = homeTransform.GetComponent<Button>();
+        if (homeButton == null)
+        {
+            return;
+        }
+
+        homeButton.onClick.RemoveListener(GoToStageSelect);
+
+        if (HasPersistentClick(homeButton, this, nameof(GoToStageSelect)))
+        {
+            return;
+        }
+
+        homeButton.onClick.AddListener(GoToStageSelect);
+    }
+
+    private static bool HasPersistentClick(Button button, Object target, string methodName)
+    {
+        if (button == null || target == null || string.IsNullOrWhiteSpace(methodName))
+        {
+            return false;
+        }
+
+        for (int i = 0; i < button.onClick.GetPersistentEventCount(); i++)
+        {
+            if (button.onClick.GetPersistentTarget(i) == target &&
+                button.onClick.GetPersistentMethodName(i) == methodName)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // 모달 창이 떴을 때 게임 정지
@@ -538,25 +609,20 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // [금융상품 선택하기 버튼] 용도 (이겼을 때 누르는 버튼)
+    // [금융상품 모달 '보리보 만나러 가기' 버튼] 용도 (이겼을 때 누르는 버튼) -> FinanceSelect 씬으로 맵 이동
     public void SelectFinanceProduct()
     {
-        Debug.Log("<color=yellow>[GameManager]</color> 금융상품 선택하기 버튼 클릭!");
-        
-        // 1. 여기서 게임이 완전히 끝난 것이므로 최종 코인을 전송할 수도 있고
-        // APIManager.Instance.SendGameResult(coinCount, SceneManager.GetActiveScene().name);
+        Debug.Log("<color=yellow>[GameManager]</color> 스테이지 클리어! 금융상품 선택(FinanceSelect) 씬으로 이동합니다.");
+        Time.timeScale = 1f;
+        FinanceFlowContext.Capture(ResolveCurrentStageCode(), coinCount, currentRunId);
+        if (Application.CanStreamedLevelBeLoaded("FinanceSelect"))
+        {
+            SceneManager.LoadScene("FinanceSelect");
+            return;
+        }
 
-        // 2. 백엔드에서 금융상품 선택지를 가져옵니다.
-        if (APIManager.Instance != null)
-        {
-            APIManager.Instance.GetFinanceOptions();
-        }
-        else
-        {
-            Debug.LogError("APIManager가 없습니다! 씬에 추가해주세요.");
-        }
-        
-        // TODO: UI 패널을 띄워서(financePanel 등) 선택지를 보여주는 코드를 추가해야 합니다.
+        Debug.LogWarning("FinanceSelect scene is not in build settings. Returning to Lobby instead.");
+        SceneManager.LoadScene("Lobby");
     }
 
     // [설정 버튼] 및 [일시정지] 용도 
@@ -581,15 +647,53 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // [바깥으로 나가기 - 씬 이름 지정] 용도
-    // Unity Inspector의 버튼에서 이 함수를 고르고, 이동하고 싶은 씬 이름(문자열, 예: "MainMenu")을 적어주세요.
+    // [바깥으로 나가기 - 씬 이름 지정] 용도 (패배 시 로비, 혹은 설정창에서 메인화면 이동 등)
+    // 인스펙터 버튼에 적어둔 문자열(sceneName)을 그대로 믿고 이동합니다.
     public void GoToScene(string sceneName)
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(sceneName);
+        // 💡 인스펙터에 옛날 이름(MainMenu)이 적혀있거나 비어있을 경우를 대비한 안전 장치
+        if (sceneName == "MainMenu" || sceneName == "MainPage" || sceneName == "Mainpage" || string.IsNullOrEmpty(sceneName))
+        {
+            SceneManager.LoadScene("Lobby");
+        }
+        else
+        {
+            SceneManager.LoadScene(sceneName);
+        }
     }
 
     // [게임 완전히 끄기 / 나가기 버튼] 용도
+    public void GoToStageSelect()
+    {
+        Time.timeScale = 1f;
+
+        string targetSceneName = ResolveStageSelectSceneName();
+        if (string.IsNullOrEmpty(targetSceneName))
+        {
+            Debug.LogWarning("StageSelect scene is not in build settings. Returning to Lobby instead.");
+            SceneManager.LoadScene("Lobby");
+            return;
+        }
+
+        SceneManager.LoadScene(targetSceneName);
+    }
+
+    private static string ResolveStageSelectSceneName()
+    {
+        if (Application.CanStreamedLevelBeLoaded("StageSelect"))
+        {
+            return "StageSelect";
+        }
+
+        if (Application.CanStreamedLevelBeLoaded("StageSelectScene"))
+        {
+            return "StageSelectScene";
+        }
+
+        return string.Empty;
+    }
+
     public void QuitGame()
     {
         Debug.Log("앱을 종료합니다.");
@@ -624,6 +728,14 @@ public class GameManager : MonoBehaviour
     public void ShowVictoryPanel()
     {
         if (sfxSource != null && winSound != null) sfxSource.PlayOneShot(winSound, winVolume);
+        
+        if (APIManager.Instance != null && currentRunId != -1)
+        {
+            player p = FindObjectOfType<player>();
+            int hp = p != null ? p.health : 1;
+            APIManager.Instance.SendGameResult(currentRunId, coinCount, Mathf.FloorToInt(distanceTraveled), hp, true, ResolveCurrentStageCode());
+        }
+
         if (victoryPanel != null)
         {
             victoryPanel.SetActive(true);
@@ -635,6 +747,14 @@ public class GameManager : MonoBehaviour
     {
         if (bgmSource != null) bgmSource.Stop();
         if (sfxSource != null && loseSound != null) sfxSource.PlayOneShot(loseSound, loseVolume);
+        
+        if (APIManager.Instance != null && currentRunId != -1)
+        {
+            player p = FindObjectOfType<player>();
+            int hp = p != null ? p.health : 0;
+            APIManager.Instance.SendGameResult(currentRunId, coinCount, Mathf.FloorToInt(distanceTraveled), hp, false, ResolveCurrentStageCode());
+        }
+
         if (losePanel != null)
         {
             losePanel.SetActive(true);
@@ -680,5 +800,21 @@ public class GameManager : MonoBehaviour
         {
             sfxSource.PlayOneShot(clip, volume);
         }
+    }
+
+    private string ResolveCurrentStageCode()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+        if (sceneName.Contains("2000"))
+        {
+            return "ERA_2000";
+        }
+
+        if (sceneName.Contains("2020"))
+        {
+            return "ERA_2020";
+        }
+
+        return "ERA_1980";
     }
 }
