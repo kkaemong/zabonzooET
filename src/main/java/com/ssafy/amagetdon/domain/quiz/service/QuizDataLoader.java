@@ -5,29 +5,40 @@ import com.ssafy.amagetdon.domain.quiz.entity.QuizQuestion;
 import com.ssafy.amagetdon.domain.quiz.repository.QuizChoiceRepository;
 import com.ssafy.amagetdon.domain.quiz.repository.QuizQuestionRepository;
 import jakarta.annotation.PostConstruct;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 @Component
 @RequiredArgsConstructor
 public class QuizDataLoader {
+    private static final String QUIZ_RESOURCE_PATH = "quiz/한국산업은행_금융 관련 용어_20151231.csv";
 
     private final QuizQuestionRepository quizQuestionRepository;
     private final QuizChoiceRepository quizChoiceRepository;
 
+    @Value("${QUIZ_FORCE_RELOAD:false}")
+    private boolean forceReload;
+
     @PostConstruct
     @Transactional
     public void loadQuizData() {
-        if (quizQuestionRepository.count() > 0) {
+        long existingQuestionCount = quizQuestionRepository.count();
+        if (existingQuestionCount > 0 && !forceReload) {
             return;
+        }
+
+        if (existingQuestionCount > 0) {
+            quizChoiceRepository.deleteAllInBatch();
+            quizQuestionRepository.deleteAllInBatch();
         }
 
         List<QuizCsvRow> rows = readCsv();
@@ -47,7 +58,6 @@ public class QuizDataLoader {
                     .build();
 
             QuizQuestion savedQuestion = quizQuestionRepository.save(question);
-
             List<String> choices = createChoices(row.term(), allTerms);
 
             for (String choice : choices) {
@@ -65,19 +75,14 @@ public class QuizDataLoader {
     private List<QuizCsvRow> readCsv() {
         List<QuizCsvRow> rows = new ArrayList<>();
 
-        try (
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(
-                                new ClassPathResource("quiz/한국산업은행_금융 관련 용어_20151231.csv").getInputStream(),
-                                "EUC-KR"
-                        )
-                )
-        ) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(
+                        new ClassPathResource(QUIZ_RESOURCE_PATH).getInputStream(),
+                        StandardCharsets.UTF_8))) {
             String line = reader.readLine();
 
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split(",", 4);
-
                 if (tokens.length < 4) {
                     continue;
                 }
@@ -86,7 +91,6 @@ public class QuizDataLoader {
                 String subcategory = tokens[1].trim();
                 String term = tokens[2].trim();
                 String description = tokens[3].trim();
-
                 rows.add(new QuizCsvRow(category, subcategory, term, description));
             }
         } catch (Exception e) {
@@ -107,7 +111,6 @@ public class QuizDataLoader {
         }
 
         Collections.shuffle(shuffled);
-
         result.add(answer);
 
         int count = 0;

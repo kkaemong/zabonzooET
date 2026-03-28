@@ -9,6 +9,8 @@ public class InvestOptionPanelUI : MonoBehaviour
     [SerializeField] private FinanceSelectManager manager;
     [SerializeField] private InvestOptionButton[] optionButtons = Array.Empty<InvestOptionButton>();
 
+    private APIManager.FinanceOptionResponse currentOption;
+
     private void Awake()
     {
         InitializePanel();
@@ -17,11 +19,20 @@ public class InvestOptionPanelUI : MonoBehaviour
     private void OnEnable()
     {
         InitializePanel();
+        ApplyCurrentOption();
+    }
+
+    public void Configure(FinanceSelectManager owner, APIManager.FinanceOptionResponse option)
+    {
+        manager = owner;
+        currentOption = option;
+        InitializePanel();
+        ApplyCurrentOption();
     }
 
     public void OnOptionClicked(InvestOptionButton optionButton)
     {
-        if (manager == null || optionButton == null)
+        if (manager == null || optionButton == null || !optionButton.IsConfigured)
         {
             return;
         }
@@ -29,9 +40,10 @@ public class InvestOptionPanelUI : MonoBehaviour
         FinanceSelectionResult result = new FinanceSelectionResult
         {
             choiceType = FinanceChoiceType.Invest,
+            choiceCode = "INVESTMENT",
             optionId = optionButton.OptionId,
             optionName = optionButton.OptionName,
-            description = optionButton.Description
+            description = optionButton.Description,
         };
 
         manager.OnInvestOptionSelected(result);
@@ -50,7 +62,6 @@ public class InvestOptionPanelUI : MonoBehaviour
         }
 
         AutoBindOptionButtons();
-
         if (optionButtons == null)
         {
             return;
@@ -59,6 +70,30 @@ public class InvestOptionPanelUI : MonoBehaviour
         for (int i = 0; i < optionButtons.Length; i++)
         {
             optionButtons[i]?.Initialize(this);
+        }
+    }
+
+    private void ApplyCurrentOption()
+    {
+        APIManager.FinanceSubOptionResponse[] subOptions = currentOption != null && currentOption.subOptions != null
+            ? currentOption.subOptions
+            : Array.Empty<APIManager.FinanceSubOptionResponse>();
+
+        if (optionButtons == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < optionButtons.Length; i++)
+        {
+            InvestOptionButton button = optionButtons[i];
+            if (button == null)
+            {
+                continue;
+            }
+
+            APIManager.FinanceSubOptionResponse subOption = i < subOptions.Length ? subOptions[i] : null;
+            button.ApplyData(subOption);
         }
     }
 
@@ -123,12 +158,48 @@ public class InvestOptionButton
     public string OptionName => optionName;
     public string Description => description;
     public bool IsUsable => button != null;
+    public bool IsConfigured => button != null && !string.IsNullOrWhiteSpace(optionId);
 
     public void Initialize(InvestOptionPanelUI panel)
     {
         owner = panel;
         EnsureRuntimeDefaults();
+        RefreshVisual();
 
+        if (button != null)
+        {
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(HandleClick);
+        }
+    }
+
+    public void ApplyData(APIManager.FinanceSubOptionResponse optionData)
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        bool isActive = optionData != null;
+        button.gameObject.SetActive(isActive);
+        if (!isActive)
+        {
+            return;
+        }
+
+        optionId = optionData.code;
+        optionName = optionData.name;
+        description = optionData.description;
+        RefreshVisual();
+    }
+
+    private void HandleClick()
+    {
+        owner?.OnOptionClicked(this);
+    }
+
+    private void RefreshVisual()
+    {
         if (nameText != null)
         {
             nameText.text = optionName;
@@ -138,22 +209,12 @@ public class InvestOptionButton
         {
             descriptionText.text = description;
         }
-
-        if (button != null)
-        {
-            button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(HandleClick);
-        }
-    }
-
-    private void HandleClick()
-    {
-        owner?.OnOptionClicked(this);
     }
 
     public static InvestOptionButton CreateRuntime(Button sourceButton)
     {
         TMP_Text primaryText = FindPrimaryText(sourceButton);
+        TMP_Text secondaryText = FindSecondaryText(sourceButton, primaryText);
         string resolvedName = ResolveOptionName(primaryText, sourceButton);
 
         return new InvestOptionButton
@@ -163,7 +224,7 @@ public class InvestOptionButton
             description = string.Empty,
             button = sourceButton,
             nameText = primaryText,
-            descriptionText = null
+            descriptionText = secondaryText,
         };
     }
 
@@ -177,6 +238,11 @@ public class InvestOptionButton
         if (nameText == null)
         {
             nameText = FindPrimaryText(button);
+        }
+
+        if (descriptionText == null)
+        {
+            descriptionText = FindSecondaryText(button, nameText);
         }
 
         if (string.IsNullOrWhiteSpace(optionName))
@@ -207,6 +273,28 @@ public class InvestOptionButton
         }
 
         return texts.Length > 0 ? texts[0] : null;
+    }
+
+    private static TMP_Text FindSecondaryText(Button sourceButton, TMP_Text primaryText)
+    {
+        if (sourceButton == null)
+        {
+            return null;
+        }
+
+        TMP_Text[] texts = sourceButton.GetComponentsInChildren<TMP_Text>(true);
+        for (int i = 0; i < texts.Length; i++)
+        {
+            TMP_Text candidate = texts[i];
+            if (candidate == null || candidate == primaryText)
+            {
+                continue;
+            }
+
+            return candidate;
+        }
+
+        return null;
     }
 
     private static string ResolveOptionName(TMP_Text text, Button sourceButton)

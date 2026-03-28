@@ -180,6 +180,7 @@ public class LobbyDirector : MonoBehaviour
         ResolveShopUiReferences();
         ResolveGarageUiReferences();
         EnsureGeneratedGarageUi();
+        backendBaseUrl = BackendUrlResolver.Resolve(backendBaseUrl);
         _authApi = new LobbyAuthApi(backendBaseUrl);
     }
 

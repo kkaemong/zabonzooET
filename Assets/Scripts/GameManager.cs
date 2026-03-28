@@ -733,7 +733,17 @@ public class GameManager : MonoBehaviour
         {
             player p = FindObjectOfType<player>();
             int hp = p != null ? p.health : 1;
-            APIManager.Instance.SendGameResult(currentRunId, coinCount, Mathf.FloorToInt(distanceTraveled), hp, true, ResolveCurrentStageCode());
+            FinanceFlowContext.BeginRunResultSubmission(currentRunId);
+            APIManager.Instance.SendGameResult(
+                currentRunId,
+                coinCount,
+                Mathf.FloorToInt(distanceTraveled),
+                hp,
+                true,
+                ResolveCurrentStageCode(),
+                "NONE",
+                FinanceFlowContext.ApplyRunResult,
+                FinanceFlowContext.SetRunResultError);
         }
 
         if (victoryPanel != null)
@@ -752,7 +762,17 @@ public class GameManager : MonoBehaviour
         {
             player p = FindObjectOfType<player>();
             int hp = p != null ? p.health : 0;
-            APIManager.Instance.SendGameResult(currentRunId, coinCount, Mathf.FloorToInt(distanceTraveled), hp, false, ResolveCurrentStageCode());
+            FinanceFlowContext.BeginRunResultSubmission(currentRunId);
+            APIManager.Instance.SendGameResult(
+                currentRunId,
+                coinCount,
+                Mathf.FloorToInt(distanceTraveled),
+                hp,
+                false,
+                ResolveCurrentStageCode(),
+                "NONE",
+                FinanceFlowContext.ApplyRunResult,
+                FinanceFlowContext.SetRunResultError);
         }
 
         if (losePanel != null)

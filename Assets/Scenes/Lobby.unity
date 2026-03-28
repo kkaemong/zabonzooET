@@ -8488,7 +8488,7 @@ MonoBehaviour:
   canvasLogin: {fileID: 936732266}
   canvasLobby: {fileID: 78626241}
   btnLogin: {fileID: 825135359}
-  backendBaseUrl: http://j14a507.p.ssafy.io
+  backendBaseUrl: 
   autoLoginAfterSignup: 1
   allowDirectLoginButton: 0
   repairUserIdOverride: -1

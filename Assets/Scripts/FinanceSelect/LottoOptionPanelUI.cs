@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,9 +13,10 @@ public class LottoOptionPanelUI : MonoBehaviour
     [SerializeField] private GameObject statusTextRoot;
     [SerializeField] private TMP_Text resultMessageText;
     [SerializeField] private float resultDisplayDuration = 1.5f;
-    [SerializeField] private LottoOptionData[] options;
+    [SerializeField] private LottoOptionData[] options = Array.Empty<LottoOptionData>();
 
     private FinanceSelectionResult pendingResult;
+    private LottoOptionData[] runtimeOptions = Array.Empty<LottoOptionData>();
 
     private void Awake()
     {
@@ -26,21 +28,6 @@ public class LottoOptionPanelUI : MonoBehaviour
         if (manager == null)
         {
             manager = UnityEngine.Object.FindFirstObjectByType<FinanceSelectManager>();
-        }
-
-        if (rouletteController == null)
-        {
-            Debug.LogWarning($"LottoOptionPanelUI.Awake: rouletteController is not assigned on '{name}'.", this);
-        }
-
-        if (spinButton == null)
-        {
-            Debug.LogWarning($"LottoOptionPanelUI.Awake: spinButton is not assigned on '{name}'.", this);
-        }
-
-        if (options == null || options.Length == 0)
-        {
-            Debug.LogWarning($"LottoOptionPanelUI.Awake: no lotto options configured on '{name}'.", this);
         }
 
         if (spinButton != null)
@@ -56,49 +43,55 @@ public class LottoOptionPanelUI : MonoBehaviour
         SetOptionsVisible(true);
         UpdateResultMessage("룰렛을 돌려 보세요.");
 
-        if (rouletteController != null && options != null && options.Length > 0)
+        LottoOptionData[] activeOptions = ResolveOptions();
+        if (rouletteController != null && activeOptions.Length > 0)
         {
-            rouletteController.SetSliceCount(options.Length);
+            rouletteController.SetSliceCount(activeOptions.Length);
         }
 
         if (spinButton != null)
         {
-            spinButton.interactable = true;
+            spinButton.interactable = activeOptions.Length > 0;
+        }
+    }
+
+    public void Configure(FinanceSelectManager owner, APIManager.FinanceOptionResponse option)
+    {
+        manager = owner;
+        runtimeOptions = BuildRuntimeOptions(option);
+
+        if (rouletteController != null && runtimeOptions.Length > 0)
+        {
+            rouletteController.SetSliceCount(runtimeOptions.Length);
         }
     }
 
     public void OnClickSpinButton()
     {
-        if (rouletteController == null)
+        if (rouletteController == null || rouletteController.IsSpinning)
         {
-            Debug.LogWarning($"LottoOptionPanelUI.OnClickSpinButton: rouletteController is missing on '{name}'.", this);
             return;
         }
 
-        if (rouletteController.IsSpinning)
-        {
-            Debug.LogWarning($"LottoOptionPanelUI.OnClickSpinButton: roulette is already spinning on '{name}'.", this);
-            return;
-        }
-
-        if (options == null || options.Length == 0)
+        LottoOptionData[] activeOptions = ResolveOptions();
+        if (activeOptions.Length == 0)
         {
             Debug.LogWarning($"LottoOptionPanelUI.OnClickSpinButton: no lotto options configured on '{name}'.", this);
             return;
         }
 
-        int targetIndex = UnityEngine.Random.Range(0, options.Length);
-        LottoOptionData targetOption = options[targetIndex];
-        Debug.Log($"LottoOptionPanelUI.OnClickSpinButton: selected targetIndex={targetIndex}, option='{targetOption.optionName}'.", this);
-
+        int targetIndex = UnityEngine.Random.Range(0, activeOptions.Length);
+        LottoOptionData targetOption = activeOptions[targetIndex];
         pendingResult = new FinanceSelectionResult
         {
             choiceType = FinanceChoiceType.Lotto,
+            choiceCode = "LOTTO",
             optionId = targetOption.optionId,
             optionName = targetOption.optionName,
             description = targetOption.description,
-            coinDelta = targetOption.coinDelta,
-            resultMessage = targetOption.resultMessage
+            resultMessage = string.IsNullOrWhiteSpace(targetOption.resultMessage)
+                ? targetOption.description
+                : targetOption.resultMessage,
         };
 
         if (spinButton != null)
@@ -118,12 +111,13 @@ public class LottoOptionPanelUI : MonoBehaviour
             spinButton.interactable = true;
         }
 
-        if (pendingResult != null)
+        if (pendingResult == null)
         {
-            Debug.Log($"LottoOptionPanelUI.OnSpinComplete: result='{pendingResult.optionName}', coinDelta={pendingResult.coinDelta}.", this);
-            UpdateResultMessage(BuildResultMessage(pendingResult));
-            StartCoroutine(NotifyResultAfterDelay());
+            return;
         }
+
+        UpdateResultMessage(BuildResultMessage(pendingResult));
+        StartCoroutine(NotifyResultAfterDelay());
     }
 
     private IEnumerator NotifyResultAfterDelay()
@@ -152,18 +146,49 @@ public class LottoOptionPanelUI : MonoBehaviour
         }
     }
 
-    private string BuildResultMessage(FinanceSelectionResult result)
+    private LottoOptionData[] ResolveOptions()
     {
-        string deltaText = result.coinDelta >= 0
-            ? $"+{result.coinDelta}코인"
-            : $"{result.coinDelta}코인";
+        return runtimeOptions != null && runtimeOptions.Length > 0
+            ? runtimeOptions
+            : options ?? Array.Empty<LottoOptionData>();
+    }
 
-        if (!string.IsNullOrWhiteSpace(result.resultMessage))
+    private static LottoOptionData[] BuildRuntimeOptions(APIManager.FinanceOptionResponse option)
+    {
+        APIManager.FinanceSubOptionResponse[] subOptions = option != null && option.subOptions != null
+            ? option.subOptions
+            : Array.Empty<APIManager.FinanceSubOptionResponse>();
+
+        List<LottoOptionData> results = new List<LottoOptionData>();
+        for (int i = 0; i < subOptions.Length; i++)
         {
-            return $"{result.resultMessage}\n{deltaText}";
+            APIManager.FinanceSubOptionResponse subOption = subOptions[i];
+            if (subOption == null)
+            {
+                continue;
+            }
+
+            results.Add(new LottoOptionData
+            {
+                optionId = subOption.code,
+                optionName = subOption.name,
+                description = subOption.description,
+                resultMessage = subOption.description,
+                coinDelta = 0,
+            });
         }
 
-        return $"{result.optionName}\n{deltaText}";
+        return results.ToArray();
+    }
+
+    private string BuildResultMessage(FinanceSelectionResult result)
+    {
+        if (!string.IsNullOrWhiteSpace(result.resultMessage))
+        {
+            return result.resultMessage;
+        }
+
+        return result.optionName;
     }
 }
 

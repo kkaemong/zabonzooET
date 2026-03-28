@@ -1,3 +1,4 @@
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,6 +13,8 @@ public class FinanceResultPanelUI : MonoBehaviour
     [SerializeField] private Button closeButton;
     [SerializeField] private Button nextButton;
     [SerializeField] private string nextSceneName = "StageSelect";
+
+    private FinanceSelectionResult currentResult;
 
     private void Awake()
     {
@@ -33,30 +36,28 @@ public class FinanceResultPanelUI : MonoBehaviour
             return;
         }
 
+        currentResult = result;
         ResolveReferences();
         BindButtons();
 
         if (titleText != null)
         {
-            titleText.text = string.IsNullOrWhiteSpace(result.optionName)
-                ? "\uACB0\uACFC"
-                : result.optionName;
+            titleText.text = BuildTitle(result);
         }
 
         if (descriptionText != null)
         {
-            descriptionText.text = !string.IsNullOrWhiteSpace(result.resultMessage)
-                ? result.resultMessage
-                : string.IsNullOrWhiteSpace(result.description)
-                    ? "\uC120\uD0DD\uD55C \uAE08\uC735 \uACB0\uACFC\uAC00 \uBC18\uC601\uB429\uB2C8\uB2E4."
-                    : result.description;
+            descriptionText.text = BuildDescription(result);
         }
 
         if (coinDeltaText != null)
         {
-            coinDeltaText.text = result.coinDelta >= 0
-                ? $"+{result.coinDelta} \uCF54\uC778"
-                : $"{result.coinDelta} \uCF54\uC778";
+            coinDeltaText.text = BuildCoinText(result);
+        }
+
+        if (closeButton != null)
+        {
+            closeButton.interactable = !result.isServerConfirmed;
         }
 
         gameObject.SetActive(true);
@@ -64,6 +65,11 @@ public class FinanceResultPanelUI : MonoBehaviour
 
     public void OnClickClose()
     {
+        if (currentResult != null && currentResult.isServerConfirmed)
+        {
+            return;
+        }
+
         manager?.CloseResultPanel();
     }
 
@@ -139,6 +145,112 @@ public class FinanceResultPanelUI : MonoBehaviour
         {
             nextButton.onClick.RemoveListener(OnClickGoToNextScene);
             nextButton.onClick.AddListener(OnClickGoToNextScene);
+        }
+    }
+
+    private static string BuildTitle(FinanceSelectionResult result)
+    {
+        if (result == null)
+        {
+            return "금융 리포트";
+        }
+
+        return string.IsNullOrWhiteSpace(result.optionName)
+            ? "금융 리포트"
+            : result.optionName.Trim();
+    }
+
+    private static string BuildDescription(FinanceSelectionResult result)
+    {
+        if (result == null)
+        {
+            return "금융 리포트를 불러오지 못했습니다.";
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        AppendSection(
+            builder,
+            !string.IsNullOrWhiteSpace(result.resultMessage)
+                ? result.resultMessage
+                : result.description);
+
+        AppendSection(builder, result.aiFeedback);
+
+        if (result.isServerConfirmed)
+        {
+            if (result.finalClear)
+            {
+                AppendSection(builder, "최종 시대까지 모두 클리어했습니다.");
+            }
+            else if (!string.IsNullOrWhiteSpace(result.nextEra))
+            {
+                AppendSection(builder, $"다음 시대: {FormatEra(result.nextEra)}");
+            }
+        }
+
+        if (builder.Length == 0)
+        {
+            builder.Append("선택한 금융 결과가 반영됩니다.");
+        }
+
+        return builder.ToString();
+    }
+
+    private static string BuildCoinText(FinanceSelectionResult result)
+    {
+        if (result == null)
+        {
+            return string.Empty;
+        }
+
+        if (!result.isServerConfirmed && result.coinDelta == 0 && result.finalCoin <= 0)
+        {
+            return string.Empty;
+        }
+
+        string deltaText = result.coinDelta >= 0
+            ? $"+{result.coinDelta:N0} 코인"
+            : $"{result.coinDelta:N0} 코인";
+
+        if (!result.isServerConfirmed)
+        {
+            return deltaText;
+        }
+
+        return $"{deltaText}\n보유 코인 {Mathf.Max(result.finalCoin, 0):N0}";
+    }
+
+    private static void AppendSection(StringBuilder builder, string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        if (builder.Length > 0)
+        {
+            builder.Append("\n\n");
+        }
+
+        builder.Append(value.Trim());
+    }
+
+    private static string FormatEra(string eraCode)
+    {
+        switch ((eraCode ?? string.Empty).Trim().ToUpperInvariant())
+        {
+            case "ERA_1980":
+                return "1980년대";
+
+            case "ERA_2000":
+                return "2000년대";
+
+            case "ERA_2020":
+                return "2020년대";
+
+            default:
+                return eraCode;
         }
     }
 

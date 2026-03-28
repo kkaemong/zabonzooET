@@ -103,17 +103,16 @@ public class APIManager : MonoBehaviour
     [Serializable]
     public class FinanceSubOptionResponse
     {
-        public string subOptionId;
-        public string subOptionName;
+        public string code;
+        public string name;
         public string description;
-        public int expectedReturn;
     }
 
     [Serializable]
     public class FinanceOptionResponse
     {
-        public string optionId;
-        public string optionName;
+        public string optionType;
+        public string title;
         public string description;
         public FinanceSubOptionResponse[] subOptions;
     }
@@ -122,6 +121,43 @@ public class APIManager : MonoBehaviour
     public class FinanceOptionsResponse
     {
         public FinanceOptionResponse[] options;
+    }
+
+    [Serializable]
+    public class FinanceEventRequest
+    {
+        public string stageId;
+        public int baseCoin;
+        public string choice;
+        public string subOptionCode;
+    }
+
+    [Serializable]
+    public class FinanceEventResponse
+    {
+        public string stageId;
+        public string choice;
+        public int baseCoin;
+        public int changeCoin;
+        public int finalCoin;
+        public string resultType;
+        public string detailResult;
+        public string aiFeedback;
+        public string nextEra;
+        public bool finalClear;
+    }
+
+    [Serializable]
+    public class RunResultResponse
+    {
+        public long runId;
+        public bool cleared;
+        public int rewardCoin;
+        public int remainingTotalCoin;
+        public string currentEra;
+        public string nextStep;
+        public bool financeEventAvailable;
+        public string nextEra;
     }
 
     private void Awake()
@@ -169,12 +205,28 @@ public class APIManager : MonoBehaviour
         string currentStage = "ERA_1980",
         string financeChoice = "NONE")
     {
+        SendGameResult(runId, coins, distance, hp, cleared, currentStage, financeChoice, null, null);
+    }
+
+    public void SendGameResult(
+        long runId,
+        int coins,
+        int distance,
+        int hp,
+        bool cleared,
+        string currentStage,
+        string financeChoice,
+        Action<RunResultResponse> onSuccess,
+        Action<string> onError)
+    {
         SyncRuntimeSession();
 
         long backendUserId = ResolveBackendUserId();
         if (backendUserId <= 0)
         {
-            Debug.LogWarning("[APIManager] Cannot send run-result because backend user id is missing.");
+            const string message = "[APIManager] Cannot send run-result because backend user id is missing.";
+            Debug.LogWarning(message);
+            onError?.Invoke(message);
             return;
         }
 
@@ -193,7 +245,25 @@ public class APIManager : MonoBehaviour
         };
 
         string url = BuildUrl($"/api/game/run-result?userId={backendUserId}");
-        StartCoroutine(PostRequest(url, JsonUtility.ToJson(body)));
+        string json = JsonUtility.ToJson(body);
+
+        if (onSuccess == null && onError == null)
+        {
+            StartCoroutine(PostRequest(url, json));
+            return;
+        }
+
+        StartCoroutine(PostRequestWithCallback(
+            url,
+            json,
+            responseJson =>
+            {
+                if (TryDeserialize(responseJson, out RunResultResponse response, onError, "game/run-result"))
+                {
+                    onSuccess?.Invoke(response);
+                }
+            },
+            onError));
     }
 
     public void GetStageInfo(string stageCode, Action<string> onSuccess = null, Action<string> onError = null)
@@ -232,6 +302,44 @@ public class APIManager : MonoBehaviour
         });
     }
 
+    public void SubmitFinanceEvent(
+        string stageCode,
+        string choice,
+        string subOptionCode,
+        int baseCoin,
+        Action<FinanceEventResponse> onSuccess,
+        Action<string> onError)
+    {
+        SyncRuntimeSession();
+
+        long backendUserId = ResolveBackendUserId();
+        if (backendUserId <= 0)
+        {
+            onError?.Invoke("Cannot submit finance event because backend user id is missing.");
+            return;
+        }
+
+        FinanceEventRequest body = new FinanceEventRequest
+        {
+            stageId = string.IsNullOrWhiteSpace(stageCode) ? ResolveCurrentStageCode() : stageCode,
+            baseCoin = Mathf.Max(baseCoin, 0),
+            choice = choice,
+            subOptionCode = subOptionCode,
+        };
+
+        StartCoroutine(PostRequestWithCallback(
+            BuildUrl($"/api/game/finance-event?userId={backendUserId}"),
+            JsonUtility.ToJson(body),
+            responseJson =>
+            {
+                if (TryDeserialize(responseJson, out FinanceEventResponse response, onError, "game/finance-event"))
+                {
+                    onSuccess?.Invoke(response);
+                }
+            },
+            onError));
+    }
+
     public void GetQuiz(long runId, Action<QuizQuestionResponse> onSuccess, Action<string> onError)
     {
         SyncRuntimeSession();
@@ -267,9 +375,7 @@ public class APIManager : MonoBehaviour
 
     private string BuildUrl(string path)
     {
-        string normalizedBaseUrl = string.IsNullOrWhiteSpace(baseUrl)
-            ? LobbyAuthApi.DefaultBaseUrl
-            : baseUrl.TrimEnd('/');
+        string normalizedBaseUrl = BackendUrlResolver.Resolve(baseUrl);
 
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -305,10 +411,10 @@ public class APIManager : MonoBehaviour
 
     private void SyncRuntimeSession()
     {
-        if (!string.IsNullOrWhiteSpace(BackendRuntimeSession.BaseUrl))
-        {
-            baseUrl = BackendRuntimeSession.BaseUrl;
-        }
+        string sessionBaseUrl = !string.IsNullOrWhiteSpace(BackendRuntimeSession.BaseUrl)
+            ? BackendRuntimeSession.BaseUrl
+            : baseUrl;
+        baseUrl = BackendUrlResolver.Resolve(sessionBaseUrl);
     }
 
     private bool TryDeserialize<T>(string json, out T result, Action<string> onError, string endpoint)
@@ -345,7 +451,8 @@ public class APIManager : MonoBehaviour
             request.SetRequestHeader("Authorization", "Bearer " + authToken);
         }
 
-        if (!string.IsNullOrWhiteSpace(BackendRuntimeSession.SessionCookie))
+        if (!BackendUrlResolver.UsesBrowserManagedCookies &&
+            !string.IsNullOrWhiteSpace(BackendRuntimeSession.SessionCookie))
         {
             request.SetRequestHeader("Cookie", BackendRuntimeSession.SessionCookie);
         }

@@ -8,7 +8,7 @@ public static class BackendRuntimeSession
 
     public static void Configure(string baseUrl, long userId, string sessionCookie, string loginId, string nickname)
     {
-        BaseUrl = string.IsNullOrWhiteSpace(baseUrl) ? LobbyAuthApi.DefaultBaseUrl : baseUrl.TrimEnd('/');
+        BaseUrl = BackendUrlResolver.Resolve(baseUrl);
         UserId = userId;
         SessionCookie = string.IsNullOrWhiteSpace(sessionCookie) ? null : sessionCookie.Trim();
         LoginId = loginId ?? string.Empty;

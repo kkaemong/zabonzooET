@@ -102,6 +102,16 @@ public class FinanceChoiceCardUI : MonoBehaviour, IPointerEnterHandler, IPointer
         manager.RequestSelect(this);
     }
 
+    public void SetTitle(string value)
+    {
+        if (titleText == null || string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        titleText.text = value.Trim();
+    }
+
     private void RefreshVisual()
     {
         bool isHighlighted = isSelected;

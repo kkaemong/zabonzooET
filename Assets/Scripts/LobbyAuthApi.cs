@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 public sealed class LobbyAuthApi
 {
-    public const string DefaultBaseUrl = "http://j14a507.p.ssafy.io";
+    public static string DefaultBaseUrl => BackendUrlResolver.DefaultBaseUrl;
 
     private readonly string _baseUrl;
     private string _sessionCookie;
@@ -17,7 +17,7 @@ public sealed class LobbyAuthApi
 
     public LobbyAuthApi(string baseUrl)
     {
-        _baseUrl = string.IsNullOrWhiteSpace(baseUrl) ? DefaultBaseUrl : baseUrl.TrimEnd('/');
+        _baseUrl = BackendUrlResolver.Resolve(baseUrl);
     }
 
     public bool HasSession => _hasSession || !string.IsNullOrEmpty(_sessionCookie);
@@ -691,7 +691,7 @@ public sealed class LobbyAuthApi
 
         request.SetRequestHeader("Accept", "application/json");
 
-        if (!string.IsNullOrEmpty(_sessionCookie))
+        if (!BackendUrlResolver.UsesBrowserManagedCookies && !string.IsNullOrEmpty(_sessionCookie))
         {
             request.SetRequestHeader("Cookie", _sessionCookie);
         }
@@ -718,6 +718,12 @@ public sealed class LobbyAuthApi
 
     private void CaptureSessionCookie(UnityWebRequest request)
     {
+        if (BackendUrlResolver.UsesBrowserManagedCookies)
+        {
+            _hasSession = true;
+            return;
+        }
+
         string setCookie = request.GetResponseHeader("Set-Cookie");
         if (string.IsNullOrEmpty(setCookie))
         {

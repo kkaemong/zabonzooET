@@ -1,13 +1,16 @@
-﻿package com.ssafy.amagetdon.domain.user.service;
+package com.ssafy.amagetdon.domain.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ssafy.amagetdon.common.exception.CustomException;
 import com.ssafy.amagetdon.common.exception.ErrorCode;
+import com.ssafy.amagetdon.domain.game.entity.UserStat;
+import com.ssafy.amagetdon.domain.game.repository.UserStatRepository;
 import com.ssafy.amagetdon.domain.user.dto.request.LoginRequest;
 import com.ssafy.amagetdon.domain.user.dto.request.SignUpRequest;
 import com.ssafy.amagetdon.domain.user.dto.response.DuplicateCheckResponse;
@@ -31,6 +34,9 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private UserStatRepository userStatRepository;
+
     @InjectMocks
     private UserService userService;
 
@@ -45,6 +51,7 @@ class UserServiceTest {
         when(userRepository.existsByLoginId("test123")).thenReturn(false);
         when(userRepository.existsByNickname("harin")).thenReturn(false);
         when(passwordEncoder.encode("1234")).thenReturn("encoded");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         userService.signUp(request);
 
@@ -54,6 +61,7 @@ class UserServiceTest {
         assertThat(saved.getLoginId()).isEqualTo("test123");
         assertThat(saved.getPassword()).isEqualTo("encoded");
         assertThat(saved.getNickname()).isEqualTo("harin");
+        verify(userStatRepository).save(any(UserStat.class));
     }
 
     @Test

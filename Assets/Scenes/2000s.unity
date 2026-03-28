@@ -1457,7 +1457,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d405a78c67d87a4bbaae80f1e273117, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::APIManager
-  baseUrl: http://j14a507.p.ssafy.io
+  baseUrl: 
   authToken: 
 --- !u!4 &479661355
 Transform:
