@@ -97,6 +97,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        SharedSceneBgm.Stop();
+
         // 💡 달리기 전용 루프 스피커 동적 생성 (독립적인 피치 조절용)
         if (runSource == null)
         {

@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class StageSelectManager : MonoBehaviour
 {
+    private const string MenuBgmResourcePath = "MenuBgm";
+    private const float MenuBgmVolume = 0.35f;
+
     [Header("Cards")]
     [SerializeField] private List<StageCardUI> stageCards = new();
     [SerializeField] private int defaultSelectedIndex;
@@ -18,6 +21,7 @@ public class StageSelectManager : MonoBehaviour
     private void Awake()
     {
         EnsureUserDataManager();
+        InitializeMenuBgm();
         InitializeCards();
     }
 
@@ -251,5 +255,16 @@ public class StageSelectManager : MonoBehaviour
 
         return stageInfo.DefaultUnlocked
             || (UserDataManager.Instance != null && UserDataManager.Instance.IsStageUnlocked(stageInfo.StageId));
+    }
+
+    private void InitializeMenuBgm()
+    {
+        if (Resources.Load<AudioClip>(MenuBgmResourcePath) == null)
+        {
+            Debug.LogWarning($"StageSelectManager: Menu BGM resource '{MenuBgmResourcePath}' was not found.", this);
+            return;
+        }
+
+        SharedSceneBgm.Play(MenuBgmResourcePath, MenuBgmVolume);
     }
 }

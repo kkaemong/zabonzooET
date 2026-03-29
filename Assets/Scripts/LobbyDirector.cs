@@ -53,6 +53,11 @@ public class LobbyDirector : MonoBehaviour
     private const string PlayerStatePrefsPrefix = "MonET.Lobby.PlayerState.";
     private const string RepairUserIdPrefsPrefix = "MonET.Lobby.RepairUserId.";
     private const string LastKnownCoinPrefsPrefix = "MonET.Lobby.LastKnownCoin.";
+    private const string MenuBgmResourcePath = "MenuBgm";
+    private const string CrashSfxResourcePath = "LobbyCrashSfx";
+    private const float MenuBgmVolume = 0.35f;
+    private const float CrashSfxVolume = 1f;
+    private const float CrashSfxLeadTime = 0.7f;
 
     private CanvasGroup _loginCanvasGroup;
     private CanvasGroup _lobbyCanvasGroup;
@@ -97,6 +102,7 @@ public class LobbyDirector : MonoBehaviour
     private int _currentBaseHp = 100;
     private float _currentBaseSpeed = 2f;
     private int _currentBoosterBonusSec;
+    private AudioSource _crashSfxSource;
 
     private enum AuthMode
     {
@@ -182,6 +188,8 @@ public class LobbyDirector : MonoBehaviour
         EnsureGeneratedGarageUi();
         backendBaseUrl = BackendUrlResolver.Resolve(backendBaseUrl);
         _authApi = new LobbyAuthApi(backendBaseUrl);
+        InitializeMenuBgm();
+        InitializeCrashSfx();
     }
 
     private void Start()
@@ -1682,6 +1690,7 @@ public class LobbyDirector : MonoBehaviour
         SetParticleActive(fxImpactDust, false);
         SetParticleActive(fxSmokeA, false);
         SetParticleActive(fxSmokeB, false);
+        StopMenuBgm();
 
         if (canvasLogin != null)
         {
@@ -1786,6 +1795,7 @@ public class LobbyDirector : MonoBehaviour
         HideCanvas(canvasShop);
         HideCanvas(canvasGarage);
         BindNavigationButtons();
+        StartMenuBgm();
     }
 
     private void BindNavigationButtons()
@@ -2567,10 +2577,13 @@ public class LobbyDirector : MonoBehaviour
 
     private IEnumerator CrashSequence()
     {
+        bool crashSfxPlayed = false;
+
         if (_loginCanvasGroup != null)
         {
             yield return StartCoroutine(FadeCanvasGroup(_loginCanvasGroup, 1f, 0f, loginFadeOutDuration));
         }
+        StopMenuBgm();
 
         if (canvasLogin != null)
         {
@@ -2589,6 +2602,7 @@ public class LobbyDirector : MonoBehaviour
 
             float elapsed = 0f;
             const float fallDuration = 0.85f;
+            float crashSfxTriggerTime = Mathf.Max(0f, fallDuration - CrashSfxLeadTime);
 
             while (elapsed < fallDuration)
             {
@@ -2596,6 +2610,13 @@ public class LobbyDirector : MonoBehaviour
                 float t = elapsed / fallDuration;
                 t *= t;
                 ufoFlying.transform.position = Vector3.Lerp(startPos, endPos, t);
+
+                if (!crashSfxPlayed && elapsed >= crashSfxTriggerTime)
+                {
+                    PlayCrashSfx();
+                    crashSfxPlayed = true;
+                }
+
                 yield return null;
             }
 
@@ -2615,6 +2636,11 @@ public class LobbyDirector : MonoBehaviour
         {
             fxImpactDust.gameObject.SetActive(true);
             fxImpactDust.Play();
+        }
+
+        if (!crashSfxPlayed)
+        {
+            PlayCrashSfx();
         }
 
         StartCoroutine(CameraShake(0.6f, 0.35f));
@@ -2641,6 +2667,7 @@ public class LobbyDirector : MonoBehaviour
         {
             canvasLobby.SetActive(true);
         }
+        StartMenuBgm();
 
         if (_lobbyCanvasGroup != null)
         {
@@ -2814,6 +2841,50 @@ public class LobbyDirector : MonoBehaviour
         {
             particle.gameObject.SetActive(active);
         }
+    }
+
+    private void InitializeMenuBgm()
+    {
+        if (Resources.Load<AudioClip>(MenuBgmResourcePath) == null)
+        {
+            Debug.LogWarning($"LobbyDirector: Menu BGM resource '{MenuBgmResourcePath}' was not found.", this);
+        }
+    }
+
+    private void InitializeCrashSfx()
+    {
+        AudioClip crashClip = Resources.Load<AudioClip>(CrashSfxResourcePath);
+        if (crashClip == null)
+        {
+            Debug.LogWarning($"LobbyDirector: Crash SFX resource '{CrashSfxResourcePath}' was not found.", this);
+            return;
+        }
+
+        _crashSfxSource = gameObject.AddComponent<AudioSource>();
+        _crashSfxSource.playOnAwake = false;
+        _crashSfxSource.loop = false;
+        _crashSfxSource.volume = CrashSfxVolume;
+        _crashSfxSource.clip = crashClip;
+    }
+
+    private void StartMenuBgm()
+    {
+        SharedSceneBgm.Play(MenuBgmResourcePath, MenuBgmVolume);
+    }
+
+    private void StopMenuBgm()
+    {
+        SharedSceneBgm.Stop();
+    }
+
+    private void PlayCrashSfx()
+    {
+        if (_crashSfxSource == null || _crashSfxSource.clip == null)
+        {
+            return;
+        }
+
+        _crashSfxSource.PlayOneShot(_crashSfxSource.clip, CrashSfxVolume);
     }
 
     private static T FindComponent<T>(Transform root, string relativePath) where T : Component

@@ -7,6 +7,9 @@ using UnityEngine.SceneManagement;
 
 public class FinanceSelectManager : MonoBehaviour
 {
+    private const string FinanceBgmResourcePath = "FinanceMenuBgm";
+    private const float FinanceBgmVolume = 0.35f;
+
     [Header("Cards")]
     [SerializeField] private List<FinanceChoiceCardUI> cards = new();
     [SerializeField] private int defaultSelectedIndex;
@@ -43,6 +46,7 @@ public class FinanceSelectManager : MonoBehaviour
         AutoBindPanels();
         EnsurePanelComponents();
         InitializeResultPanel();
+        InitializeFinanceBgm();
         InitializeCards();
         CloseOptionPanels();
         CloseResultPanel();
@@ -1036,5 +1040,16 @@ public class FinanceSelectManager : MonoBehaviour
         }
 
         return null;
+    }
+
+    private void InitializeFinanceBgm()
+    {
+        if (Resources.Load<AudioClip>(FinanceBgmResourcePath) == null)
+        {
+            Debug.LogWarning($"FinanceSelectManager: Finance BGM resource '{FinanceBgmResourcePath}' was not found.", this);
+            return;
+        }
+
+        SharedSceneBgm.Play(FinanceBgmResourcePath, FinanceBgmVolume, restartIfSame: false);
     }
 }
