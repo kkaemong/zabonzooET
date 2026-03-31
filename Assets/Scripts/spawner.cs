@@ -65,8 +65,8 @@ public class spawner : MonoBehaviour
 
     void SetRandomInterval()
     {
-        // 1000m 완주에 다가갈수록 스폰 간격이 짧아짐 (난이도 상승)
-        float progress = Mathf.Clamp01(GameManager.distanceTraveled / 1000f);
+        // 700m 완주에 다가갈수록 스폰 간격이 짧아짐 (난이도 상승)
+        float progress = Mathf.Clamp01(GameManager.distanceTraveled / 700f);
         float multiplier = Mathf.Lerp(1f, 0.4f, progress); // 후반엔 스폰 간격이 40% 수준으로 짧아짐
         currentInterval = Random.Range(minSpawnInterval, maxSpawnInterval) * multiplier;
     }

@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
     private float currentDifficultySpeed;  // 시간에 따라 서서히 오르는 목표 속도
     public static bool IsGamePaused = false; // 외부(스포너 등)에서 멈춤 상태 확인용
     public static bool isGameOver = false;   // 플레이어 사망 시 영구 정지용
-    private bool isEnding = false;           // 1000m 도착 후 감속 상태 확인용
+    private bool isEnding = false;           // 700m 도착 후 감속 상태 확인용
     private Coroutine boostCoroutine;        // 부스트(가속) 코루틴 추적
     private float lastNotifiedSpeed;
     private Color originalSpeedTextColor = Color.white;
@@ -91,7 +91,7 @@ public class GameManager : MonoBehaviour
     public Text speedText;   // 현재 체감 속도 표시 텍스트
 
     [Header("거리 기반 속보 퀴즈 설정")]
-    public float quizDistanceInterval = 333f; // 1000m 기준 딱 2번(333m, 666m) 팝업
+    public float quizDistanceInterval = 175f; // 700m 기준 딱 3번(175m, 350m, 525m) 팝업
     private float nextQuizDistance;           // 다음 퀴즈가 나올 목표 거리
     private int quizCount = 0;                // 퀴즈 등장 횟수 추적
 
@@ -129,7 +129,8 @@ public class GameManager : MonoBehaviour
         globalSpeed = baseSpeed;
         
         quizCount = 0;
-        nextQuizDistance = quizDistanceInterval; // 첫 퀴즈 목표(333m) 설정
+        quizDistanceInterval = 175f; // 💡 인스펙터 값을 무시하고 700m 기준 3회를 위해 강제 고정
+        nextQuizDistance = quizDistanceInterval; // 첫 퀴즈 목표(175m) 설정
 
         if (speedText == null)
         {
@@ -187,6 +188,9 @@ public class GameManager : MonoBehaviour
         {
             IsGamePaused = false; // 매니저가 없으면 바로 알아서 출발
         }
+
+        // 💡 700m 기준 딱 3회(175, 350, 525) 마커 시각화 업데이트
+        UpdateProgressBarMarkers();
     }
 
     void Update()
@@ -214,10 +218,10 @@ public class GameManager : MonoBehaviour
         {
             if (!isEnding) distanceTraveled += globalSpeed * Time.deltaTime;
 
-            // 목적지 1000m에 도달하면 서서히 멈추는 연출 시작
-            if (distanceTraveled >= 1000f && !isEnding)
+            // 목적지 700m에 도달하면 서서히 멈추는 연출 시작
+            if (distanceTraveled >= 700f && !isEnding)
             {
-                distanceTraveled = 1000f;
+                distanceTraveled = 700f;
                 isEnding = true;
                 StartCoroutine(SlowDownAndClearGame());
             }
@@ -225,7 +229,7 @@ public class GameManager : MonoBehaviour
             // 💡 프로그레스 바(게이지 바) 및 플레이어 아이콘 UI 실시간 업데이트
             if (distanceProgressBar != null)
             {
-                float progress = Mathf.Clamp01(distanceTraveled / 1000f);
+                float progress = Mathf.Clamp01(distanceTraveled / 700f);
                 distanceProgressBar.value = progress;
                 
                 if (playerIconRect != null)
@@ -239,8 +243,8 @@ public class GameManager : MonoBehaviour
             UpdateDistanceUI();
             UpdateSpeedUI();
 
-            // 💡 원래 기획대로 1000m 완주 중 딱 2번만 나오도록 제한 (quizCount < 2)
-            if (quizCount < 2 && distanceTraveled >= nextQuizDistance)
+            // 💡 700m 완주 중 딱 3번만 나오도록 제한 (quizCount < 3)
+            if (quizCount < 3 && distanceTraveled >= nextQuizDistance)
             {
                 TriggerBreakingNews();
             }
@@ -249,7 +253,7 @@ public class GameManager : MonoBehaviour
 
     System.Collections.IEnumerator SlowDownAndClearGame()
     {
-        Debug.Log("<color=green>[Game Clear]</color> 1000m 도달! 브레이크 밟는 중...");
+        Debug.Log("<color=green>[Game Clear]</color> 700m 도달! 브레이크 밟는 중...");
 
         float slowDownDuration = 1.5f; // 서서히 멈출 시간 (1.5초)
         float currentStartSpeed = globalSpeed;
@@ -838,5 +842,57 @@ public class GameManager : MonoBehaviour
         }
 
         return "ERA_1980";
+    }
+
+    private void UpdateProgressBarMarkers()
+    {
+        if (distanceProgressBar == null) return;
+        
+        // 1. 기존에 생성된 마커가 있다면 정리를 위해 "Markers" 컨테이너를 찾습니다.
+        Transform container = distanceProgressBar.transform.Find("Markers");
+        if (container != null)
+        {
+            Destroy(container.gameObject);
+        }
+
+        // 2. 새 컨테이너 생성
+        GameObject containerObj = new GameObject("Markers");
+        container = containerObj.transform;
+        container.SetParent(distanceProgressBar.transform, false);
+        
+        RectTransform containerRect = containerObj.AddComponent<RectTransform>();
+        containerRect.anchorMin = Vector2.zero;
+        containerRect.anchorMax = Vector2.one;
+        containerRect.sizeDelta = Vector2.zero;
+        containerRect.anchoredPosition = Vector2.zero;
+
+        // 3. 700m 중 3회 (175, 350, 525) 위치에 빨간 마커 생성
+        float[] markerDistances = { 175f, 350f, 525f };
+        float totalGoal = 700f;
+
+        foreach (float d in markerDistances)
+        {
+            float ratio = d / totalGoal;
+
+            GameObject marker = new GameObject($"Marker_{d}m");
+            marker.transform.SetParent(container, false);
+            marker.transform.SetAsFirstSibling(); // 💡 캐릭터(PlayerHandle)보다 뒤에 오도록 레이어 순서 조정
+            
+            UnityEngine.UI.Image img = marker.AddComponent<UnityEngine.UI.Image>();
+            img.color = Color.red;
+            img.raycastTarget = false;
+
+            RectTransform rect = marker.GetComponent<RectTransform>();
+            // 마커가 게이지 바의 가로 비율에 맞게 위치하도록 앵커 설정
+            rect.anchorMin = new Vector2(ratio, 0.5f);
+            rect.anchorMax = new Vector2(ratio, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            
+            // 마커의 크기 (폭 4픽셀, 높이는 게이지바보다 살짝 크게 25픽셀)
+            rect.sizeDelta = new Vector2(4f, 25f);
+            rect.anchoredPosition = Vector2.zero;
+        }
+        
+        Debug.Log($"<color=yellow>[UI]</color> Progress Bar Markers Updated for 700m (3 points).");
     }
 }
