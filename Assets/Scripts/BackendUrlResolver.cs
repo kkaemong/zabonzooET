@@ -3,7 +3,8 @@ using UnityEngine;
 
 public static class BackendUrlResolver
 {
-    public const string LegacyDefaultBaseUrl = "http://j14a507.p.ssafy.io";
+    public const string LocalBaseUrl = "http://localhost:8080";
+    public const string ProductionBaseUrl = "http://j14a507.p.ssafy.io";
 
     public static bool UsesBrowserManagedCookies
     {
@@ -22,6 +23,16 @@ public static class BackendUrlResolver
     public static string Resolve(string configuredBaseUrl)
     {
         string normalizedBaseUrl = Normalize(configuredBaseUrl);
+
+        // 💡 [환경별 자동 감지] 에디터에서는 로컬 백엔드를 기본으로 사용합니다.
+#if UNITY_EDITOR
+        if (string.IsNullOrWhiteSpace(normalizedBaseUrl) || normalizedBaseUrl == ProductionBaseUrl)
+        {
+            Debug.Log($"<color=yellow>[BackendUrlResolver]</color> Unity Editor Detected. Using Local Backend: {LocalBaseUrl}");
+            return LocalBaseUrl;
+        }
+#endif
+
         if (UsesBrowserManagedCookies && ShouldUsePageOrigin(normalizedBaseUrl))
         {
             string pageOrigin = GetPageOrigin();
@@ -32,7 +43,7 @@ public static class BackendUrlResolver
         }
 
         return string.IsNullOrWhiteSpace(normalizedBaseUrl)
-            ? LegacyDefaultBaseUrl
+            ? ProductionBaseUrl
             : normalizedBaseUrl;
     }
 
@@ -55,12 +66,12 @@ public static class BackendUrlResolver
             return false;
         }
 
-        if (!Uri.TryCreate(LegacyDefaultBaseUrl, UriKind.Absolute, out Uri legacyUri))
+        if (!Uri.TryCreate(ProductionBaseUrl, UriKind.Absolute, out Uri productionUri))
         {
             return false;
         }
 
-        return string.Equals(configuredUri.Host, legacyUri.Host, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(configuredUri.Host, productionUri.Host, StringComparison.OrdinalIgnoreCase);
     }
 
     private static string GetPageOrigin()

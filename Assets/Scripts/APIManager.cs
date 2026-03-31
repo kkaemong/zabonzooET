@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Text;
-using System.Text.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -10,12 +9,6 @@ using UnityEngine.Networking;
 /// </summary>
 public class APIManager : MonoBehaviour
 {
-    private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
-    {
-        PropertyNameCaseInsensitive = true,
-        IncludeFields = true
-    };
-
     public static APIManager Instance { get; private set; }
 
     [Header("Server")]
@@ -421,7 +414,7 @@ public class APIManager : MonoBehaviour
     {
         try
         {
-            result = JsonSerializer.Deserialize<T>(json, JsonOptions);
+            result = JsonUtility.FromJson<T>(json);
             if (result == null)
             {
                 onError?.Invoke($"Failed to parse response from {endpoint}: empty payload");
