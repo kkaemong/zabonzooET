@@ -25,6 +25,11 @@ public class FinanceSelectManager : MonoBehaviour
     [SerializeField] private GameObject lottoOptionPanel;
     [SerializeField] private GameObject resultPanel;
 
+    [Header("Base Screen")]
+    [SerializeField] private GameObject mainTitleRoot;
+    [SerializeField] private GameObject mainSubtextRoot;
+    [SerializeField] private GameObject cardContainerRoot;
+
     private readonly Dictionary<FinanceChoiceType, APIManager.FinanceOptionResponse> optionsByChoiceType = new();
 
     private FinanceResultPanelUI resultPanelUI;
@@ -159,6 +164,7 @@ public class FinanceSelectManager : MonoBehaviour
             lottoOptionPanel.SetActive(false);
         }
 
+        SetBaseScreenVisible(true);
         RefreshCardInteractableState();
     }
 
@@ -340,6 +346,7 @@ public class FinanceSelectManager : MonoBehaviour
         }
 
         isOptionPanelOpen = true;
+        SetBaseScreenVisible(false);
 
         if (dimmedPanel != null)
         {
@@ -704,6 +711,21 @@ public class FinanceSelectManager : MonoBehaviour
         {
             resultPanel = FindSceneObject("ResultPanel");
         }
+
+        if (mainTitleRoot == null)
+        {
+            mainTitleRoot = FindCanvasChild("Title");
+        }
+
+        if (mainSubtextRoot == null)
+        {
+            mainSubtextRoot = FindCanvasChild("Subtext");
+        }
+
+        if (cardContainerRoot == null)
+        {
+            cardContainerRoot = FindCanvasChild("CardContainer");
+        }
     }
 
     private void InitializeResultPanel()
@@ -1018,6 +1040,23 @@ public class FinanceSelectManager : MonoBehaviour
         return null;
     }
 
+    private static GameObject FindCanvasChild(string objectName)
+    {
+        if (string.IsNullOrWhiteSpace(objectName))
+        {
+            return null;
+        }
+
+        Canvas canvas = UnityEngine.Object.FindFirstObjectByType<Canvas>();
+        if (canvas == null)
+        {
+            return null;
+        }
+
+        Transform target = canvas.transform.Find(objectName);
+        return target != null ? target.gameObject : null;
+    }
+
     private static Transform FindDeepChild(Transform parent, string childName)
     {
         if (parent == null)
@@ -1040,6 +1079,24 @@ public class FinanceSelectManager : MonoBehaviour
         }
 
         return null;
+    }
+
+    private void SetBaseScreenVisible(bool visible)
+    {
+        if (mainTitleRoot != null)
+        {
+            mainTitleRoot.SetActive(visible);
+        }
+
+        if (mainSubtextRoot != null)
+        {
+            mainSubtextRoot.SetActive(visible);
+        }
+
+        if (cardContainerRoot != null)
+        {
+            cardContainerRoot.SetActive(visible);
+        }
     }
 
     private void InitializeFinanceBgm()
