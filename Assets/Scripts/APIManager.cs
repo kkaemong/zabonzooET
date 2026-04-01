@@ -9,6 +9,57 @@ using UnityEngine.Networking;
 /// </summary>
 public class APIManager : MonoBehaviour
 {
+    private const string Era2020StageCode = "ERA_2020";
+
+    private readonly struct LocalQuizDefinition
+    {
+        public LocalQuizDefinition(long quizId, string questionText, int timeLimitSec, int correctAnswerNumber, params string[] choices)
+        {
+            QuizId = quizId;
+            QuestionText = questionText;
+            TimeLimitSec = timeLimitSec;
+            CorrectAnswerNumber = correctAnswerNumber;
+            Choices = choices ?? Array.Empty<string>();
+        }
+
+        public long QuizId { get; }
+        public string QuestionText { get; }
+        public int TimeLimitSec { get; }
+        public int CorrectAnswerNumber { get; }
+        public string[] Choices { get; }
+    }
+
+    private static readonly LocalQuizDefinition[] Era2020QuizBank =
+    {
+        new LocalQuizDefinition(
+            202001,
+            "기업이 벌어들인 이익 일부를 주주에게 현금으로 나눠주는 것은?",
+            15,
+            1,
+            "배당금",
+            "증거금",
+            "공모가",
+            "액면가"),
+        new LocalQuizDefinition(
+            202002,
+            "2024년 대한민국 수출액 반등의 주역은?",
+            15,
+            3,
+            "자동차",
+            "조선업",
+            "반도체",
+            "석유화학"),
+        new LocalQuizDefinition(
+            202003,
+            "2026년 삼성전자가 발표한, 주식을 불태워 1주당 가치를 극대화하는 이 '주주환원 정책'은?",
+            15,
+            3,
+            "액면분할",
+            "유상증자",
+            "자사주 소각",
+            "무상감자"),
+    };
+
     public static APIManager Instance { get; private set; }
 
     [Header("Server")]
@@ -17,6 +68,8 @@ public class APIManager : MonoBehaviour
 
     [Tooltip("Optional bearer token for isolated ingame API tests.")]
     public string authToken = string.Empty;
+
+    private int era2020QuizIndex;
 
     [Serializable]
     public class RunResultRequest
@@ -172,6 +225,7 @@ public class APIManager : MonoBehaviour
     public void StartGame(string stageCode, Action<GameStartResponse> onSuccess, Action<string> onError)
     {
         SyncRuntimeSession();
+        ResetLocalQuizSequence(stageCode);
 
         GameStartRequest body = new GameStartRequest { stageCode = stageCode };
         string json = JsonUtility.ToJson(body);
@@ -336,6 +390,13 @@ public class APIManager : MonoBehaviour
     public void GetQuiz(long runId, Action<QuizQuestionResponse> onSuccess, Action<string> onError)
     {
         SyncRuntimeSession();
+
+        if (UsesLocalEra2020Quiz(ResolveCurrentStageCode()))
+        {
+            onSuccess?.Invoke(CreateEra2020QuizQuestionResponse());
+            return;
+        }
+
         StartCoroutine(GetRequestWithCallback(
             BuildUrl($"/api/game/quiz?runId={runId}"),
             responseJson =>
@@ -351,6 +412,13 @@ public class APIManager : MonoBehaviour
     public void SubmitQuizResult(QuizResultRequest requestData, Action<QuizResultResponse> onSuccess, Action<string> onError)
     {
         SyncRuntimeSession();
+
+        if (UsesLocalEra2020Quiz(requestData?.stageId))
+        {
+            onSuccess?.Invoke(EvaluateEra2020QuizResult(requestData));
+            return;
+        }
+
         string json = JsonUtility.ToJson(requestData);
 
         StartCoroutine(PostRequestWithCallback(
@@ -378,6 +446,107 @@ public class APIManager : MonoBehaviour
         return path.StartsWith("/", StringComparison.Ordinal)
             ? normalizedBaseUrl + path
             : normalizedBaseUrl + "/" + path;
+    }
+
+    private void ResetLocalQuizSequence(string stageCode)
+    {
+        if (UsesLocalEra2020Quiz(stageCode))
+        {
+            era2020QuizIndex = 0;
+        }
+    }
+
+    private bool UsesLocalEra2020Quiz(string stageCode)
+    {
+        return string.Equals(stageCode, Era2020StageCode, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private QuizQuestionResponse CreateEra2020QuizQuestionResponse()
+    {
+        int questionIndex = Mathf.Clamp(era2020QuizIndex, 0, Era2020QuizBank.Length - 1);
+        LocalQuizDefinition definition = Era2020QuizBank[questionIndex];
+        era2020QuizIndex = Mathf.Min(questionIndex + 1, Era2020QuizBank.Length);
+
+        QuizChoiceResponse[] choices = new QuizChoiceResponse[definition.Choices.Length];
+        for (int i = 0; i < definition.Choices.Length; i++)
+        {
+            choices[i] = new QuizChoiceResponse
+            {
+                quizChoiceId = definition.QuizId * 10 + i + 1,
+                choiceText = definition.Choices[i]
+            };
+        }
+
+        Debug.Log($"[APIManager] Using hardcoded 2020 quiz #{questionIndex + 1}: {definition.QuestionText}");
+
+        return new QuizQuestionResponse
+        {
+            quizQuestionId = definition.QuizId,
+            questionText = definition.QuestionText,
+            timeLimitSec = definition.TimeLimitSec,
+            choices = choices
+        };
+    }
+
+    private QuizResultResponse EvaluateEra2020QuizResult(QuizResultRequest requestData)
+    {
+        if (requestData == null)
+        {
+            return CreateLocalQuizResultResponse(false, "오답입니다.. 체력이 감소했습니다.");
+        }
+
+        if (requestData.timeOver)
+        {
+            return CreateLocalQuizResultResponse(false, "시간 초과로 오답 처리되었습니다.");
+        }
+
+        if (!TryGetEra2020QuizDefinition(requestData.quizId, out LocalQuizDefinition definition))
+        {
+            Debug.LogWarning($"[APIManager] Unknown hardcoded 2020 quiz id: {requestData.quizId}");
+            return CreateLocalQuizResultResponse(false, "오답입니다.. 체력이 감소했습니다.");
+        }
+
+        bool isCorrect = requestData.selectedAnswer == definition.CorrectAnswerNumber;
+        return CreateLocalQuizResultResponse(
+            isCorrect,
+            isCorrect ? "정답입니다! 체력이 증가했습니다." : "오답입니다.. 체력이 감소했습니다.");
+    }
+
+    private QuizResultResponse CreateLocalQuizResultResponse(bool isCorrect, string message)
+    {
+        int hpChange = isCorrect ? 1 : -1;
+        player playerComponent = FindObjectOfType<player>();
+        int maxLife = 3;
+        int currentLifeBeforeApply = playerComponent != null ? playerComponent.health : maxLife;
+        int currentLifeAfterApply = Mathf.Clamp(currentLifeBeforeApply + hpChange, 0, maxLife);
+
+        return new QuizResultResponse
+        {
+            correct = isCorrect,
+            effectType = isCorrect ? "BUFF" : "DEBUFF",
+            speedMultiplier = 1.0,
+            hpChange = hpChange,
+            monsterAction = "NONE",
+            message = message,
+            currentLife = currentLifeAfterApply,
+            maxLife = maxLife,
+            quizCount = Mathf.Clamp(era2020QuizIndex, 0, Era2020QuizBank.Length)
+        };
+    }
+
+    private bool TryGetEra2020QuizDefinition(long quizId, out LocalQuizDefinition definition)
+    {
+        for (int i = 0; i < Era2020QuizBank.Length; i++)
+        {
+            if (Era2020QuizBank[i].QuizId == quizId)
+            {
+                definition = Era2020QuizBank[i];
+                return true;
+            }
+        }
+
+        definition = default;
+        return false;
     }
 
     private long ResolveBackendUserId()
