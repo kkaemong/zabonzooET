@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -12,10 +11,8 @@ namespace MonET.Editor
     {
         private const string DefaultOutputPath = "Builds/WebGL";
         private const string OutputPathArgName = "-webglBuildPath";
-        private const string FooterBrandText = "SSAFY 14th";
-        private const string FooterBrandMarkup = "<div id=\"unity-brand-footer\">SSAFY 14th</div>";
-        private const string FooterBrandStyle =
-            "#unity-brand-footer { float:left; height: 38px; line-height: 38px; margin-left: 10px; font-family: Arial, sans-serif; font-size: 18px; font-weight: 700; color: #ffffff }";
+        private const string TemplateFolderPath = "Assets/WebGLTemplates/MonETBrand";
+        private const string TemplateSetting = "PROJECT:MonETBrand";
 
         [MenuItem("Build/WebGL Release")]
         public static void BuildReleaseMenu()
@@ -46,7 +43,14 @@ namespace MonET.Editor
             string outputPath = ResolveOutputPath();
             Directory.CreateDirectory(outputPath);
 
+            if (!Directory.Exists(TemplateFolderPath))
+            {
+                throw new InvalidOperationException(
+                    $"WebGL template folder '{TemplateFolderPath}' was not found.");
+            }
+
             PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
+            PlayerSettings.WebGL.template = TemplateSetting;
 
             BuildPlayerOptions options = new BuildPlayerOptions
             {
@@ -62,8 +66,6 @@ namespace MonET.Editor
                 throw new InvalidOperationException(
                     $"WebGL build failed with result {report.summary.result}. See Unity Editor logs for details.");
             }
-
-            ApplyBranding(outputPath);
 
             UnityEngine.Debug.Log(
                 $"WebGL build completed successfully at '{Path.GetFullPath(outputPath)}'.");
@@ -87,30 +89,6 @@ namespace MonET.Editor
             }
 
             return DefaultOutputPath;
-        }
-
-        private static void ApplyBranding(string outputPath)
-        {
-            string indexPath = Path.Combine(outputPath, "index.html");
-            string stylePath = Path.Combine(outputPath, "TemplateData", "style.css");
-
-            if (File.Exists(indexPath))
-            {
-                string indexHtml = File.ReadAllText(indexPath, Encoding.UTF8);
-                indexHtml = indexHtml.Replace(
-                    "<div id=\"unity-logo-title-footer\"></div>",
-                    FooterBrandMarkup);
-                File.WriteAllText(indexPath, indexHtml, new UTF8Encoding(false));
-            }
-
-            if (File.Exists(stylePath))
-            {
-                string styleCss = File.ReadAllText(stylePath, Encoding.UTF8);
-                styleCss = styleCss.Replace(
-                    "#unity-logo-title-footer { float:left; width: 102px; height: 38px; background: url('unity-logo-title-footer.png') no-repeat center }",
-                    FooterBrandStyle);
-                File.WriteAllText(stylePath, styleCss, new UTF8Encoding(false));
-            }
         }
     }
 }

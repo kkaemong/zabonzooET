@@ -92,4 +92,7 @@ Then open:
   it is hosted on the public domain, so `/api/*` requests stay same-origin.
 - The WebGL build script disables Unity compression by default to keep nginx
   serving simple and predictable on the first deployment.
+- The branded landing shell is now maintained in
+  `Assets/WebGLTemplates/MonETBrand`, so rebuilding WebGL keeps the same page
+  layout and styling without post-build patching.
 - HTTPS is not active on `j14a507.p.ssafy.io` yet in the current environment.

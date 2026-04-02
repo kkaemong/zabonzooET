@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="theme-color" content="#09111f">
+    <meta
+      name="description"
+      content="시대별 금융 선택과 경제 이벤트를 넘나들며 미래의 자산을 직접 만들어 가는 스토리형 브라우저 러너 게임, 자본주E.T."
+    >
+    <title>{{{ PRODUCT_NAME }}} | Browser Play</title>
+    <link rel="icon" type="image/png" href="TemplateData/favicon.png">
+    <link rel="apple-touch-icon" href="TemplateData/favicon.png">
+    <link rel="stylesheet" href="TemplateData/style.css">
+  </head>
+  <body>
+    <div class="brand-page">
+      <header class="brand-hero">
+        <div class="brand-copy">
+          <span class="brand-kicker">Interactive Finance Adventure</span>
+          <h1>{{{ PRODUCT_NAME }}}</h1>
+          <p class="brand-lead">
+            시대별 금융 선택과 경제 이벤트를 넘나들며, 미래의 자산 궤적을 직접 바꿔 나가는
+            스토리형 브라우저 러너 게임.
+          </p>
+
+          <div class="brand-actions">
+            <a class="brand-primary" href="#play-now">지금 플레이</a>
+            <button class="brand-secondary" id="hero-fullscreen-button" type="button" disabled>
+              전체화면 준비 중
+            </button>
+          </div>
+
+          <div class="brand-signals">
+            <article class="brand-signal-card">
+              <span class="brand-signal-label">Stage Flow</span>
+              <strong>시대 이동형 러닝</strong>
+              <p>1950년대부터 미래까지, 선택에 따라 금융 성장 곡선이 달라집니다.</p>
+            </article>
+            <article class="brand-signal-card">
+              <span class="brand-signal-label">Decision Loop</span>
+              <strong>이벤트 반응형 플레이</strong>
+              <p>경제 이슈, 대출, 자산 판단이 한 번의 러닝 흐름 안에서 연결됩니다.</p>
+            </article>
+            <article class="brand-signal-card">
+              <span class="brand-signal-label">Browser Ready</span>
+              <strong>설치 없이 즉시 실행</strong>
+              <p>브라우저에서 바로 접속해 실제 플레이 감각까지 한 번에 전달합니다.</p>
+            </article>
+          </div>
+        </div>
+
+        <div class="brand-showcase">
+          <div class="brand-logo-stage">
+            <span class="brand-stage-badge">Finance Runner</span>
+            <img class="brand-logo-img" src="TemplateData/brand-logo.png" alt="{{{ PRODUCT_NAME }}} 로고">
+          </div>
+
+          <div class="brand-story-card">
+            <span class="brand-story-label">Core Loop</span>
+            <p>금융 선택과 경제 이벤트 반응으로 자산 성장을 만들고 다음 시대로 이동합니다.</p>
+          </div>
+        </div>
+      </header>
+
+      <section class="experience-shell" id="play-now">
+        <div class="experience-topbar">
+          <div class="experience-heading">
+            <span class="experience-caption-eyebrow">Play Now</span>
+            <h2>설치 없이 바로 시작하는 몰입형 플레이</h2>
+            <p>
+              공개용 샘플 페이지가 아니라 게임의 분위기와 템포를 바로 체감할 수 있는 실제 실행
+              화면입니다.
+            </p>
+          </div>
+
+          <div class="experience-status">
+            <span class="experience-status-item">Chrome 기반 브라우저 권장</span>
+            <span class="experience-status-item">전체화면 플레이 지원</span>
+            <span class="experience-status-item">데스크톱 환경 최적화</span>
+          </div>
+        </div>
+
+        <div class="experience-frame">
+          <div class="experience-frame-header">
+            <span class="frame-pill">Play Experience</span>
+            <span class="frame-copy">창을 넓게 사용할수록 UI와 화면 전환이 더 안정적으로 감상됩니다.</span>
+          </div>
+
+          <div id="unity-container" class="unity-desktop">
+            <canvas id="unity-canvas" width={{{ WIDTH }}} height={{{ HEIGHT }}} tabindex="-1"></canvas>
+            <div id="unity-loading-bar">
+              <div id="unity-logo"></div>
+              <div id="unity-progress-bar-empty">
+                <div id="unity-progress-bar-full"></div>
+              </div>
+            </div>
+            <div id="unity-warning"></div>
+            <div id="unity-footer">
+              <div id="unity-brand-footer">Browser Play</div>
+              <button id="unity-fullscreen-button" type="button" aria-label="전체 화면"></button>
+              <div id="unity-build-title">{{{ PRODUCT_NAME }}}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="experience-notes">
+          <span class="experience-note">금융 선택</span>
+          <span class="experience-note">경제 이벤트</span>
+          <span class="experience-note">대출 리스크</span>
+          <span class="experience-note">스테이지 성장</span>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      var canvas = document.querySelector("#unity-canvas");
+      var heroFullscreenButton = document.querySelector("#hero-fullscreen-button");
+      var footerFullscreenButton = document.querySelector("#unity-fullscreen-button");
+
+      function unityShowBanner(msg, type) {
+        var warningBanner = document.querySelector("#unity-warning");
+
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? "block" : "none";
+        }
+
+        var div = document.createElement("div");
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+
+        if (type === "error") {
+          div.style = "background: rgba(205, 54, 54, 0.92); padding: 10px 12px; border-radius: 12px;";
+        } else {
+          if (type === "warning") {
+            div.style = "background: rgba(255, 183, 64, 0.92); color: #0a1120; padding: 10px 12px; border-radius: 12px;";
+          }
+
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+        frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+#if USE_THREADS
+        workerUrl: buildUrl + "/{{{ WORKER_FILENAME }}}",
+#endif
+#if USE_WASM
+        codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+        symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
+#endif
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Jabonju ET Team",
+        productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+        productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+        showBanner: unityShowBanner
+      };
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        var meta = document.createElement("meta");
+        meta.name = "viewport";
+        meta.content = "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
+        document.getElementsByTagName("head")[0].appendChild(meta);
+        document.querySelector("#unity-container").className = "unity-mobile";
+        canvas.className = "unity-mobile";
+      } else {
+        canvas.style.width = "100%";
+        canvas.style.height = "auto";
+      }
+
+#if BACKGROUND_FILENAME
+      canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
+#endif
+
+      document.querySelector("#unity-loading-bar").style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = function() {
+        createUnityInstance(canvas, config, function(progress) {
+          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+        }).then(function(unityInstance) {
+          document.querySelector("#unity-loading-bar").style.display = "none";
+
+          function enterFullscreen() {
+            unityInstance.SetFullscreen(1);
+          }
+
+          heroFullscreenButton.disabled = false;
+          heroFullscreenButton.textContent = "전체화면으로 시작";
+          heroFullscreenButton.onclick = enterFullscreen;
+          footerFullscreenButton.onclick = enterFullscreen;
+        }).catch(function(message) {
+          heroFullscreenButton.textContent = "실행 오류";
+          alert(message);
+        });
+      };
+
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>

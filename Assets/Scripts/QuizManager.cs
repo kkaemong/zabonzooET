@@ -26,9 +26,15 @@ public class QuizManager : MonoBehaviour
     public float boostDuration = 3f;
 
     private APIManager.QuizQuestionResponse currentApiQuiz;
+    private APIManager.QuizResultResponse pendingQuizResult;
     private float questionStartTime;
     private GameManager gm;
     private GameObject buttonGroupObj;
+    private GameObject resultTitleTextObj;
+    private GameObject resultMessageTextObj;
+    private GameObject explanationTextObj;
+    private GameObject confirmButtonObj;
+    private GameObject confirmButtonTextObj;
 
     private void Awake()
     {
@@ -51,9 +57,13 @@ public class QuizManager : MonoBehaviour
         EnsureBindings();
         gm?.PauseGame();
 
-        if (GameManager.Instance != null && GameManager.Instance.sfxSource != null && GameManager.Instance.quizPopSound != null)
+        if (GameManager.Instance != null &&
+            GameManager.Instance.sfxSource != null &&
+            GameManager.Instance.quizPopSound != null)
         {
-            GameManager.Instance.sfxSource.PlayOneShot(GameManager.Instance.quizPopSound, GameManager.Instance.quizPopVolume);
+            GameManager.Instance.sfxSource.PlayOneShot(
+                GameManager.Instance.quizPopSound,
+                GameManager.Instance.quizPopVolume);
         }
 
         if (quizPanel == null)
@@ -63,7 +73,16 @@ public class QuizManager : MonoBehaviour
             return;
         }
 
+        currentApiQuiz = null;
+        pendingQuizResult = null;
+
         quizPanel.SetActive(true);
+        SetQuestionTextVisible(true);
+        SetResultTitleTextVisible(false);
+        SetResultMessageTextVisible(false);
+        SetAnswerButtonsVisible(false);
+        SetExplanationTextVisible(false);
+        SetConfirmButtonVisible(false);
         if (buttonGroupObj != null)
         {
             buttonGroupObj.SetActive(false);
@@ -89,6 +108,16 @@ public class QuizManager : MonoBehaviour
     private IEnumerator ResumeAfterDelay(float delay)
     {
         yield return new WaitForSecondsRealtime(delay);
+
+        currentApiQuiz = null;
+        pendingQuizResult = null;
+        SetQuestionTextVisible(true);
+        SetResultTitleTextVisible(false);
+        SetResultMessageTextVisible(false);
+        SetConfirmButtonVisible(false);
+        SetExplanationTextVisible(false);
+        SetAnswerButtonsVisible(false);
+
         if (quizPanel != null)
         {
             quizPanel.SetActive(false);
@@ -107,8 +136,12 @@ public class QuizManager : MonoBehaviour
         }
 
         currentApiQuiz = response;
+        pendingQuizResult = null;
         questionStartTime = Time.realtimeSinceStartup;
 
+        SetQuestionTextVisible(true);
+        SetResultTitleTextVisible(false);
+        SetResultMessageTextVisible(false);
         SetText(questionTextObj, currentApiQuiz.questionText);
 
         APIManager.QuizChoiceResponse[] choices = currentApiQuiz.choices;
@@ -124,6 +157,9 @@ public class QuizManager : MonoBehaviour
         AddButtonListener(buttonCObj, () => OnAnswerSelected(2));
         AddButtonListener(buttonDObj, () => OnAnswerSelected(3));
 
+        SetConfirmButtonVisible(false);
+        SetExplanationTextVisible(false);
+        SetAnswerButtonsVisible(true);
         if (buttonGroupObj != null)
         {
             buttonGroupObj.SetActive(true);
@@ -132,12 +168,14 @@ public class QuizManager : MonoBehaviour
 
     private int GetChoiceNumber(int index)
     {
-        if (currentApiQuiz?.choices == null || index < 0 || index >= currentApiQuiz.choices.Length || currentApiQuiz.choices[index] == null)
+        if (currentApiQuiz?.choices == null ||
+            index < 0 ||
+            index >= currentApiQuiz.choices.Length ||
+            currentApiQuiz.choices[index] == null)
         {
             return -1;
         }
 
-        // Backend expects a 1-based answer number, not the quizChoiceId primary key.
         return index + 1;
     }
 
@@ -185,6 +223,9 @@ public class QuizManager : MonoBehaviour
         quizPanel.SetActive(false);
 
         questionTextObj = ResolveTextTarget(questionTextObj, quizPanel.transform, "QuestionText");
+        EnsureResultTitleText();
+        EnsureResultMessageText();
+        EnsureExplanationText();
 
         Transform buttonGroup = FindDeepChildByName(quizPanel.transform, "ButtonGroup");
         if (buttonGroup != null)
@@ -199,12 +240,319 @@ public class QuizManager : MonoBehaviour
             btnTextBObj = ResolveButtonText(btnTextBObj, buttonBObj);
             btnTextCObj = ResolveButtonText(btnTextCObj, buttonCObj);
             btnTextDObj = ResolveButtonText(btnTextDObj, buttonDObj);
+
+            EnsureConfirmButton();
         }
 
-        if (questionTextObj == null || buttonGroupObj == null ||
-            btnTextAObj == null || btnTextBObj == null || btnTextCObj == null || btnTextDObj == null)
+        if (questionTextObj == null ||
+            buttonGroupObj == null ||
+            btnTextAObj == null ||
+            btnTextBObj == null ||
+            btnTextCObj == null ||
+            btnTextDObj == null)
         {
             Debug.LogWarning("[QuizManager] QuizPanel bindings are incomplete.");
+        }
+    }
+
+    private void EnsureConfirmButton()
+    {
+        if (quizPanel == null || buttonAObj == null)
+        {
+            return;
+        }
+
+        if (!IsUsableSceneObject(confirmButtonObj))
+        {
+            confirmButtonObj = Instantiate(buttonAObj, quizPanel.transform);
+            confirmButtonObj.name = "ConfirmButton";
+
+            RectTransform templateRect = buttonAObj.GetComponent<RectTransform>();
+            RectTransform confirmRect = confirmButtonObj.GetComponent<RectTransform>();
+            if (templateRect != null && confirmRect != null)
+            {
+                confirmRect.anchorMin = new Vector2(0.5f, 0f);
+                confirmRect.anchorMax = new Vector2(0.5f, 0f);
+                confirmRect.pivot = new Vector2(0.5f, 0.5f);
+                confirmRect.sizeDelta = templateRect.sizeDelta;
+                confirmRect.localScale = templateRect.localScale;
+                confirmRect.localRotation = templateRect.localRotation;
+                confirmRect.anchoredPosition = new Vector2(0f, 68f);
+            }
+        }
+
+        confirmButtonTextObj = ResolveButtonText(confirmButtonTextObj, confirmButtonObj);
+        SetText(confirmButtonTextObj, "확인");
+        SetConfirmButtonVisible(false);
+    }
+
+    private void EnsureExplanationText()
+    {
+        if (quizPanel == null || questionTextObj == null)
+        {
+            return;
+        }
+
+        if (!IsUsableSceneObject(explanationTextObj))
+        {
+            explanationTextObj = Instantiate(questionTextObj, quizPanel.transform);
+            explanationTextObj.name = "ExplanationText";
+
+            RectTransform rect = explanationTextObj.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                rect.anchorMin = new Vector2(0.5f, 1f);
+                rect.anchorMax = new Vector2(0.5f, 1f);
+                rect.pivot = new Vector2(0.5f, 1f);
+                rect.anchoredPosition = new Vector2(0f, -310f);
+                rect.sizeDelta = new Vector2(1320f, 190f);
+            }
+        }
+
+        ConfigureExplanationTextStyle();
+        SetExplanationTextVisible(false);
+    }
+
+    private void EnsureResultTitleText()
+    {
+        if (quizPanel == null || questionTextObj == null)
+        {
+            return;
+        }
+
+        if (!IsUsableSceneObject(resultTitleTextObj))
+        {
+            resultTitleTextObj = Instantiate(questionTextObj, quizPanel.transform);
+            resultTitleTextObj.name = "ResultTitleText";
+
+            RectTransform rect = resultTitleTextObj.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                rect.anchorMin = new Vector2(0.5f, 1f);
+                rect.anchorMax = new Vector2(0.5f, 1f);
+                rect.pivot = new Vector2(0.5f, 1f);
+                rect.anchoredPosition = new Vector2(0f, -120f);
+                rect.sizeDelta = new Vector2(900f, 100f);
+            }
+        }
+
+        ConfigureResultTitleTextStyle();
+        SetResultTitleTextVisible(false);
+    }
+
+    private void EnsureResultMessageText()
+    {
+        if (quizPanel == null || questionTextObj == null)
+        {
+            return;
+        }
+
+        if (!IsUsableSceneObject(resultMessageTextObj))
+        {
+            resultMessageTextObj = Instantiate(questionTextObj, quizPanel.transform);
+            resultMessageTextObj.name = "ResultMessageText";
+
+            RectTransform rect = resultMessageTextObj.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                rect.anchorMin = new Vector2(0.5f, 1f);
+                rect.anchorMax = new Vector2(0.5f, 1f);
+                rect.pivot = new Vector2(0.5f, 1f);
+                rect.anchoredPosition = new Vector2(0f, -188f);
+                rect.sizeDelta = new Vector2(1250f, 70f);
+            }
+        }
+
+        ConfigureResultMessageTextStyle();
+        SetResultMessageTextVisible(false);
+    }
+
+    private void ConfigureResultTitleTextStyle()
+    {
+        if (resultTitleTextObj == null)
+        {
+            return;
+        }
+
+        Text text = resultTitleTextObj.GetComponent<Text>();
+        if (text != null)
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 28;
+            text.resizeTextMaxSize = 60;
+        }
+
+        TextMeshProUGUI tmp = resultTitleTextObj.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 28;
+            tmp.fontSizeMax = 60;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+        }
+    }
+
+    private void ConfigureResultMessageTextStyle()
+    {
+        if (resultMessageTextObj == null)
+        {
+            return;
+        }
+
+        Text text = resultMessageTextObj.GetComponent<Text>();
+        if (text != null)
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 18;
+            text.resizeTextMaxSize = 30;
+        }
+
+        TextMeshProUGUI tmp = resultMessageTextObj.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 18;
+            tmp.fontSizeMax = 30;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+        }
+    }
+
+    private void ConfigureExplanationTextStyle()
+    {
+        if (explanationTextObj == null)
+        {
+            return;
+        }
+
+        Text text = explanationTextObj.GetComponent<Text>();
+        if (text != null)
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 18;
+            text.resizeTextMaxSize = 38;
+        }
+
+        TextMeshProUGUI tmp = explanationTextObj.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 18;
+            tmp.fontSizeMax = 38;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+        }
+    }
+
+    private void SetResultTitleText(string value)
+    {
+        if (resultTitleTextObj == null)
+        {
+            return;
+        }
+
+        Text text = resultTitleTextObj.GetComponent<Text>();
+        if (text != null)
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 28;
+            text.resizeTextMaxSize = 60;
+            text.text = value;
+            return;
+        }
+
+        TextMeshProUGUI tmp = resultTitleTextObj.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 28;
+            tmp.fontSizeMax = 60;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+            tmp.text = value;
+        }
+    }
+
+    private void SetResultMessageText(string value)
+    {
+        if (resultMessageTextObj == null)
+        {
+            return;
+        }
+
+        Text text = resultMessageTextObj.GetComponent<Text>();
+        if (text != null)
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 18;
+            text.resizeTextMaxSize = 30;
+            text.text = value;
+            return;
+        }
+
+        TextMeshProUGUI tmp = resultMessageTextObj.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 18;
+            tmp.fontSizeMax = 30;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+            tmp.text = value;
+        }
+    }
+
+    private void SetExplanationText(string value)
+    {
+        if (explanationTextObj == null)
+        {
+            return;
+        }
+
+        Text text = explanationTextObj.GetComponent<Text>();
+        if (text != null)
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 18;
+            text.resizeTextMaxSize = 38;
+            text.text = value;
+            return;
+        }
+
+        TextMeshProUGUI tmp = explanationTextObj.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 18;
+            tmp.fontSizeMax = 38;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+            tmp.text = value;
         }
     }
 
@@ -383,6 +731,47 @@ public class QuizManager : MonoBehaviour
         button.onClick.AddListener(action);
     }
 
+    private void SetAnswerButtonsVisible(bool visible)
+    {
+        SetGameObjectVisible(buttonAObj, visible);
+        SetGameObjectVisible(buttonBObj, visible);
+        SetGameObjectVisible(buttonCObj, visible);
+        SetGameObjectVisible(buttonDObj, visible);
+    }
+
+    private void SetConfirmButtonVisible(bool visible)
+    {
+        SetGameObjectVisible(confirmButtonObj, visible);
+    }
+
+    private void SetQuestionTextVisible(bool visible)
+    {
+        SetGameObjectVisible(questionTextObj, visible);
+    }
+
+    private void SetResultTitleTextVisible(bool visible)
+    {
+        SetGameObjectVisible(resultTitleTextObj, visible);
+    }
+
+    private void SetResultMessageTextVisible(bool visible)
+    {
+        SetGameObjectVisible(resultMessageTextObj, visible);
+    }
+
+    private void SetExplanationTextVisible(bool visible)
+    {
+        SetGameObjectVisible(explanationTextObj, visible);
+    }
+
+    private void SetGameObjectVisible(GameObject target, bool visible)
+    {
+        if (target != null)
+        {
+            target.SetActive(visible);
+        }
+    }
+
     private void OnAnswerSelected(int selectedIndex)
     {
         int selectedAnswerNumber = GetChoiceNumber(selectedIndex);
@@ -391,6 +780,8 @@ public class QuizManager : MonoBehaviour
             return;
         }
 
+        SetAnswerButtonsVisible(false);
+        SetConfirmButtonVisible(false);
         if (buttonGroupObj != null)
         {
             buttonGroupObj.SetActive(false);
@@ -417,10 +808,11 @@ public class QuizManager : MonoBehaviour
 
     private void OnQuizResultReceived(APIManager.QuizResultResponse result)
     {
-        StartCoroutine(ShowExplanationCoroutine(result));
+        pendingQuizResult = result;
+        ShowResultState(result);
     }
 
-    private IEnumerator ShowExplanationCoroutine(APIManager.QuizResultResponse result)
+    private void ShowResultState(APIManager.QuizResultResponse result)
     {
         bool isCorrect = result != null && result.correct;
 
@@ -436,49 +828,92 @@ public class QuizManager : MonoBehaviour
             }
         }
 
-        string resultWord = isCorrect ? "<color=#00FF00>[정답]</color>" : "<color=#FF0000>[오답]</color>";
-        string message = result != null && !string.IsNullOrWhiteSpace(result.message)
-            ? $"\n\n<size=50>{result.message}</size>"
-            : string.Empty;
-        SetText(questionTextObj, $"{resultWord}{message}");
+        string resultWord = isCorrect ? "<color=#00FF00>[정답]</color>" : "<color=#FF4D4D>[오답]</color>";
+        string resultMessage = result != null && !string.IsNullOrWhiteSpace(result.message)
+            ? result.message
+            : (isCorrect ? "정답입니다." : "오답입니다.");
+        string explanation = ResolveQuizExplanation(isCorrect);
+        SetQuestionTextVisible(false);
+        SetResultTitleText(resultWord);
+        SetResultMessageText(resultMessage);
+        SetResultTitleTextVisible(true);
+        SetResultMessageTextVisible(true);
+        SetExplanationText(explanation);
+        SetExplanationTextVisible(!string.IsNullOrWhiteSpace(explanation));
 
-        yield return new WaitForSecondsRealtime(3f);
-
-        if (gm != null && result != null)
+        if (buttonGroupObj != null)
         {
-            if (result.hpChange > 0)
+            buttonGroupObj.SetActive(false);
+        }
+
+        EnsureConfirmButton();
+        SetAnswerButtonsVisible(false);
+        SetText(confirmButtonTextObj, isCorrect ? "계속 달리기" : "알겠습니다");
+        AddButtonListener(confirmButtonObj, ConfirmQuizResult);
+        SetConfirmButtonVisible(true);
+    }
+
+    private string ResolveQuizExplanation(bool isCorrect)
+    {
+        if (currentApiQuiz == null)
+        {
+            return string.Empty;
+        }
+
+        string explanation = isCorrect
+            ? currentApiQuiz.correctExplanation
+            : currentApiQuiz.wrongExplanation;
+
+        return !string.IsNullOrWhiteSpace(explanation)
+            ? explanation.Trim()
+            : string.Empty;
+    }
+
+    private void ConfirmQuizResult()
+    {
+        bool isCorrect = pendingQuizResult != null && pendingQuizResult.correct;
+
+        if (gm != null && pendingQuizResult != null)
+        {
+            if (pendingQuizResult.hpChange > 0)
             {
-                gm.AddLife(result.hpChange);
+                gm.AddLife(pendingQuizResult.hpChange);
             }
-            else if (result.hpChange < 0)
+            else if (pendingQuizResult.hpChange < 0)
             {
                 player playerComponent = FindObjectOfType<player>();
                 if (playerComponent != null)
                 {
-                    playerComponent.TakeDamage(-result.hpChange);
+                    playerComponent.TakeDamage(-pendingQuizResult.hpChange);
                 }
-            }
-
-            gm.ResumeGame();
-
-            if (isCorrect)
-            {
-                gm.ApplyTemporarySpeedBoost(boostMultiplier, boostDuration);
-            }
-        }
-
-        if (isCorrect)
-        {
-            player playerComponent = FindObjectOfType<player>();
-            if (playerComponent != null)
-            {
-                playerComponent.TriggerQuizInvincibility(3f);
             }
         }
 
         if (quizPanel != null)
         {
             quizPanel.SetActive(false);
+        }
+
+        SetQuestionTextVisible(true);
+        SetResultTitleTextVisible(false);
+        SetResultMessageTextVisible(false);
+        SetConfirmButtonVisible(false);
+        SetExplanationTextVisible(false);
+        SetAnswerButtonsVisible(false);
+        currentApiQuiz = null;
+        pendingQuizResult = null;
+
+        gm?.ResumeGame();
+
+        if (isCorrect && gm != null)
+        {
+            gm.ApplyTemporarySpeedBoost(boostMultiplier, boostDuration);
+
+            player playerComponent = FindObjectOfType<player>();
+            if (playerComponent != null)
+            {
+                playerComponent.TriggerQuizInvincibility(3f);
+            }
         }
     }
 }

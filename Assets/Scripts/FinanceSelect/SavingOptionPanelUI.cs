@@ -95,6 +95,8 @@ public class SavingOptionPanelUI : MonoBehaviour
             APIManager.FinanceSubOptionResponse subOption = i < subOptions.Length ? subOptions[i] : null;
             button.ApplyData(subOption);
         }
+
+        RefreshButtonLayout();
     }
 
     private void AutoBindOptionButtons()
@@ -140,6 +142,25 @@ public class SavingOptionPanelUI : MonoBehaviour
 
         return true;
     }
+
+    private void RefreshButtonLayout()
+    {
+        if (optionButtons == null || optionButtons.Length == 0)
+        {
+            return;
+        }
+
+        List<Button> buttons = new List<Button>();
+        for (int i = 0; i < optionButtons.Length; i++)
+        {
+            if (optionButtons[i] != null && optionButtons[i].Button != null)
+            {
+                buttons.Add(optionButtons[i].Button);
+            }
+        }
+
+        FinanceOptionPanelLayout.RecenterActiveButtons(buttons);
+    }
 }
 
 [Serializable]
@@ -159,6 +180,7 @@ public class SavingOptionButton
     public string Description => description;
     public bool IsUsable => button != null;
     public bool IsConfigured => button != null && !string.IsNullOrWhiteSpace(optionId);
+    public Button Button => button;
 
     public void Initialize(SavingOptionPanelUI panel)
     {
