@@ -30,6 +30,7 @@ public class QuizManager : MonoBehaviour
     private float questionStartTime;
     private GameManager gm;
     private GameObject buttonGroupObj;
+    private GameObject explanationTextObj;
     private GameObject confirmButtonObj;
     private GameObject confirmButtonTextObj;
 
@@ -75,6 +76,7 @@ public class QuizManager : MonoBehaviour
 
         quizPanel.SetActive(true);
         SetAnswerButtonsVisible(false);
+        SetExplanationTextVisible(false);
         SetConfirmButtonVisible(false);
         if (buttonGroupObj != null)
         {
@@ -105,6 +107,7 @@ public class QuizManager : MonoBehaviour
         currentApiQuiz = null;
         pendingQuizResult = null;
         SetConfirmButtonVisible(false);
+        SetExplanationTextVisible(false);
         SetAnswerButtonsVisible(false);
 
         if (quizPanel != null)
@@ -144,6 +147,7 @@ public class QuizManager : MonoBehaviour
         AddButtonListener(buttonDObj, () => OnAnswerSelected(3));
 
         SetConfirmButtonVisible(false);
+        SetExplanationTextVisible(false);
         SetAnswerButtonsVisible(true);
         if (buttonGroupObj != null)
         {
@@ -208,6 +212,7 @@ public class QuizManager : MonoBehaviour
         quizPanel.SetActive(false);
 
         questionTextObj = ResolveTextTarget(questionTextObj, quizPanel.transform, "QuestionText");
+        EnsureExplanationText();
 
         Transform buttonGroup = FindDeepChildByName(quizPanel.transform, "ButtonGroup");
         if (buttonGroup != null)
@@ -239,14 +244,14 @@ public class QuizManager : MonoBehaviour
 
     private void EnsureConfirmButton()
     {
-        if (buttonGroupObj == null || buttonAObj == null)
+        if (quizPanel == null || buttonAObj == null)
         {
             return;
         }
 
         if (!IsUsableSceneObject(confirmButtonObj))
         {
-            confirmButtonObj = Instantiate(buttonAObj, buttonGroupObj.transform);
+            confirmButtonObj = Instantiate(buttonAObj, quizPanel.transform);
             confirmButtonObj.name = "ConfirmButton";
 
             RectTransform templateRect = buttonAObj.GetComponent<RectTransform>();
@@ -259,13 +264,103 @@ public class QuizManager : MonoBehaviour
                 confirmRect.sizeDelta = templateRect.sizeDelta;
                 confirmRect.localScale = templateRect.localScale;
                 confirmRect.localRotation = templateRect.localRotation;
-                confirmRect.anchoredPosition = new Vector2(0f, 52f);
+                confirmRect.anchoredPosition = new Vector2(0f, 84f);
             }
         }
 
         confirmButtonTextObj = ResolveButtonText(confirmButtonTextObj, confirmButtonObj);
         SetText(confirmButtonTextObj, "확인");
         SetConfirmButtonVisible(false);
+    }
+
+    private void EnsureExplanationText()
+    {
+        if (quizPanel == null || questionTextObj == null)
+        {
+            return;
+        }
+
+        if (!IsUsableSceneObject(explanationTextObj))
+        {
+            explanationTextObj = Instantiate(questionTextObj, quizPanel.transform);
+            explanationTextObj.name = "ExplanationText";
+
+            RectTransform rect = explanationTextObj.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                rect.anchorMin = new Vector2(0.5f, 0.5f);
+                rect.anchorMax = new Vector2(0.5f, 0.5f);
+                rect.pivot = new Vector2(0.5f, 0.5f);
+                rect.anchoredPosition = new Vector2(0f, -20f);
+                rect.sizeDelta = new Vector2(1550f, 360f);
+            }
+        }
+
+        ConfigureExplanationTextStyle();
+        SetExplanationTextVisible(false);
+    }
+
+    private void ConfigureExplanationTextStyle()
+    {
+        if (explanationTextObj == null)
+        {
+            return;
+        }
+
+        Text text = explanationTextObj.GetComponent<Text>();
+        if (text != null)
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 24;
+            text.resizeTextMaxSize = 56;
+        }
+
+        TextMeshProUGUI tmp = explanationTextObj.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 24;
+            tmp.fontSizeMax = 56;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+        }
+    }
+
+    private void SetExplanationText(string value)
+    {
+        if (explanationTextObj == null)
+        {
+            return;
+        }
+
+        Text text = explanationTextObj.GetComponent<Text>();
+        if (text != null)
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 24;
+            text.resizeTextMaxSize = 56;
+            text.text = value;
+            return;
+        }
+
+        TextMeshProUGUI tmp = explanationTextObj.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 24;
+            tmp.fontSizeMax = 56;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+            tmp.text = value;
+        }
     }
 
     private GameObject ResolveQuizPanel()
@@ -456,6 +551,11 @@ public class QuizManager : MonoBehaviour
         SetGameObjectVisible(confirmButtonObj, visible);
     }
 
+    private void SetExplanationTextVisible(bool visible)
+    {
+        SetGameObjectVisible(explanationTextObj, visible);
+    }
+
     private void SetGameObjectVisible(GameObject target, bool visible)
     {
         if (target != null)
@@ -525,11 +625,9 @@ public class QuizManager : MonoBehaviour
             ? result.message
             : (isCorrect ? "정답입니다." : "오답입니다.");
         string explanation = ResolveQuizExplanation(isCorrect);
-        string explanationBlock = string.IsNullOrWhiteSpace(explanation)
-            ? string.Empty
-            : $"\n\n<size=28>{explanation}</size>";
-
-        SetText(questionTextObj, $"{resultWord}\n<size=36>{resultMessage}</size>{explanationBlock}");
+        SetText(questionTextObj, $"{resultWord}\n<size=36>{resultMessage}</size>");
+        SetExplanationText(explanation);
+        SetExplanationTextVisible(!string.IsNullOrWhiteSpace(explanation));
 
         if (buttonGroupObj != null)
         {
@@ -538,7 +636,7 @@ public class QuizManager : MonoBehaviour
 
         EnsureConfirmButton();
         SetAnswerButtonsVisible(false);
-        SetText(confirmButtonTextObj, "확인");
+        SetText(confirmButtonTextObj, isCorrect ? "계속 달리기" : "알겠습니다");
         AddButtonListener(confirmButtonObj, ConfirmQuizResult);
         SetConfirmButtonVisible(true);
     }
@@ -585,6 +683,7 @@ public class QuizManager : MonoBehaviour
         }
 
         SetConfirmButtonVisible(false);
+        SetExplanationTextVisible(false);
         SetAnswerButtonsVisible(false);
         currentApiQuiz = null;
         pendingQuizResult = null;
