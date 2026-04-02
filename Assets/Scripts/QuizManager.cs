@@ -30,6 +30,8 @@ public class QuizManager : MonoBehaviour
     private float questionStartTime;
     private GameManager gm;
     private GameObject buttonGroupObj;
+    private GameObject resultTitleTextObj;
+    private GameObject resultMessageTextObj;
     private GameObject explanationTextObj;
     private GameObject confirmButtonObj;
     private GameObject confirmButtonTextObj;
@@ -75,6 +77,9 @@ public class QuizManager : MonoBehaviour
         pendingQuizResult = null;
 
         quizPanel.SetActive(true);
+        SetQuestionTextVisible(true);
+        SetResultTitleTextVisible(false);
+        SetResultMessageTextVisible(false);
         SetAnswerButtonsVisible(false);
         SetExplanationTextVisible(false);
         SetConfirmButtonVisible(false);
@@ -106,6 +111,9 @@ public class QuizManager : MonoBehaviour
 
         currentApiQuiz = null;
         pendingQuizResult = null;
+        SetQuestionTextVisible(true);
+        SetResultTitleTextVisible(false);
+        SetResultMessageTextVisible(false);
         SetConfirmButtonVisible(false);
         SetExplanationTextVisible(false);
         SetAnswerButtonsVisible(false);
@@ -131,6 +139,9 @@ public class QuizManager : MonoBehaviour
         pendingQuizResult = null;
         questionStartTime = Time.realtimeSinceStartup;
 
+        SetQuestionTextVisible(true);
+        SetResultTitleTextVisible(false);
+        SetResultMessageTextVisible(false);
         SetText(questionTextObj, currentApiQuiz.questionText);
 
         APIManager.QuizChoiceResponse[] choices = currentApiQuiz.choices;
@@ -212,6 +223,8 @@ public class QuizManager : MonoBehaviour
         quizPanel.SetActive(false);
 
         questionTextObj = ResolveTextTarget(questionTextObj, quizPanel.transform, "QuestionText");
+        EnsureResultTitleText();
+        EnsureResultMessageText();
         EnsureExplanationText();
 
         Transform buttonGroup = FindDeepChildByName(quizPanel.transform, "ButtonGroup");
@@ -288,16 +301,130 @@ public class QuizManager : MonoBehaviour
             RectTransform rect = explanationTextObj.GetComponent<RectTransform>();
             if (rect != null)
             {
-                rect.anchorMin = new Vector2(0.5f, 0.5f);
-                rect.anchorMax = new Vector2(0.5f, 0.5f);
-                rect.pivot = new Vector2(0.5f, 0.5f);
-                rect.anchoredPosition = new Vector2(0f, -20f);
-                rect.sizeDelta = new Vector2(1550f, 360f);
+                rect.anchorMin = new Vector2(0.5f, 1f);
+                rect.anchorMax = new Vector2(0.5f, 1f);
+                rect.pivot = new Vector2(0.5f, 1f);
+                rect.anchoredPosition = new Vector2(0f, -260f);
+                rect.sizeDelta = new Vector2(1450f, 280f);
             }
         }
 
         ConfigureExplanationTextStyle();
         SetExplanationTextVisible(false);
+    }
+
+    private void EnsureResultTitleText()
+    {
+        if (quizPanel == null || questionTextObj == null)
+        {
+            return;
+        }
+
+        if (!IsUsableSceneObject(resultTitleTextObj))
+        {
+            resultTitleTextObj = Instantiate(questionTextObj, quizPanel.transform);
+            resultTitleTextObj.name = "ResultTitleText";
+
+            RectTransform rect = resultTitleTextObj.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                rect.anchorMin = new Vector2(0.5f, 1f);
+                rect.anchorMax = new Vector2(0.5f, 1f);
+                rect.pivot = new Vector2(0.5f, 1f);
+                rect.anchoredPosition = new Vector2(0f, -120f);
+                rect.sizeDelta = new Vector2(900f, 100f);
+            }
+        }
+
+        ConfigureResultTitleTextStyle();
+        SetResultTitleTextVisible(false);
+    }
+
+    private void EnsureResultMessageText()
+    {
+        if (quizPanel == null || questionTextObj == null)
+        {
+            return;
+        }
+
+        if (!IsUsableSceneObject(resultMessageTextObj))
+        {
+            resultMessageTextObj = Instantiate(questionTextObj, quizPanel.transform);
+            resultMessageTextObj.name = "ResultMessageText";
+
+            RectTransform rect = resultMessageTextObj.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                rect.anchorMin = new Vector2(0.5f, 1f);
+                rect.anchorMax = new Vector2(0.5f, 1f);
+                rect.pivot = new Vector2(0.5f, 1f);
+                rect.anchoredPosition = new Vector2(0f, -180f);
+                rect.sizeDelta = new Vector2(1350f, 90f);
+            }
+        }
+
+        ConfigureResultMessageTextStyle();
+        SetResultMessageTextVisible(false);
+    }
+
+    private void ConfigureResultTitleTextStyle()
+    {
+        if (resultTitleTextObj == null)
+        {
+            return;
+        }
+
+        Text text = resultTitleTextObj.GetComponent<Text>();
+        if (text != null)
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 28;
+            text.resizeTextMaxSize = 60;
+        }
+
+        TextMeshProUGUI tmp = resultTitleTextObj.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 28;
+            tmp.fontSizeMax = 60;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+        }
+    }
+
+    private void ConfigureResultMessageTextStyle()
+    {
+        if (resultMessageTextObj == null)
+        {
+            return;
+        }
+
+        Text text = resultMessageTextObj.GetComponent<Text>();
+        if (text != null)
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 20;
+            text.resizeTextMaxSize = 34;
+        }
+
+        TextMeshProUGUI tmp = resultMessageTextObj.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 20;
+            tmp.fontSizeMax = 34;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+        }
     }
 
     private void ConfigureExplanationTextStyle()
@@ -310,23 +437,89 @@ public class QuizManager : MonoBehaviour
         Text text = explanationTextObj.GetComponent<Text>();
         if (text != null)
         {
-            text.alignment = TextAnchor.MiddleCenter;
+            text.alignment = TextAnchor.UpperCenter;
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 24;
-            text.resizeTextMaxSize = 56;
+            text.resizeTextMinSize = 20;
+            text.resizeTextMaxSize = 42;
         }
 
         TextMeshProUGUI tmp = explanationTextObj.GetComponent<TextMeshProUGUI>();
         if (tmp != null)
         {
+            tmp.alignment = TextAlignmentOptions.Top;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 20;
+            tmp.fontSizeMax = 42;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+        }
+    }
+
+    private void SetResultTitleText(string value)
+    {
+        if (resultTitleTextObj == null)
+        {
+            return;
+        }
+
+        Text text = resultTitleTextObj.GetComponent<Text>();
+        if (text != null)
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 28;
+            text.resizeTextMaxSize = 60;
+            text.text = value;
+            return;
+        }
+
+        TextMeshProUGUI tmp = resultTitleTextObj.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.enableAutoSizing = true;
-            tmp.fontSizeMin = 24;
-            tmp.fontSizeMax = 56;
+            tmp.fontSizeMin = 28;
+            tmp.fontSizeMax = 60;
             tmp.overflowMode = TextOverflowModes.Overflow;
+            tmp.text = value;
+        }
+    }
+
+    private void SetResultMessageText(string value)
+    {
+        if (resultMessageTextObj == null)
+        {
+            return;
+        }
+
+        Text text = resultMessageTextObj.GetComponent<Text>();
+        if (text != null)
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 20;
+            text.resizeTextMaxSize = 34;
+            text.text = value;
+            return;
+        }
+
+        TextMeshProUGUI tmp = resultMessageTextObj.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 20;
+            tmp.fontSizeMax = 34;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+            tmp.text = value;
         }
     }
 
@@ -340,12 +533,12 @@ public class QuizManager : MonoBehaviour
         Text text = explanationTextObj.GetComponent<Text>();
         if (text != null)
         {
-            text.alignment = TextAnchor.MiddleCenter;
+            text.alignment = TextAnchor.UpperCenter;
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 24;
-            text.resizeTextMaxSize = 56;
+            text.resizeTextMinSize = 20;
+            text.resizeTextMaxSize = 42;
             text.text = value;
             return;
         }
@@ -353,11 +546,11 @@ public class QuizManager : MonoBehaviour
         TextMeshProUGUI tmp = explanationTextObj.GetComponent<TextMeshProUGUI>();
         if (tmp != null)
         {
-            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.alignment = TextAlignmentOptions.Top;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.enableAutoSizing = true;
-            tmp.fontSizeMin = 24;
-            tmp.fontSizeMax = 56;
+            tmp.fontSizeMin = 20;
+            tmp.fontSizeMax = 42;
             tmp.overflowMode = TextOverflowModes.Overflow;
             tmp.text = value;
         }
@@ -551,6 +744,21 @@ public class QuizManager : MonoBehaviour
         SetGameObjectVisible(confirmButtonObj, visible);
     }
 
+    private void SetQuestionTextVisible(bool visible)
+    {
+        SetGameObjectVisible(questionTextObj, visible);
+    }
+
+    private void SetResultTitleTextVisible(bool visible)
+    {
+        SetGameObjectVisible(resultTitleTextObj, visible);
+    }
+
+    private void SetResultMessageTextVisible(bool visible)
+    {
+        SetGameObjectVisible(resultMessageTextObj, visible);
+    }
+
     private void SetExplanationTextVisible(bool visible)
     {
         SetGameObjectVisible(explanationTextObj, visible);
@@ -625,13 +833,17 @@ public class QuizManager : MonoBehaviour
             ? result.message
             : (isCorrect ? "정답입니다." : "오답입니다.");
         string explanation = ResolveQuizExplanation(isCorrect);
-        SetText(questionTextObj, $"{resultWord}\n<size=36>{resultMessage}</size>");
+        SetQuestionTextVisible(false);
+        SetResultTitleText(resultWord);
+        SetResultMessageText(resultMessage);
+        SetResultTitleTextVisible(true);
+        SetResultMessageTextVisible(true);
         SetExplanationText(explanation);
         SetExplanationTextVisible(!string.IsNullOrWhiteSpace(explanation));
 
         if (buttonGroupObj != null)
         {
-            buttonGroupObj.SetActive(true);
+            buttonGroupObj.SetActive(false);
         }
 
         EnsureConfirmButton();
@@ -682,6 +894,9 @@ public class QuizManager : MonoBehaviour
             quizPanel.SetActive(false);
         }
 
+        SetQuestionTextVisible(true);
+        SetResultTitleTextVisible(false);
+        SetResultMessageTextVisible(false);
         SetConfirmButtonVisible(false);
         SetExplanationTextVisible(false);
         SetAnswerButtonsVisible(false);
