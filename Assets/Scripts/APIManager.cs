@@ -13,13 +13,21 @@ public class APIManager : MonoBehaviour
 
     private readonly struct LocalQuizDefinition
     {
-        public LocalQuizDefinition(long quizId, string questionText, int timeLimitSec, int correctAnswerNumber, string explanation, params string[] choices)
+        public LocalQuizDefinition(
+            long quizId,
+            string questionText,
+            int timeLimitSec,
+            int correctAnswerNumber,
+            string correctExplanation,
+            string wrongExplanation,
+            params string[] choices)
         {
             QuizId = quizId;
             QuestionText = questionText;
             TimeLimitSec = timeLimitSec;
             CorrectAnswerNumber = correctAnswerNumber;
-            Explanation = explanation;
+            CorrectExplanation = correctExplanation;
+            WrongExplanation = wrongExplanation;
             Choices = choices ?? Array.Empty<string>();
         }
 
@@ -27,7 +35,8 @@ public class APIManager : MonoBehaviour
         public string QuestionText { get; }
         public int TimeLimitSec { get; }
         public int CorrectAnswerNumber { get; }
-        public string Explanation { get; }
+        public string CorrectExplanation { get; }
+        public string WrongExplanation { get; }
         public string[] Choices { get; }
     }
 
@@ -38,7 +47,8 @@ public class APIManager : MonoBehaviour
             "2020년대 '주주환원' 흐름에서,\n기업이 벌어들인 이익 일부를\n주주에게 현금으로 나눠주는 것은?",
             15,
             1,
-            "배당금은 기업이 벌어들인 이익 일부를 주주에게 현금이나 주식으로 돌려주는 대표적인 주주환원 방식입니다.",
+            "증거금은 거래를 위해 미리 맡기는 돈이고, 공모가는 상장 전 투자자에게 제시하는 가격, 액면가는 주식의 기준 금액입니다.",
+            "앗, 여기선 배당금이 정답이었어요. 회사 이익 일부를 주주에게 나눠주는 대표적인 주주환원 방식이라 2020년대 기사에도 자주 등장합니다. 다음 문제는 바로 잡아봅시다.",
             "배당금",
             "증거금",
             "공모가",
@@ -48,7 +58,8 @@ public class APIManager : MonoBehaviour
             "2024년 대한민국\n수출액 반등의 주역은?",
             15,
             3,
-            "2024년 수출 반등은 메모리 업황 회복과 AI 수요 확대에 힘입은 반도체 수출 증가가 핵심 동력이었습니다.",
+            "자동차와 조선도 강했지만, 2024년 수출 반등의 대표 주역으로 가장 많이 언급된 건 반도체였습니다.",
+            "이번 주인공은 반도체였습니다. 자동차와 조선도 잘했지만, 메모리 업황 회복과 AI 수요 덕분에 반도체가 헤드라인을 가져갔어요. 방금은 살짝 미끄러졌고, 다음엔 맞힐 수 있습니다.",
             "자동차",
             "조선업",
             "반도체",
@@ -58,7 +69,8 @@ public class APIManager : MonoBehaviour
             "2026년 삼성전자가 발표한,\n주식을 불태워 1주당 가치를\n극대화 하는 이 '주주환원 정책'은?",
             15,
             3,
-            "자사주 소각은 회사가 보유한 자기주식을 없애 유통 주식 수를 줄이고, 주당 가치와 주주가치를 높이려는 대표적인 주주환원 정책입니다.",
+            "액면분할은 주식을 쪼개는 것이고, 유상증자는 자금을 새로 조달하는 방식, 무상감자는 자본을 줄이는 조정입니다.",
+            "정답은 자사주 소각이었어요. 이름은 세 보이지만 핵심은 유통 주식 수를 줄여 1주당 가치를 끌어올리는 것이라 주주환원 맥락에서 자주 언급됩니다. 이번엔 헷갈렸지만 충분히 만회할 수 있어요.",
             "액면분할",
             "유상증자",
             "자사주 소각",
@@ -105,7 +117,8 @@ public class APIManager : MonoBehaviour
         public string questionText;
         public int timeLimitSec;
         public QuizChoiceResponse[] choices;
-        public string explanation;
+        public string correctExplanation;
+        public string wrongExplanation;
     }
 
     [Serializable]
@@ -491,7 +504,8 @@ public class APIManager : MonoBehaviour
             questionText = definition.QuestionText,
             timeLimitSec = definition.TimeLimitSec,
             choices = choices,
-            explanation = definition.Explanation
+            correctExplanation = definition.CorrectExplanation,
+            wrongExplanation = definition.WrongExplanation
         };
     }
 

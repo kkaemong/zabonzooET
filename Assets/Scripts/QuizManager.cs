@@ -253,13 +253,13 @@ public class QuizManager : MonoBehaviour
             RectTransform confirmRect = confirmButtonObj.GetComponent<RectTransform>();
             if (templateRect != null && confirmRect != null)
             {
-                confirmRect.anchorMin = new Vector2(0.5f, 0.5f);
-                confirmRect.anchorMax = new Vector2(0.5f, 0.5f);
+                confirmRect.anchorMin = new Vector2(0.5f, 0f);
+                confirmRect.anchorMax = new Vector2(0.5f, 0f);
                 confirmRect.pivot = new Vector2(0.5f, 0.5f);
                 confirmRect.sizeDelta = templateRect.sizeDelta;
                 confirmRect.localScale = templateRect.localScale;
                 confirmRect.localRotation = templateRect.localRotation;
-                confirmRect.anchoredPosition = new Vector2(0f, -150f);
+                confirmRect.anchoredPosition = new Vector2(0f, 52f);
             }
         }
 
@@ -524,10 +524,10 @@ public class QuizManager : MonoBehaviour
         string resultMessage = result != null && !string.IsNullOrWhiteSpace(result.message)
             ? result.message
             : (isCorrect ? "정답입니다." : "오답입니다.");
-        string explanation = ResolveQuizExplanation();
+        string explanation = ResolveQuizExplanation(isCorrect);
         string explanationBlock = string.IsNullOrWhiteSpace(explanation)
             ? string.Empty
-            : $"\n\n<size=28><b>해설</b>\n{explanation}</size>";
+            : $"\n\n<size=28>{explanation}</size>";
 
         SetText(questionTextObj, $"{resultWord}\n<size=36>{resultMessage}</size>{explanationBlock}");
 
@@ -543,10 +543,19 @@ public class QuizManager : MonoBehaviour
         SetConfirmButtonVisible(true);
     }
 
-    private string ResolveQuizExplanation()
+    private string ResolveQuizExplanation(bool isCorrect)
     {
-        return currentApiQuiz != null && !string.IsNullOrWhiteSpace(currentApiQuiz.explanation)
-            ? currentApiQuiz.explanation.Trim()
+        if (currentApiQuiz == null)
+        {
+            return string.Empty;
+        }
+
+        string explanation = isCorrect
+            ? currentApiQuiz.correctExplanation
+            : currentApiQuiz.wrongExplanation;
+
+        return !string.IsNullOrWhiteSpace(explanation)
+            ? explanation.Trim()
             : string.Empty;
     }
 
