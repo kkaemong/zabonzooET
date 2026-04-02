@@ -277,7 +277,7 @@ public class QuizManager : MonoBehaviour
                 confirmRect.sizeDelta = templateRect.sizeDelta;
                 confirmRect.localScale = templateRect.localScale;
                 confirmRect.localRotation = templateRect.localRotation;
-                confirmRect.anchoredPosition = new Vector2(0f, 84f);
+                confirmRect.anchoredPosition = new Vector2(0f, 68f);
             }
         }
 
@@ -304,8 +304,8 @@ public class QuizManager : MonoBehaviour
                 rect.anchorMin = new Vector2(0.5f, 1f);
                 rect.anchorMax = new Vector2(0.5f, 1f);
                 rect.pivot = new Vector2(0.5f, 1f);
-                rect.anchoredPosition = new Vector2(0f, -260f);
-                rect.sizeDelta = new Vector2(1450f, 280f);
+                rect.anchoredPosition = new Vector2(0f, -310f);
+                rect.sizeDelta = new Vector2(1320f, 190f);
             }
         }
 
@@ -358,8 +358,8 @@ public class QuizManager : MonoBehaviour
                 rect.anchorMin = new Vector2(0.5f, 1f);
                 rect.anchorMax = new Vector2(0.5f, 1f);
                 rect.pivot = new Vector2(0.5f, 1f);
-                rect.anchoredPosition = new Vector2(0f, -180f);
-                rect.sizeDelta = new Vector2(1350f, 90f);
+                rect.anchoredPosition = new Vector2(0f, -188f);
+                rect.sizeDelta = new Vector2(1250f, 70f);
             }
         }
 
@@ -411,8 +411,8 @@ public class QuizManager : MonoBehaviour
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 20;
-            text.resizeTextMaxSize = 34;
+            text.resizeTextMinSize = 18;
+            text.resizeTextMaxSize = 30;
         }
 
         TextMeshProUGUI tmp = resultMessageTextObj.GetComponent<TextMeshProUGUI>();
@@ -421,8 +421,8 @@ public class QuizManager : MonoBehaviour
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.enableAutoSizing = true;
-            tmp.fontSizeMin = 20;
-            tmp.fontSizeMax = 34;
+            tmp.fontSizeMin = 18;
+            tmp.fontSizeMax = 30;
             tmp.overflowMode = TextOverflowModes.Overflow;
         }
     }
@@ -437,22 +437,22 @@ public class QuizManager : MonoBehaviour
         Text text = explanationTextObj.GetComponent<Text>();
         if (text != null)
         {
-            text.alignment = TextAnchor.UpperCenter;
+            text.alignment = TextAnchor.MiddleCenter;
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 20;
-            text.resizeTextMaxSize = 42;
+            text.resizeTextMinSize = 18;
+            text.resizeTextMaxSize = 38;
         }
 
         TextMeshProUGUI tmp = explanationTextObj.GetComponent<TextMeshProUGUI>();
         if (tmp != null)
         {
-            tmp.alignment = TextAlignmentOptions.Top;
+            tmp.alignment = TextAlignmentOptions.Center;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.enableAutoSizing = true;
-            tmp.fontSizeMin = 20;
-            tmp.fontSizeMax = 42;
+            tmp.fontSizeMin = 18;
+            tmp.fontSizeMax = 38;
             tmp.overflowMode = TextOverflowModes.Overflow;
         }
     }
@@ -504,8 +504,8 @@ public class QuizManager : MonoBehaviour
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 20;
-            text.resizeTextMaxSize = 34;
+            text.resizeTextMinSize = 18;
+            text.resizeTextMaxSize = 30;
             text.text = value;
             return;
         }
@@ -516,8 +516,8 @@ public class QuizManager : MonoBehaviour
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.enableAutoSizing = true;
-            tmp.fontSizeMin = 20;
-            tmp.fontSizeMax = 34;
+            tmp.fontSizeMin = 18;
+            tmp.fontSizeMax = 30;
             tmp.overflowMode = TextOverflowModes.Overflow;
             tmp.text = value;
         }
@@ -533,12 +533,12 @@ public class QuizManager : MonoBehaviour
         Text text = explanationTextObj.GetComponent<Text>();
         if (text != null)
         {
-            text.alignment = TextAnchor.UpperCenter;
+            text.alignment = TextAnchor.MiddleCenter;
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 20;
-            text.resizeTextMaxSize = 42;
+            text.resizeTextMinSize = 18;
+            text.resizeTextMaxSize = 38;
             text.text = value;
             return;
         }
@@ -546,11 +546,11 @@ public class QuizManager : MonoBehaviour
         TextMeshProUGUI tmp = explanationTextObj.GetComponent<TextMeshProUGUI>();
         if (tmp != null)
         {
-            tmp.alignment = TextAlignmentOptions.Top;
+            tmp.alignment = TextAlignmentOptions.Center;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.enableAutoSizing = true;
-            tmp.fontSizeMin = 20;
-            tmp.fontSizeMax = 42;
+            tmp.fontSizeMin = 18;
+            tmp.fontSizeMax = 38;
             tmp.overflowMode = TextOverflowModes.Overflow;
             tmp.text = value;
         }
