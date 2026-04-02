@@ -26,9 +26,12 @@ public class QuizManager : MonoBehaviour
     public float boostDuration = 3f;
 
     private APIManager.QuizQuestionResponse currentApiQuiz;
+    private APIManager.QuizResultResponse pendingQuizResult;
     private float questionStartTime;
     private GameManager gm;
     private GameObject buttonGroupObj;
+    private GameObject confirmButtonObj;
+    private GameObject confirmButtonTextObj;
 
     private void Awake()
     {
@@ -51,9 +54,13 @@ public class QuizManager : MonoBehaviour
         EnsureBindings();
         gm?.PauseGame();
 
-        if (GameManager.Instance != null && GameManager.Instance.sfxSource != null && GameManager.Instance.quizPopSound != null)
+        if (GameManager.Instance != null &&
+            GameManager.Instance.sfxSource != null &&
+            GameManager.Instance.quizPopSound != null)
         {
-            GameManager.Instance.sfxSource.PlayOneShot(GameManager.Instance.quizPopSound, GameManager.Instance.quizPopVolume);
+            GameManager.Instance.sfxSource.PlayOneShot(
+                GameManager.Instance.quizPopSound,
+                GameManager.Instance.quizPopVolume);
         }
 
         if (quizPanel == null)
@@ -63,7 +70,12 @@ public class QuizManager : MonoBehaviour
             return;
         }
 
+        currentApiQuiz = null;
+        pendingQuizResult = null;
+
         quizPanel.SetActive(true);
+        SetAnswerButtonsVisible(false);
+        SetConfirmButtonVisible(false);
         if (buttonGroupObj != null)
         {
             buttonGroupObj.SetActive(false);
@@ -89,6 +101,12 @@ public class QuizManager : MonoBehaviour
     private IEnumerator ResumeAfterDelay(float delay)
     {
         yield return new WaitForSecondsRealtime(delay);
+
+        currentApiQuiz = null;
+        pendingQuizResult = null;
+        SetConfirmButtonVisible(false);
+        SetAnswerButtonsVisible(false);
+
         if (quizPanel != null)
         {
             quizPanel.SetActive(false);
@@ -107,6 +125,7 @@ public class QuizManager : MonoBehaviour
         }
 
         currentApiQuiz = response;
+        pendingQuizResult = null;
         questionStartTime = Time.realtimeSinceStartup;
 
         SetText(questionTextObj, currentApiQuiz.questionText);
@@ -124,6 +143,8 @@ public class QuizManager : MonoBehaviour
         AddButtonListener(buttonCObj, () => OnAnswerSelected(2));
         AddButtonListener(buttonDObj, () => OnAnswerSelected(3));
 
+        SetConfirmButtonVisible(false);
+        SetAnswerButtonsVisible(true);
         if (buttonGroupObj != null)
         {
             buttonGroupObj.SetActive(true);
@@ -132,12 +153,14 @@ public class QuizManager : MonoBehaviour
 
     private int GetChoiceNumber(int index)
     {
-        if (currentApiQuiz?.choices == null || index < 0 || index >= currentApiQuiz.choices.Length || currentApiQuiz.choices[index] == null)
+        if (currentApiQuiz?.choices == null ||
+            index < 0 ||
+            index >= currentApiQuiz.choices.Length ||
+            currentApiQuiz.choices[index] == null)
         {
             return -1;
         }
 
-        // Backend expects a 1-based answer number, not the quizChoiceId primary key.
         return index + 1;
     }
 
@@ -199,13 +222,50 @@ public class QuizManager : MonoBehaviour
             btnTextBObj = ResolveButtonText(btnTextBObj, buttonBObj);
             btnTextCObj = ResolveButtonText(btnTextCObj, buttonCObj);
             btnTextDObj = ResolveButtonText(btnTextDObj, buttonDObj);
+
+            EnsureConfirmButton();
         }
 
-        if (questionTextObj == null || buttonGroupObj == null ||
-            btnTextAObj == null || btnTextBObj == null || btnTextCObj == null || btnTextDObj == null)
+        if (questionTextObj == null ||
+            buttonGroupObj == null ||
+            btnTextAObj == null ||
+            btnTextBObj == null ||
+            btnTextCObj == null ||
+            btnTextDObj == null)
         {
             Debug.LogWarning("[QuizManager] QuizPanel bindings are incomplete.");
         }
+    }
+
+    private void EnsureConfirmButton()
+    {
+        if (buttonGroupObj == null || buttonAObj == null)
+        {
+            return;
+        }
+
+        if (!IsUsableSceneObject(confirmButtonObj))
+        {
+            confirmButtonObj = Instantiate(buttonAObj, buttonGroupObj.transform);
+            confirmButtonObj.name = "ConfirmButton";
+
+            RectTransform templateRect = buttonAObj.GetComponent<RectTransform>();
+            RectTransform confirmRect = confirmButtonObj.GetComponent<RectTransform>();
+            if (templateRect != null && confirmRect != null)
+            {
+                confirmRect.anchorMin = new Vector2(0.5f, 0.5f);
+                confirmRect.anchorMax = new Vector2(0.5f, 0.5f);
+                confirmRect.pivot = new Vector2(0.5f, 0.5f);
+                confirmRect.sizeDelta = templateRect.sizeDelta;
+                confirmRect.localScale = templateRect.localScale;
+                confirmRect.localRotation = templateRect.localRotation;
+                confirmRect.anchoredPosition = new Vector2(0f, -150f);
+            }
+        }
+
+        confirmButtonTextObj = ResolveButtonText(confirmButtonTextObj, confirmButtonObj);
+        SetText(confirmButtonTextObj, "확인");
+        SetConfirmButtonVisible(false);
     }
 
     private GameObject ResolveQuizPanel()
@@ -383,6 +443,27 @@ public class QuizManager : MonoBehaviour
         button.onClick.AddListener(action);
     }
 
+    private void SetAnswerButtonsVisible(bool visible)
+    {
+        SetGameObjectVisible(buttonAObj, visible);
+        SetGameObjectVisible(buttonBObj, visible);
+        SetGameObjectVisible(buttonCObj, visible);
+        SetGameObjectVisible(buttonDObj, visible);
+    }
+
+    private void SetConfirmButtonVisible(bool visible)
+    {
+        SetGameObjectVisible(confirmButtonObj, visible);
+    }
+
+    private void SetGameObjectVisible(GameObject target, bool visible)
+    {
+        if (target != null)
+        {
+            target.SetActive(visible);
+        }
+    }
+
     private void OnAnswerSelected(int selectedIndex)
     {
         int selectedAnswerNumber = GetChoiceNumber(selectedIndex);
@@ -391,6 +472,8 @@ public class QuizManager : MonoBehaviour
             return;
         }
 
+        SetAnswerButtonsVisible(false);
+        SetConfirmButtonVisible(false);
         if (buttonGroupObj != null)
         {
             buttonGroupObj.SetActive(false);
@@ -417,10 +500,11 @@ public class QuizManager : MonoBehaviour
 
     private void OnQuizResultReceived(APIManager.QuizResultResponse result)
     {
-        StartCoroutine(ShowExplanationCoroutine(result));
+        pendingQuizResult = result;
+        ShowResultState(result);
     }
 
-    private IEnumerator ShowExplanationCoroutine(APIManager.QuizResultResponse result)
+    private void ShowResultState(APIManager.QuizResultResponse result)
     {
         bool isCorrect = result != null && result.correct;
 
@@ -436,49 +520,77 @@ public class QuizManager : MonoBehaviour
             }
         }
 
-        string resultWord = isCorrect ? "<color=#00FF00>[정답]</color>" : "<color=#FF0000>[오답]</color>";
-        string message = result != null && !string.IsNullOrWhiteSpace(result.message)
-            ? $"\n\n<size=50>{result.message}</size>"
-            : string.Empty;
-        SetText(questionTextObj, $"{resultWord}{message}");
+        string resultWord = isCorrect ? "<color=#00FF00>[정답]</color>" : "<color=#FF4D4D>[오답]</color>";
+        string resultMessage = result != null && !string.IsNullOrWhiteSpace(result.message)
+            ? result.message
+            : (isCorrect ? "정답입니다." : "오답입니다.");
+        string explanation = ResolveQuizExplanation();
+        string explanationBlock = string.IsNullOrWhiteSpace(explanation)
+            ? string.Empty
+            : $"\n\n<size=28><b>해설</b>\n{explanation}</size>";
 
-        yield return new WaitForSecondsRealtime(3f);
+        SetText(questionTextObj, $"{resultWord}\n<size=36>{resultMessage}</size>{explanationBlock}");
 
-        if (gm != null && result != null)
+        if (buttonGroupObj != null)
         {
-            if (result.hpChange > 0)
+            buttonGroupObj.SetActive(true);
+        }
+
+        EnsureConfirmButton();
+        SetAnswerButtonsVisible(false);
+        SetText(confirmButtonTextObj, "확인");
+        AddButtonListener(confirmButtonObj, ConfirmQuizResult);
+        SetConfirmButtonVisible(true);
+    }
+
+    private string ResolveQuizExplanation()
+    {
+        return currentApiQuiz != null && !string.IsNullOrWhiteSpace(currentApiQuiz.explanation)
+            ? currentApiQuiz.explanation.Trim()
+            : string.Empty;
+    }
+
+    private void ConfirmQuizResult()
+    {
+        bool isCorrect = pendingQuizResult != null && pendingQuizResult.correct;
+
+        if (gm != null && pendingQuizResult != null)
+        {
+            if (pendingQuizResult.hpChange > 0)
             {
-                gm.AddLife(result.hpChange);
+                gm.AddLife(pendingQuizResult.hpChange);
             }
-            else if (result.hpChange < 0)
+            else if (pendingQuizResult.hpChange < 0)
             {
                 player playerComponent = FindObjectOfType<player>();
                 if (playerComponent != null)
                 {
-                    playerComponent.TakeDamage(-result.hpChange);
+                    playerComponent.TakeDamage(-pendingQuizResult.hpChange);
                 }
-            }
-
-            gm.ResumeGame();
-
-            if (isCorrect)
-            {
-                gm.ApplyTemporarySpeedBoost(boostMultiplier, boostDuration);
-            }
-        }
-
-        if (isCorrect)
-        {
-            player playerComponent = FindObjectOfType<player>();
-            if (playerComponent != null)
-            {
-                playerComponent.TriggerQuizInvincibility(3f);
             }
         }
 
         if (quizPanel != null)
         {
             quizPanel.SetActive(false);
+        }
+
+        SetConfirmButtonVisible(false);
+        SetAnswerButtonsVisible(false);
+        currentApiQuiz = null;
+        pendingQuizResult = null;
+
+        gm?.ResumeGame();
+
+        if (isCorrect && gm != null)
+        {
+            gm.ApplyTemporarySpeedBoost(boostMultiplier, boostDuration);
+
+            player playerComponent = FindObjectOfType<player>();
+            if (playerComponent != null)
+            {
+                playerComponent.TriggerQuizInvincibility(3f);
+            }
         }
     }
 }
