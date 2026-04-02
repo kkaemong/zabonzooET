@@ -33,7 +33,7 @@ public class APIManager : MonoBehaviour
     {
         new LocalQuizDefinition(
             202001,
-            "기업이 벌어들인 이익 일부를 주주에게 현금으로 나눠주는 것은?",
+            "기업이 벌어들인 이익 일부를\n주주에게 현금으로 나눠주는 것은?",
             15,
             1,
             "배당금",
@@ -42,7 +42,7 @@ public class APIManager : MonoBehaviour
             "액면가"),
         new LocalQuizDefinition(
             202002,
-            "2024년 대한민국 수출액 반등의 주역은?",
+            "2024년 대한민국\n수출액 반등의 주역은?",
             15,
             3,
             "자동차",
@@ -51,7 +51,7 @@ public class APIManager : MonoBehaviour
             "석유화학"),
         new LocalQuizDefinition(
             202003,
-            "2026년 삼성전자가 발표한, 주식을 불태워 1주당 가치를 극대화하는 이 '주주환원 정책'은?",
+            "2026년 삼성전자가 발표한,\n주식을 불태워 1주당 가치를\n극대화 하는 이 '주주환원 정책'은?",
             15,
             3,
             "액면분할",
