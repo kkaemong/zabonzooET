@@ -33,7 +33,7 @@ public class APIManager : MonoBehaviour
     {
         new LocalQuizDefinition(
             202001,
-            "기업이 벌어들인 이익 일부를\n주주에게 현금으로 나눠주는 것은?",
+            "2020년대 '주주환원' 흐름에서,\n기업이 벌어들인 이익 일부를\n주주에게 현금으로 나눠주는 것은?",
             15,
             1,
             "배당금",
