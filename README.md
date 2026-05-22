@@ -229,30 +229,37 @@ zabonzooET/
 
 ### ⚡ 1. KDB 공공데이터 기반 동적 퀴즈 자동 생성 — `QuizDataLoader.java`
 
-| 구분 | 내용 |
-|:---:|---|
-| 🔴 **문제** | 금융 학습 효과를 위해 수백 개의 퀴즈가 필요했으나, DB 수동 등록은 비효율적 |
-| 🟢 **해결** | KDB 금융 용어 공공데이터 CSV를 파싱하는 **자동 배치 로더** 구현 |
-| 🔵 **방식** | 서버 기동 시 용어 설명문에서 정답을 추출하고, 전체 용어 풀에서 무작위 오답 3개를 Shuffle → **4지선다 객관식 퀴즈 동적 자동 생성** |
+> 🔴 **문제점** <br/>
+> 금융 학습 효과를 위해 수백 개의 퀴즈가 필요했으나, DB 수동 등록은 비효율적이었습니다.
+> 
+> 🟢 **해결책** <br/>
+> KDB 금융 용어 공공데이터 CSV를 파싱하는 **자동 배치 로더**를 구현했습니다.
+> 
+> 🔵 **구현 방식** <br/>
+> 서버 기동 시 용어 설명문에서 정답을 추출하고, 전체 용어 풀에서 무작위 오답 3개를 Shuffle하여 **4지선다 객관식 퀴즈를 동적으로 자동 생성**하도록 구축했습니다.
 
 <br/>
 
 ### 🎯 2. 게임 물리 & 연출 디테일링 — `player.cs` · `GameManager.cs`
 
-| 구분 | 내용 |
-|:---:|---|
-| 🔴 **1단/2단 점프** | `Rigidbody2D` 물리 연산 + `Raycast` 지면 감지를 혼합하여 매끄러운 점프 피드백 구현 |
-| 🟢 **가변 사운드 피치** | 주행 속도 변화에 따라 달리기 오디오의 **Pitch를 실시간 비례 연동**, 청각적 속도감 극대화 |
-| 🔵 **카메라 셰이크** | 피격 시 화면 흔들림 + 무적 프레임 기믹으로 타격감 & 밸런싱 동시 해결 |
+> 🔴 **1단/2단 점프 구현** <br/>
+> `Rigidbody2D` 물리 연산과 `Raycast` 지면 감지를 혼합하여 매끄럽고 정교한 점프 피드백을 구현했습니다.
+> 
+> 🟢 **가변 사운드 피치** <br/>
+> 주행 속도 변화에 따라 달리기 오디오의 **Pitch를 실시간으로 비례 연동**시켜 청각적 속도감을 극대화했습니다.
+> 
+> 🔵 **카메라 셰이크 연출** <br/>
+> 피격 시 화면 흔들림 효과와 무적 프레임 기믹을 추가하여 타격감을 살리고 게임 밸런싱을 동시에 해결했습니다.
 
 <br/>
 
 ### 🔒 3. 보안성 중심의 인프라 격리 설계
 
-| 구분 | 내용 |
-|:---:|---|
-| 🔐 **환경 변수화** | `application.yml` 내 PostgreSQL · Redis 계정 정보를 모두 `${ENV_VAR}` 방식으로 외부화 |
-| 🛡️ **.gitignore 최적화** | Unity 에디터 캐시(`Library/`, `Temp/`), 인프라 시크릿(`.env`) 완벽 격리 → Public 저장소 보안 사고 원천 차단 |
+> 🔐 **환경 변수화** <br/>
+> `application.yml` 내 PostgreSQL, Redis 계정 정보 등 민감한 데이터를 모두 `${ENV_VAR}` 방식으로 외부화했습니다.
+> 
+> 🛡️ **.gitignore 최적화** <br/>
+> Unity 에디터 캐시(`Library/`, `Temp/`) 및 인프라 시크릿(`.env`)을 완벽하게 격리하여, Public 저장소에서의 보안 사고를 원천 차단했습니다.
 
 <br/>
 
@@ -262,45 +269,55 @@ zabonzooET/
 
 <table>
   <tr>
-    <td align="center" width="25%">
-      <a href="https://github.com/kkaemong">
-        <img src="https://github.com/kkaemong.png" width="80" style="border-radius:50%"/><br/><br/>
-        <b>진준영</b><br/>
-        <sub>🎮 Unity 클라이언트 · 본인</sub>
-      </a><br/><br/>
-      🕹️ 물리 점프 &amp; 무한 러너 시스템<br/>
-      💬 퀴즈 모달 &amp; 부스터/쉴드 연출<br/>
-      🔌 <code>APIManager.cs</code> HTTP 모듈 단독 설계
+    <td align="center" width="50%">
+      <a href="https://github.com/kkaemong"><img src="https://github.com/kkaemong.png" width="100" style="border-radius:50%"/></a><br/><br/>
+      <h3>진준영</h3>
+      <b>🎮 Unity 클라이언트 · 본인</b><br/><br/>
+      <div align="left">
+        <ul>
+          <li>🕹️ 물리 점프 & 무한 러너 시스템 설계</li>
+          <li>💬 퀴즈 모달 & 부스터/쉴드 연출</li>
+          <li>🔌 <code>APIManager.cs</code> HTTP 모듈 단독 설계</li>
+        </ul>
+      </div>
     </td>
-    <td align="center" width="25%">
-      <a href="#">
-        <img src="https://github.com/identicons/gyeongminji.png" width="80" style="border-radius:50%"/><br/><br/>
-        <b>경민지</b><br/>
-        <sub>🎨 Unity 클라이언트</sub>
-      </a><br/><br/>
-      🗂️ 스테이지 선택 &amp; 금융 상품 씬 구현<br/>
-      ✏️ E.T. &amp; 배경 2D 에셋 직접 드로잉<br/>
-      🖼️ 스프라이트 패킹 &amp; UI 최적화
+    <td align="center" width="50%">
+      <a href="#"><img src="https://github.com/identicons/gyeongminji.png" width="100" style="border-radius:50%"/></a><br/><br/>
+      <h3>경민지</h3>
+      <b>🎨 Unity 클라이언트</b><br/><br/>
+      <div align="left">
+        <ul>
+          <li>🗂️ 스테이지 선택 & 금융 상품 씬 구현</li>
+          <li>✏️ E.T. & 배경 2D 에셋 직접 드로잉</li>
+          <li>🖼️ 스프라이트 패킹 & UI 최적화</li>
+        </ul>
+      </div>
     </td>
-    <td align="center" width="25%">
-      <a href="#">
-        <img src="https://github.com/identicons/hongjeonghee.png" width="80" style="border-radius:50%"/><br/><br/>
-        <b>홍정희</b><br/>
-        <sub>⚙️ Spring Boot 백엔드</sub>
-      </a><br/><br/>
-      🛠️ 전 도메인 REST API 단독 구현<br/>
-      🧠 KDB 기반 4지선다 퀴즈 자동 생성<br/>
-      📦 Redis 캐싱 &amp; 실시간 리더보드
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <a href="#"><img src="https://github.com/identicons/hongjeonghee.png" width="100" style="border-radius:50%"/></a><br/><br/>
+      <h3>홍정희</h3>
+      <b>⚙️ Spring Boot 백엔드</b><br/><br/>
+      <div align="left">
+        <ul>
+          <li>🛠️ 전 도메인 REST API 단독 구현</li>
+          <li>🧠 KDB 기반 4지선다 퀴즈 자동 생성</li>
+          <li>📦 Redis 캐싱 & 실시간 리더보드</li>
+        </ul>
+      </div>
     </td>
-    <td align="center" width="25%">
-      <a href="#">
-        <img src="https://github.com/identicons/kimdaeyeon.png" width="80" style="border-radius:50%"/><br/><br/>
-        <b>김대연</b><br/>
-        <sub>☁️ 인프라 &amp; Unity 클라이언트</sub>
-      </a><br/><br/>
-      🏠 로비 · 상점 · UFO 정비소 UI 구현<br/>
-      🚀 AWS EC2 + Docker Compose 배포<br/>
-      🌐 Nginx 리버스 프록시 &amp; WebGL 최적화
+    <td align="center" width="50%">
+      <a href="#"><img src="https://github.com/identicons/kimdaeyeon.png" width="100" style="border-radius:50%"/></a><br/><br/>
+      <h3>김대연</h3>
+      <b>☁️ 인프라 & Unity 클라이언트</b><br/><br/>
+      <div align="left">
+        <ul>
+          <li>🏠 로비 · 상점 · UFO 정비소 UI 구현</li>
+          <li>🚀 AWS EC2 + Docker Compose 배포</li>
+          <li>🌐 Nginx 리버스 프록시 & WebGL 최적화</li>
+        </ul>
+      </div>
     </td>
   </tr>
 </table>
