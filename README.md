@@ -270,52 +270,52 @@ zabonzooET/
 <table>
   <tr>
     <td align="center" width="50%">
-      <a href="https://github.com/kkaemong"><img src="https://github.com/kkaemong.png" width="100" style="border-radius:50%"/></a><br/><br/>
+      <a href="https://github.com/kkaemong"><img src="./profiles/jinjuneyoung.png" width="100" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>진준영</h3>
-      <b>🎮 Unity 클라이언트 · 본인</b><br/><br/>
+      <b>Unity 클라이언트 · 본인</b><br/><br/>
       <div align="left">
         <ul>
-          <li>🕹️ 물리 점프 & 무한 러너 시스템 설계</li>
-          <li>💬 퀴즈 모달 & 부스터/쉴드 연출</li>
-          <li>🔌 <code>APIManager.cs</code> HTTP 모듈 단독 설계</li>
+          <li>물리 점프 & 무한 러너 시스템 설계</li>
+          <li>퀴즈 모달 & 부스터/쉴드 연출</li>
+          <li><code>APIManager.cs</code> HTTP 모듈 단독 설계</li>
         </ul>
       </div>
     </td>
     <td align="center" width="50%">
-      <a href="#"><img src="https://github.com/identicons/gyeongminji.png" width="100" style="border-radius:50%"/></a><br/><br/>
+      <a href="#"><img src="./profiles/gyeongminji.png" width="100" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>경민지</h3>
-      <b>🎨 Unity 클라이언트</b><br/><br/>
+      <b>Unity 클라이언트</b><br/><br/>
       <div align="left">
         <ul>
-          <li>🗂️ 스테이지 선택 & 금융 상품 씬 구현</li>
-          <li>✏️ E.T. & 배경 2D 에셋 직접 드로잉</li>
-          <li>🖼️ 스프라이트 패킹 & UI 최적화</li>
+          <li>스테이지 선택 & 금융 상품 씬 구현</li>
+          <li>E.T. & 배경 2D 에셋 직접 드로잉</li>
+          <li>스프라이트 패킹 & UI 최적화</li>
         </ul>
       </div>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <a href="#"><img src="https://github.com/identicons/hongjeonghee.png" width="100" style="border-radius:50%"/></a><br/><br/>
+      <a href="#"><img src="./profiles/hongjeonghee.png" width="100" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>홍정희</h3>
-      <b>⚙️ Spring Boot 백엔드</b><br/><br/>
+      <b>Spring Boot 백엔드</b><br/><br/>
       <div align="left">
         <ul>
-          <li>🛠️ 전 도메인 REST API 단독 구현</li>
-          <li>🧠 KDB 기반 4지선다 퀴즈 자동 생성</li>
-          <li>📦 Redis 캐싱 & 실시간 리더보드</li>
+          <li>전 도메인 REST API 단독 구현</li>
+          <li>KDB 기반 4지선다 퀴즈 자동 생성</li>
+          <li>Redis 캐싱 & 실시간 리더보드</li>
         </ul>
       </div>
     </td>
     <td align="center" width="50%">
-      <a href="#"><img src="https://github.com/identicons/kimdaeyeon.png" width="100" style="border-radius:50%"/></a><br/><br/>
+      <a href="#"><img src="./profiles/kimdaeyeon.png" width="100" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>김대연</h3>
-      <b>☁️ 인프라 & Unity 클라이언트</b><br/><br/>
+      <b>인프라 & Unity 클라이언트</b><br/><br/>
       <div align="left">
         <ul>
-          <li>🏠 로비 · 상점 · UFO 정비소 UI 구현</li>
-          <li>🚀 AWS EC2 + Docker Compose 배포</li>
-          <li>🌐 Nginx 리버스 프록시 & WebGL 최적화</li>
+          <li>로비 · 상점 · UFO 정비소 UI 구현</li>
+          <li>AWS EC2 + Docker Compose 배포</li>
+          <li>Nginx 리버스 프록시 & WebGL 최적화</li>
         </ul>
       </div>
     </td>
