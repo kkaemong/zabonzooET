@@ -186,6 +186,75 @@ graph LR
 
 ---
 
+## 📂 &nbsp;디렉토리 구조
+
+```text
+zabonzooET/
+├── Assets/                       # 🎮 Unity 게임 클라이언트 에셋 & C# 스크립트
+│   ├── Scripts/
+│   │   ├── APIManager.cs         #   커스텀 HTTP 통신 모듈
+│   │   ├── player.cs             #   플레이어 물리 & 점프 시스템
+│   │   ├── GameManager.cs        #   인게임 전체 흐름 관리
+│   │   ├── QuizManager.cs        #   퀴즈 UI 모달 & 판정 로직
+│   │   ├── FinanceSelect/        #   금융 상품 선택 씬 스크립트
+│   │   └── StageSelect/          #   스테이지 선택 씬 스크립트
+│   ├── Scenes/                   #   Lobby · StageSelect · 1980s/2000s/2020s · FinanceSelect
+│   ├── Sprites/                  #   시대별 캐릭터 & UI 스프라이트
+│   └── WebGLTemplates/           #   브라우저 배포용 커스텀 WebGL 템플릿
+│
+├── src/main/java/                # ⚙️ Spring Boot 백엔드 소스
+│   └── com/ssafy/amagetdon/
+│       ├── common/               #   글로벌 예외처리 · 세션 인터셉터 · 웹 설정
+│       └── domain/               #   User · Game · Quiz · Coin 도메인 비즈니스 로직
+│
+├── infra/                        # ☁️ 배포 인프라 설정
+│   ├── docker-compose.prod.yml   #   프로덕션 컨테이너 구성
+│   ├── nginx.conf                #   리버스 프록시 & 라우팅
+│   └── scripts/                  #   EC2 초기화 · 배포 자동화 스크립트
+│
+├── portfolio/                    # 🌐 React 포트폴리오 소개 페이지
+└── build.gradle                  # Gradle 빌드 스크립트
+```
+
+<br/>
+
+---
+
+## 🚀 &nbsp;주요 기술적 도전 및 해결
+
+<br/>
+
+### &nbsp;⚡ 1. KDB 공공데이터 기반 동적 퀴즈 자동 생성 &nbsp;`QuizDataLoader.java`
+
+| | 내용 |
+|---|---|
+| **문제** | 금융 학습 효과를 위해 수백 개의 퀴즈가 필요했으나, DB 수동 등록은 비효율적 |
+| **해결** | KDB 금융 용어 공공데이터 CSV를 파싱하는 **자동 배치 로더** 구현 |
+| **방식** | 서버 기동 시 용어 설명문에서 정답을 추출하고, 전체 용어 풀에서 무작위 오답 3개를 Shuffle → **4지선다 객관식 퀴즈 동적 자동 생성** |
+
+<br/>
+
+### &nbsp;🎯 2. 게임 물리 & 연출 디테일링 &nbsp;`player.cs` · `GameManager.cs`
+
+| | 내용 |
+|---|---|
+| **1단/2단 점프** | `Rigidbody2D` 물리 연산 + `Raycast` 지면 감지를 혼합하여 매끄러운 점프 피드백 구현 |
+| **가변 사운드 피치** | 주행 속도 변화에 따라 달리기 오디오의 **Pitch를 실시간 비례 연동**, 청각적 속도감 극대화 |
+| **카메라 셰이크** | 피격 시 화면 흔들림 + 무적 프레임 기믹으로 타격감 & 밸런싱 동시 해결 |
+
+<br/>
+
+### &nbsp;🔒 3. 보안성 중심의 인프라 격리 설계
+
+| | 내용 |
+|---|---|
+| **환경 변수화** | `application.yml` 내 PostgreSQL · Redis 계정 정보를 모두 `${ENV_VAR}` 방식으로 외부화 |
+| **.gitignore 최적화** | Unity 에디터 캐시(`Library/`, `Temp/`), 인프라 시크릿(`.env`) 완벽 격리 → Public 저장소 보안 사고 원천 차단 |
+
+<br/>
+
+---
+
 ## 👥 &nbsp;팀 구성 및 역할 분담
 
 <table>
@@ -283,72 +352,6 @@ graph LR
     </td>
   </tr>
 </table>
----
-
-## 📂 &nbsp;디렉토리 구조
-
-```text
-zabonzooET/
-├── Assets/                       # 🎮 Unity 게임 클라이언트 에셋 & C# 스크립트
-│   ├── Scripts/
-│   │   ├── APIManager.cs         #   커스텀 HTTP 통신 모듈
-│   │   ├── player.cs             #   플레이어 물리 & 점프 시스템
-│   │   ├── GameManager.cs        #   인게임 전체 흐름 관리
-│   │   ├── QuizManager.cs        #   퀴즈 UI 모달 & 판정 로직
-│   │   ├── FinanceSelect/        #   금융 상품 선택 씬 스크립트
-│   │   └── StageSelect/          #   스테이지 선택 씬 스크립트
-│   ├── Scenes/                   #   Lobby · StageSelect · 1980s/2000s/2020s · FinanceSelect
-│   ├── Sprites/                  #   시대별 캐릭터 & UI 스프라이트
-│   └── WebGLTemplates/           #   브라우저 배포용 커스텀 WebGL 템플릿
-│
-├── src/main/java/                # ⚙️ Spring Boot 백엔드 소스
-│   └── com/ssafy/amagetdon/
-│       ├── common/               #   글로벌 예외처리 · 세션 인터셉터 · 웹 설정
-│       └── domain/               #   User · Game · Quiz · Coin 도메인 비즈니스 로직
-│
-├── infra/                        # ☁️ 배포 인프라 설정
-│   ├── docker-compose.prod.yml   #   프로덕션 컨테이너 구성
-│   ├── nginx.conf                #   리버스 프록시 & 라우팅
-│   └── scripts/                  #   EC2 초기화 · 배포 자동화 스크립트
-│
-├── portfolio/                    # 🌐 React 포트폴리오 소개 페이지
-└── build.gradle                  # Gradle 빌드 스크립트
-```
-
-<br/>
-
----
-
-## 🚀 &nbsp;주요 기술적 도전 및 해결
-
-<br/>
-
-### &nbsp;⚡ 1. KDB 공공데이터 기반 동적 퀴즈 자동 생성 &nbsp;`QuizDataLoader.java`
-
-| | 내용 |
-|---|---|
-| **문제** | 금융 학습 효과를 위해 수백 개의 퀴즈가 필요했으나, DB 수동 등록은 비효율적 |
-| **해결** | KDB 금융 용어 공공데이터 CSV를 파싱하는 **자동 배치 로더** 구현 |
-| **방식** | 서버 기동 시 용어 설명문에서 정답을 추출하고, 전체 용어 풀에서 무작위 오답 3개를 Shuffle → **4지선다 객관식 퀴즈 동적 자동 생성** |
-
-<br/>
-
-### &nbsp;🎯 2. 게임 물리 & 연출 디테일링 &nbsp;`player.cs` · `GameManager.cs`
-
-| | 내용 |
-|---|---|
-| **1단/2단 점프** | `Rigidbody2D` 물리 연산 + `Raycast` 지면 감지를 혼합하여 매끄러운 점프 피드백 구현 |
-| **가변 사운드 피치** | 주행 속도 변화에 따라 달리기 오디오의 **Pitch를 실시간 비례 연동**, 청각적 속도감 극대화 |
-| **카메라 셰이크** | 피격 시 화면 흔들림 + 무적 프레임 기믹으로 타격감 & 밸런싱 동시 해결 |
-
-<br/>
-
-### &nbsp;🔒 3. 보안성 중심의 인프라 격리 설계
-
-| | 내용 |
-|---|---|
-| **환경 변수화** | `application.yml` 내 PostgreSQL · Redis 계정 정보를 모두 `${ENV_VAR}` 방식으로 외부화 |
-| **.gitignore 최적화** | Unity 에디터 캐시(`Library/`, `Temp/`), 인프라 시크릿(`.env`) 완벽 격리 → Public 저장소 보안 사고 원천 차단 |
 
 <br/>
 
