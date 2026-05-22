@@ -227,32 +227,32 @@ zabonzooET/
 
 <br/>
 
-### &nbsp;⚡ 1. KDB 공공데이터 기반 동적 퀴즈 자동 생성 &nbsp;`QuizDataLoader.java`
+### ⚡ 1. KDB 공공데이터 기반 동적 퀴즈 자동 생성 — `QuizDataLoader.java`
 
-| | 내용 |
-|---|---|
-| **문제** | 금융 학습 효과를 위해 수백 개의 퀴즈가 필요했으나, DB 수동 등록은 비효율적 |
-| **해결** | KDB 금융 용어 공공데이터 CSV를 파싱하는 **자동 배치 로더** 구현 |
-| **방식** | 서버 기동 시 용어 설명문에서 정답을 추출하고, 전체 용어 풀에서 무작위 오답 3개를 Shuffle → **4지선다 객관식 퀴즈 동적 자동 생성** |
-
-<br/>
-
-### &nbsp;🎯 2. 게임 물리 & 연출 디테일링 &nbsp;`player.cs` · `GameManager.cs`
-
-| | 내용 |
-|---|---|
-| **1단/2단 점프** | `Rigidbody2D` 물리 연산 + `Raycast` 지면 감지를 혼합하여 매끄러운 점프 피드백 구현 |
-| **가변 사운드 피치** | 주행 속도 변화에 따라 달리기 오디오의 **Pitch를 실시간 비례 연동**, 청각적 속도감 극대화 |
-| **카메라 셰이크** | 피격 시 화면 흔들림 + 무적 프레임 기믹으로 타격감 & 밸런싱 동시 해결 |
+| 구분 | 내용 |
+|:---:|---|
+| 🔴 **문제** | 금융 학습 효과를 위해 수백 개의 퀴즈가 필요했으나, DB 수동 등록은 비효율적 |
+| 🟢 **해결** | KDB 금융 용어 공공데이터 CSV를 파싱하는 **자동 배치 로더** 구현 |
+| 🔵 **방식** | 서버 기동 시 용어 설명문에서 정답을 추출하고, 전체 용어 풀에서 무작위 오답 3개를 Shuffle → **4지선다 객관식 퀴즈 동적 자동 생성** |
 
 <br/>
 
-### &nbsp;🔒 3. 보안성 중심의 인프라 격리 설계
+### 🎯 2. 게임 물리 & 연출 디테일링 — `player.cs` · `GameManager.cs`
 
-| | 내용 |
-|---|---|
-| **환경 변수화** | `application.yml` 내 PostgreSQL · Redis 계정 정보를 모두 `${ENV_VAR}` 방식으로 외부화 |
-| **.gitignore 최적화** | Unity 에디터 캐시(`Library/`, `Temp/`), 인프라 시크릿(`.env`) 완벽 격리 → Public 저장소 보안 사고 원천 차단 |
+| 구분 | 내용 |
+|:---:|---|
+| 🔴 **1단/2단 점프** | `Rigidbody2D` 물리 연산 + `Raycast` 지면 감지를 혼합하여 매끄러운 점프 피드백 구현 |
+| 🟢 **가변 사운드 피치** | 주행 속도 변화에 따라 달리기 오디오의 **Pitch를 실시간 비례 연동**, 청각적 속도감 극대화 |
+| 🔵 **카메라 셰이크** | 피격 시 화면 흔들림 + 무적 프레임 기믹으로 타격감 & 밸런싱 동시 해결 |
+
+<br/>
+
+### 🔒 3. 보안성 중심의 인프라 격리 설계
+
+| 구분 | 내용 |
+|:---:|---|
+| 🔐 **환경 변수화** | `application.yml` 내 PostgreSQL · Redis 계정 정보를 모두 `${ENV_VAR}` 방식으로 외부화 |
+| 🛡️ **.gitignore 최적화** | Unity 에디터 캐시(`Library/`, `Temp/`), 인프라 시크릿(`.env`) 완벽 격리 → Public 저장소 보안 사고 원천 차단 |
 
 <br/>
 
@@ -268,9 +268,9 @@ zabonzooET/
         <b>진준영</b><br/>
         <sub>🎮 Unity 클라이언트 · 본인</sub>
       </a><br/><br/>
-      <sub>🕹️ 물리 점프 & 무한 러너 시스템</sub><br/>
-      <sub>💬 퀴즈 모달 & 부스터/쉴드 연출</sub><br/>
-      <sub>🔌 <code>APIManager.cs</code> HTTP 모듈 단독 설계</sub>
+      🕹️ 물리 점프 &amp; 무한 러너 시스템<br/>
+      💬 퀴즈 모달 &amp; 부스터/쉴드 연출<br/>
+      🔌 <code>APIManager.cs</code> HTTP 모듈 단독 설계
     </td>
     <td align="center" width="25%">
       <a href="#">
@@ -278,9 +278,9 @@ zabonzooET/
         <b>경민지</b><br/>
         <sub>🎨 Unity 클라이언트</sub>
       </a><br/><br/>
-      <sub>🗂️ 스테이지 선택 & 금융 상품 씬 구현</sub><br/>
-      <sub>✏️ E.T. & 배경 2D 에셋 직접 드로잉</sub><br/>
-      <sub>🖼️ 스프라이트 패킹 & UI 최적화</sub>
+      🗂️ 스테이지 선택 &amp; 금융 상품 씬 구현<br/>
+      ✏️ E.T. &amp; 배경 2D 에셋 직접 드로잉<br/>
+      🖼️ 스프라이트 패킹 &amp; UI 최적화
     </td>
     <td align="center" width="25%">
       <a href="#">
@@ -288,19 +288,19 @@ zabonzooET/
         <b>홍정희</b><br/>
         <sub>⚙️ Spring Boot 백엔드</sub>
       </a><br/><br/>
-      <sub>🛠️ 전 도메인 REST API 단독 구현</sub><br/>
-      <sub>🧠 KDB 기반 4지선다 퀴즈 자동 생성</sub><br/>
-      <sub>📦 Redis 캐싱 & 실시간 리더보드</sub>
+      🛠️ 전 도메인 REST API 단독 구현<br/>
+      🧠 KDB 기반 4지선다 퀴즈 자동 생성<br/>
+      📦 Redis 캐싱 &amp; 실시간 리더보드
     </td>
     <td align="center" width="25%">
       <a href="#">
         <img src="https://github.com/identicons/kimdaeyeon.png" width="80" style="border-radius:50%"/><br/><br/>
         <b>김대연</b><br/>
-        <sub>☁️ 인프라 & Unity 클라이언트</sub>
+        <sub>☁️ 인프라 &amp; Unity 클라이언트</sub>
       </a><br/><br/>
-      <sub>🏠 로비 · 상점 · UFO 정비소 UI 구현</sub><br/>
-      <sub>🚀 AWS EC2 + Docker Compose 배포</sub><br/>
-      <sub>🌐 Nginx 리버스 프록시 & WebGL 최적화</sub>
+      🏠 로비 · 상점 · UFO 정비소 UI 구현<br/>
+      🚀 AWS EC2 + Docker Compose 배포<br/>
+      🌐 Nginx 리버스 프록시 &amp; WebGL 최적화
     </td>
   </tr>
 </table>
