@@ -294,61 +294,24 @@ zabonzooET/
   </tr>
   <tr>
     <td valign="top">
-      <b>인게임 핵심 플레이 시스템 총괄</b><br/>
-      · <code>Rigidbody2D</code> + <code>Raycast</code> 혼합 1단/2단 점프 물리 설계 (<code>player.cs</code>)<br/>
-      · 시대별 3개 맵 주행 필드 & 무한 러너 장애물 스포너 구현<br/>
-      · 피격 카메라 셰이크 & 무적 프레임 기믹<br/>
-      <br/>
-      <b>인게임 퀴즈 시스템 & 동적 연출</b><br/>
-      · 경제 군인 충돌 → 시간 정지 → 퀴즈 UI 모달 전환<br/>
-      · 정답 시 부스터 & 쉴드 / 오답 시 즉시 HP 유실<br/>
-      · 주행 속도 비례 오디오 가변 피치 모듈<br/>
-      <br/>
-      <b>REST API 통신 모듈 단독 설계</b><br/>
-      · <code>APIManager.cs</code> 커스텀 HTTP 모듈 단독 설계<br/>
-      · <code>runId</code> 발급, 코인 & 퀴즈 로그 실시간 전송
+      · 물리 기반 1단/2단 점프 & 무한 러너 시스템 설계 (<code>player.cs</code>)<br/>
+      · 경제 군인 충돌 → 퀴즈 모달 전환 & 부스터/쉴드 연출<br/>
+      · <code>APIManager.cs</code> 커스텀 HTTP 통신 모듈 단독 설계
     </td>
     <td valign="top">
-      <b>스테이지 & 금융 상품 선택 씬 구현</b><br/>
-      · <code>StageSelect.unity</code> 씬 구성<br/>
-      · <code>StageCardUI.cs</code>, <code>StageSelectManager.cs</code><br/>
-      · <code>FinanceSelect.unity</code> 전 화면 개발<br/>
-      · <code>FinanceSelectManager.cs</code><br/>
-      · <code>SavingOptionPanelUI.cs</code><br/>
-      · <code>InvestOptionPanelUI.cs</code><br/>
-      · <code>FinanceResultPanelUI.cs</code><br/>
-      <br/>
-      <b>2D 에셋 직접 드로잉</b><br/>
-      · 주인공(E.T.) & 시대별 배경 에셋 제작<br/>
+      · 스테이지 선택 & 금융 상품 선택 씬 전담 구현<br/>
+      · 주인공(E.T.) & 시대별 배경 2D 에셋 직접 드로잉<br/>
       · 스프라이트 컷팅/패킹 & UI 최적화
     </td>
     <td valign="top">
-      <b>Spring Boot API 전 영역 단독 구현</b><br/>
-      · User · Game · Coin · Quiz · Shop<br/>
-      &nbsp;&nbsp;도메인 REST API 전 구간 설계<br/>
-      · <code>GameController</code><br/>
-      · <code>UserController</code><br/>
-      · <code>RankingController</code><br/>
-      · <code>QuizController</code><br/>
-      <br/>
-      <b>퀴즈 & 데이터 설계</b><br/>
-      · KDB 공공데이터 CSV 파싱<br/>
-      &nbsp;&nbsp;<code>QuizDataLoader</code> — 4지선다 자동 생성<br/>
-      · Redis 세션 캐싱 & 리더보드<br/>
-      · PostgreSQL JPA 매핑 최적화
+      · User · Game · Quiz · Shop 전 도메인 REST API 단독 구현<br/>
+      · KDB 공공데이터 기반 4지선다 퀴즈 자동 생성 (<code>QuizDataLoader</code>)<br/>
+      · Redis 세션 캐싱 & 실시간 리더보드
     </td>
     <td valign="top">
-      <b>아웃게임 메인페이지 & UI 구현</b><br/>
-      · 메인 로비 <code>LobbyDirector.cs</code><br/>
-      &nbsp;&nbsp;로그인/세션 바인딩, UFO 불시착 시퀀스<br/>
-      · <b>상점(Shop)</b> UI & 거래 흐름 구현<br/>
-      · <b>UFO 정비소(Garage)</b> 시스템 구현<br/>
-      <br/>
-      <b>클라우드 인프라 구축</b><br/>
-      · AWS EC2 & Docker Compose<br/>
-      &nbsp;&nbsp;PostgreSQL/Redis 컨테이너 배포<br/>
-      · Nginx 리버스 프록시 구성<br/>
-      · WebGL 빌드 템플릿 최적화
+      · 메인 로비 · 상점 · UFO 정비소 UI & 흐름 구현<br/>
+      · AWS EC2 + Docker Compose 인프라 구축 & 배포 자동화<br/>
+      · Nginx 리버스 프록시 & WebGL 빌드 템플릿 최적화
     </td>
   </tr>
 </table>
