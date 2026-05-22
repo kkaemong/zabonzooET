@@ -275,9 +275,10 @@ zabonzooET/
       <b>Unity 클라이언트 · 본인</b><br/><br/>
       <div align="left">
         <ul>
-          <li>물리 점프 & 무한 러너 시스템 설계</li>
-          <li>퀴즈 모달 & 부스터/쉴드 연출</li>
-          <li><code>APIManager.cs</code> HTTP 모듈 단독 설계</li>
+          <li>Unity를 활용하여 핵심 인게임 씬(Scene)을 구축하고, 중력 적용 및 캐릭터 애니메이션을 구현하여 역동적인 환경 조성</li>
+          <li>Rigidbody2D 기반의 물리 점프 시스템 및 게임 내 재화(코인) 동적 생성 로직을 설계하여 핵심 게임 루프 완성</li>
+          <li>커스텀 HTTP 통신 모듈을 단독 설계하여 Spring Boot 백엔드와의 금융 퀴즈 데이터를 연동하고 퀴즈 모달 UI 개발</li>
+            <li>가변 사운드 피치, 카메라 셰이크 등 디테일한 연출 요소들을 추가하여 사용자의 게임 몰입도 및 타격감 향상</li>
         </ul>
       </div>
     </td>
