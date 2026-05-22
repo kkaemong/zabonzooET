@@ -190,6 +190,43 @@ graph LR
 
 <table>
   <tr>
+    <th align="center">진준영</th>
+    <th align="center">경민지</th>
+    <th align="center">홍정희</th>
+    <th align="center">김대연</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="#">
+        <img src="https://github.com/identicons/junjunyoung.png" width="80" style="border-radius:50%"/><br/>
+        <sub><b>@GitHub</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="#">
+        <img src="https://github.com/identicons/gyeongminji.png" width="80" style="border-radius:50%"/><br/>
+        <sub><b>@GitHub</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="#">
+        <img src="https://github.com/identicons/hongjeonghee.png" width="80" style="border-radius:50%"/><br/>
+        <sub><b>@GitHub</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="#">
+        <img src="https://github.com/identicons/kimdaeyeon.png" width="80" style="border-radius:50%"/><br/>
+        <sub><b>@GitHub</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
+
+<br/>
+
+<table>
+  <tr>
     <th width="80">역할</th>
     <th width="100">이름</th>
     <th>담당 내용</th>
