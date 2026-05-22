@@ -1,28 +1,16 @@
 <div align="center">
 
-<img src="./Assets/Art/UI/Logo/logo.png" width="220" alt="자본주E.T. 로고" />
+<img src="./Assets/Art/UI/Logo/logo.png" width="380" alt="자본주E.T. 로고" />
 
-# 👽 자본주E.T. &nbsp;·&nbsp; Capitalist E.T.
+<br/><br/>
 
 **지구에 불시착한 외계인 E.T., 시대별 경제 격변을 헤쳐나가며 UFO 수리 자금을 모아라!**
 
 <br/>
 
-[![Unity](https://img.shields.io/badge/Unity-WebGL-black?style=for-the-badge&logo=unity&logoColor=white)](https://unity.com/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.11-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![AWS](https://img.shields.io/badge/AWS-EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
-
-<br/>
-
-🏆 &nbsp;**SSAFY 공통 프로젝트 핀테크 트랙 &nbsp;🥈 2등 수상 (우수상)**
+🏆 &nbsp;**SSAFY 특화 프로젝트 핀테크 트랙 &nbsp;🥈 2등 수상 (우수상)**
 
 </div>
-
-<br/>
 
 ---
 
