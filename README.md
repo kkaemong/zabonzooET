@@ -1,24 +1,33 @@
 <div align="center">
 
-<img src="./Assets/Art/UI/Logo/logo.png" width="380" alt="자본주E.T. 로고" />
+<img src="./Assets/Art/UI/Logo/logo.png" width="520" alt="자본주E.T. 로고" />
 
 <br/><br/>
 
-**지구에 불시착한 외계인 E.T., 시대별 경제 격변을 헤쳐나가며 UFO 수리 자금을 모아라!**
+<h2>🛸 &nbsp; 지구에 불시착한 외계인 E.T. &nbsp; 🛸</h2>
+<h3>시대별 경제 격변을 헤쳐나가며 UFO 수리 자금을 모아라!</h3>
 
 <br/>
 
-Unity 클라이언트 + Spring Boot 백엔드 + AWS 인프라가 긴밀하게 연동된 **풀스택 2D 러너 금융 학습 게임**입니다.<br/>
-시대별 주행 스테이지에서 코인을 모으고, 경제 군인과의 충돌로 발생하는 **금융 퀴즈**를 풀며 자산을 불려 UFO 수리 자금을 완성하세요.
+<img src="https://img.shields.io/badge/기간-2026.02.16_~_2026.04.03-4f46e5?style=for-the-badge" />
+&nbsp;
+<img src="https://img.shields.io/badge/팀원-4명-7c3aed?style=for-the-badge" />
+&nbsp;
+<img src="https://img.shields.io/badge/플랫폼-Unity_WebGL-000000?style=for-the-badge&logo=unity&logoColor=white" />
 
-<br/>
+<br/><br/>
 
-![Award](https://img.shields.io/badge/🏆_SSAFY_핀테크_트랙-🥈_우수상_2위-silver?style=for-the-badge)
+Unity · Spring Boot · AWS 풀스택 **2D 러너 금융 학습 게임** &nbsp;|&nbsp; 시대별 경제 스테이지 주행 · 금융 퀴즈 · 자산 증식
 
-</div>
+<br/><br/>
 
 ---
 
+🏆 &nbsp; **SSAFY 특화 프로젝트 핀테크 트랙** &nbsp; — &nbsp; 🥈 **우수상 2위**
+
+---
+
+</div>
 
 
 ## 🔄 &nbsp;핵심 플레이 루프
