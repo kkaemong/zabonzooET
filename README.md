@@ -1,208 +1,348 @@
-# 👽 자본주E.T. (Capitalist E.T.)
+<div align="center">
 
-<p align="center">
-  <img src="./Assets/Art/UI/Logo/logo.png" width="300" alt="자본주E.T. 로고" />
-</p>
+<img src="./Assets/Art/UI/Logo/logo.png" width="220" alt="자본주E.T. 로고" />
 
-<p align="center">
-  <b>🏆 SSAFY 공통 프로젝트 핀테크 트랙 2등 수상 (우수상)</b>
-</p>
+# 👽 자본주E.T. &nbsp;·&nbsp; Capitalist E.T.
 
-> **"지구에 불시착한 외계인(E.T.), 시대별 경제 격변을 헤쳐나가며 UFO 수리 자금을 모아라!"**  
-> **자본주E.T.**는 시대별 경제 이벤트와 금융 선택을 통과하며 미래의 자산 궤적을 직접 바꾸는 **스토리형 브라우저 2D 러너 게임 및 금융 학습 �### 🎮 Client Developers (유니티 클라이언트)
-* **진준영 (유니티 클라이언트 개발 - 본인)**
-  * **인게임 클라이언트 핵심 플레이 시스템 및 물리 설계 총괄**:
-    * `Rigidbody2D` 기반 플레이어 물리 연산 구현 및 정밀 지면 감지(`Raycast`)를 혼합한 1단/2단 점프 메커니즘 설계 (`player.cs`)
-    * 1980년대(성장기), 2000년대(격변기), 2020년대(인플레이션기) 시대별 경제 흐름에 맞춘 3개 인게임 맵 주행 필드 설계 및 무한 러너 장애물 패턴 스포너 구현
-    * 피격 시 충격 카메라 셰이크(Screen Shake) 효과 및 무적 프레임 기믹 구현을 통한 타격감 및 플레이 밸런싱
-  * **인게임 퀴즈 시스템 & 동적 연출 구현**:
-    * 경제 군인 오브젝트와의 트리거 충돌에 따른 시간 정지 및 퀴즈 UI 모달 전환 흐름 제어
-    * 퀴즈 정답 판정 시 가속 부스터 및 쉴드(방어막) 이펙트 연출, 오답 판정 시 즉시 체력 하트(HP) 유실 기믹 구현
-    * 주행 가속 속도에 동적으로 변조되는 오디오 가변 피치 모듈 설계(속도 비례 사운드 피치 가변 조절)로 청각적 속도감 극대화
-  * **클라이언트-서버 REST API 통신 아키텍처 연동**:
-    * Unity `UnityWebRequest`를 활용한 커스텀 HTTP 통신 모듈(`APIManager.cs`) 단독 설계
-    * 로그인 세션 기반의 `runId` 발급, 인게임 코인 획득량, 주행 중 퀴즈 응답 로그 실시간 전송 및 데이터 정합성 보장
+**지구에 불시착한 외계인 E.T., 시대별 경제 격변을 헤쳐나가며 UFO 수리 자금을 모아라!**
 
-* **경민지 (유니티 클라이언트 개발)**
-  * **스테이지 선택 씬 및 금융 상품 선택 씬 구현**:
-    * 시대별 스테이지 선택 씬(`StageSelect.unity`) 구성 및 스테이지 카드 UI(`StageCardUI.cs`, `StageSelectManager.cs`) 설계 및 연출 구현
-    * 주행 종료 후 번 자산을 활용한 금융 상품(적금/주식/로또) 가입 선택 씬(`FinanceSelect.unity`) 개발 — `FinanceSelectManager.cs`, `SavingOptionPanelUI.cs`, `InvestOptionPanelUI.cs`, `FinanceResultPanelUI.cs` 등 전 화면 구현
-  * **2D 비주얼 에셋 직접 제작 (에셋 드로잉)**:
-    * 게임 테마에 맞는 2D 주인공 캐릭터(E.T.) 및 시대별 배경 에셋 직접 드로잉 및 스프라이트 리소스 컷팅/패킹
-    * UI 패널 레이아웃 조정 및 WebGL 템플릿용 비주얼 리소스 최적화, 캔버스 스케일링 대응 설계
+<br/>
 
-### ⚙️ Backend & Infrastructure Developers
-* **홍정희 (백엔드 개발)**
-  * **Spring Boot API 및 서비스 비즈니스 로직 총괄 개발 (백엔드 전 영역 단독 구현)**:
-    * Spring Boot 3.5.11 기반 게임 세션 트랜잭션 처리 및 도메인(User, Game, Coin, Quiz, Shop) 핵심 비즈니스 로직 설계 및 REST API 엔드포인트 전 구간 단독 구현 (`GameController`, `UserController`, `RankingController`, `QuizController`)
-    * 한국산업은행(KDB) 금융 용어 공공데이터 CSV 파싱 배치 프로세서(`QuizDataLoader`) 및 동적 4지선다 객관식 퀴즈 생성 알고리즘 설계
-    * Redis를 활용한 실시간 게임 세션 캐싱/검증 시스템 및 리더보드 순위 집계 로직 설계
-    * PostgreSQL JPA 엔티티 관계 매핑 최적화 및 트랜잭션 전파 제어를 통한 유저 데이터 무결성 보장
+[![Unity](https://img.shields.io/badge/Unity-WebGL-black?style=for-the-badge&logo=unity&logoColor=white)](https://unity.com/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.11-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![AWS](https://img.shields.io/badge/AWS-EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
 
-* **김대연 (인프라 & 유니티 클라이언트 개발)**
-  * **아웃게임 메인페이지 및 핵심 거점 UI 구현**:
-    * 아웃게임 메인 로비(`LobbyDirector.cs`) 연출 구현 — 게임 핵심 진입점, 로그인/회원가입 세션 상태 바인딩, UFO 불시착 애니메이션 시퀀스 제어
-    * 인게임 아이템 구매를 위한 **상점(Shop) 페이지** 및 최종 목표 달성을 위한 **UFO 정비소(Garage/Repair) 시스템** UI 및 거래 흐름 전체 구현
-  * **클라우드 인프라 구축 및 가상화 플랫폼 배포 최적화**:
-    * AWS EC2 가상 컴퓨팅 환경 구축 및 Docker Compose(`infra/docker-compose.prod.yml`) 기반 PostgreSQL/Redis 데이터베이스 컨테이너 가상화 분산 배포
-    * Nginx 리버스 프록시 구성(`infra/nginx.conf`) 및 WebGL 프론트엔드-백엔드 API 엔드포인트 네트워크 라우팅 연동
-    * WebGL 플랫폼용 커스텀 빌드 템플릿 환경 최적화 및 Unity WebGL 클라이언트-서버 네트워크 엔드포인트 연동
+<br/>
+
+🏆 &nbsp;**SSAFY 공통 프로젝트 핀테크 트랙 &nbsp;🥈 2등 수상 (우수상)**
+
+</div>
+
+<br/>
 
 ---
 
-## 🌟 프로젝트 소개
-본 프로젝트는 **Unity (클라이언트) + Spring Boot (백엔드) + React (포트폴리오 소개 페이지)**가 긴밀하게 연동된 풀스택 게임 프로젝트입니다.  
-유저는 시대별(1980년대, 2000년대, 2020년대) 주행 스테이지에서 장애물을 피하며 코인을 모으고, 돌발적으로 등장하는 경제 퀴즈를 해결하며 금융 지식을 학습합니다. 주행 결과로 축적된 자산은 백엔드 데이터베이스에 실시간으로 연동되어, 자산 증식과 상점 구매, 그리고 궁극적인 목표인 **UFO 수리 자금** 마련으로 이어집니다.
+## 📖 &nbsp;프로젝트 소개
+
+> Unity 클라이언트 + Spring Boot 백엔드 + AWS 인프라가 긴밀하게 연동된 **풀스택 2D 러너 금융 학습 게임**입니다.
+
+유저는 **1980년대 · 2000년대 · 2020년대** 시대별 주행 스테이지에서 장애물을 피하며 코인을 모으고,
+돌발적으로 등장하는 **경제 군인**과 충돌하면 금융 퀴즈를 풀게 됩니다.
+정답 시 **가속 부스터 & 방어막** 획득, 오답 시 **체력(HP) 유실**로 이어지며,
+주행으로 축적된 자산은 실시간으로 백엔드에 저장되어 **적금 · 주식 · 정비소** 등 다양한 금융 선택으로 이어집니다.
+
+<br/>
 
 ---
 
-## 🔄 핵심 플레이 루프 (Core Loop)
+## 🔄 &nbsp;핵심 플레이 루프
 
 ```mermaid
-graph TD
-    A[Lobby: E.T. 불시착 및 스테이지 선택] --> B[Stage Run: 2D 달리기 및 코인 획득]
-    B --> C{돌발 경제 퀴즈 발생}
-    C -- 정답 --> D[가속 부스터 & 보호막 획득]
-    C -- 오답 --> E[체력 유실 & 일반 주행]
-    D --> F[700m 완주 및 결과 송신]
+graph LR
+    A(["🛸 Lobby<br/>E.T. 불시착 & 스테이지 선택"]) --> B(["🏃 Stage Run<br/>2D 달리기 & 코인 획득"])
+    B --> C{"⚡ 돌발 경제 퀴즈"}
+    C -->|"✅ 정답"| D(["🚀 가속 부스터<br/>& 방어막 획득"])
+    C -->|"❌ 오답"| E(["💔 체력 유실<br/>& 일반 주행"])
+    D --> F(["📊 700m 완주<br/>결과 서버 전송"])
     E --> F
-    F --> G[Finance Select: 시대별 금융 상품 투자]
-    G --> H[Lobby: 자산 업데이트 & UFO 수리 및 아이템 상점 이용]
+    F --> G(["💰 Finance Select<br/>시대별 금융 상품 투자"])
+    G --> H(["🔧 Lobby<br/>자산 업데이트 & UFO 수리"])
     H --> A
 ```
 
+<br/>
+
 ---
 
-## 🎮 실제 플레이 화면 (Gameplay Showcase)
+## 🎮 &nbsp;실제 플레이 화면
 
-게임플레이 흐름과 서순(Sequence)에 맞추어 구성된 실제 구동 화면입니다. 아래의 **[보러가기]** 메뉴를 누르시면 큼직한 고화질 시연 화면이 펼쳐집니다!
+> 게임플레이 흐름 순서대로 구성된 실제 구동 화면입니다. 클릭하면 펼쳐집니다!
 
-<br />
+<br/>
 
 <details>
-<summary><b>🎬 [보러가기] 1. 로비 & 스테이지 선택 (Lobby & Stage Selection)</b></summary>
-<br />
+<summary><b>🎬 &nbsp;1. 로비 &amp; 스테이지 선택 (Lobby &amp; Stage Selection)</b></summary>
+<br/>
 
-* E.T.가 지구에서 자산 관리 기초를 훈련하고, 시대별 금융 흐름으로 진입하는 로비 및 스테이지 화면입니다.
+> E.T.가 지구에 불시착하고, 시대별 금융 흐름의 스테이지로 진입하는 메인 화면입니다.
 
-| 로비 (메인 화면) | 스테이지 선택 |
+| 🛸 로비 (메인 화면) | 📋 스테이지 선택 |
 | :---: | :---: |
-| <img src="./gifs/메인페이지.gif" height="250" /> | <img src="./gifs/스테이지_선택.gif" height="250" /> |
+| <img src="./gifs/메인페이지.gif" height="260" /> | <img src="./gifs/스테이지_선택.gif" height="260" /> |
 
 </details>
 
-<br />
+<br/>
 
 <details>
-<summary><b>🎬 [보러가기] 2. 시대별 게임 주행 (Era Stages)</b></summary>
-<br />
+<summary><b>🎬 &nbsp;2. 시대별 게임 주행 (Era Stages)</b></summary>
+<br/>
 
-* 1980년대 경제 급성장기부터 2000년대 IT 닷컴버블 격변기, 2020년대 고인플레이션/고금리기까지 시대별 맥락이 설계된 2D 러너 맵을 주행합니다.
+> 1980년대 경제 급성장기 → 2000년대 IT 닷컴버블 격변기 → 2020년대 고인플레이션기까지, 시대별 맥락이 설계된 2D 러너 맵을 주행합니다.
 
-| 1980년대 (대한민국 급성장기) | 2000년대 (IT 정보화 & 닷컴버블기) |
+| 📼 1980년대 · 대한민국 급성장기 | 💻 2000년대 · IT 정보화 &amp; 닷컴버블기 |
 | :---: | :---: |
-| <img src="./gifs/1980게임.gif" height="250" /> | <img src="./gifs/2000게임.gif" height="250" /> |
+| <img src="./gifs/1980게임.gif" height="260" /> | <img src="./gifs/2000게임.gif" height="260" /> |
 
-| 2020년대 (팬데믹 & 고인플레이션기) |
+| 📈 2020년대 · 팬데믹 &amp; 고인플레이션기 |
 | :---: |
-| <img src="./gifs/2020게임.gif" height="250" /> |
+| <img src="./gifs/2020게임.gif" height="260" /> |
 
 </details>
 
-<br />
+<br/>
 
 <details>
-<summary><b>🎬 [보러가기] 3. 인게임 기믹 & 이벤트 (In-Game Gimmicks & Events)</b></summary>
-<br />
+<summary><b>🎬 &nbsp;3. 인게임 기믹 &amp; 이벤트 (In-Game Gimmicks &amp; Events)</b></summary>
+<br/>
 
-* 주행 중 장애물에 피격되면 카메라가 흔들리며 하트가 차감됩니다. 중간중간 등장하는 군인과 충돌하면 **돌발 퀴즈**가 열리며, 정답을 맞추면 가속 부스터와 방어막을 획득합니다.
+> 장애물 피격 시 카메라가 흔들리며 HP가 차감됩니다. 경제 군인과 충돌하면 **돌발 퀴즈**가 열리며, 정답 시 가속 부스터 & 방어막을 획득합니다.
 
-| 장애물 피격 (카메라 셰이크) | 돌발 경제 퀴즈 등장 |
+| 💥 장애물 피격 (카메라 셰이크) | ❓ 돌발 경제 퀴즈 등장 |
 | :---: | :---: |
-| <img src="./gifs/부딪혔을때.gif" height="250" /> | <img src="./gifs/퀴즈.gif" height="250" /> |
+| <img src="./gifs/부딪혔을때.gif" height="260" /> | <img src="./gifs/퀴즈.gif" height="260" /> |
 
-| 퀴즈 정답 시 보호막 & 속도 부스트 | 게임 오버 (체력 유실) |
+| 🛡️ 퀴즈 정답 → 보호막 &amp; 속도 부스트 | 💀 게임 오버 (체력 유실) |
 | :---: | :---: |
-| <img src="./gifs/퀴즈_정답_후_방어막.gif" height="250" /> | <img src="./gifs/게임오버.gif" height="250" /> |
+| <img src="./gifs/퀴즈_정답_후_방어막.gif" height="260" /> | <img src="./gifs/게임오버.gif" height="260" /> |
 
 </details>
 
-<br />
+<br/>
 
 <details>
-<summary><b>🎬 [보러가기] 4. 자산 증식 & 정비 (Finance & Goal Achievement)</b></summary>
-<br />
+<summary><b>🎬 &nbsp;4. 자산 증식 &amp; 정비 (Finance &amp; Goal Achievement)</b></summary>
+<br/>
 
-* 주행 종료 후 번 돈을 시기 적절한 금융 상품(적금/주식 등)에 가입해 굴리고, 상점에서 인게임 아이템을 사거나 우주선을 정비하여 탈출을 가속화합니다.
+> 주행으로 번 자산을 금융 상품에 굴리고, 상점에서 아이템을 사거나 UFO를 정비하여 탈출을 가속화합니다.
 
-| 금융 상품 가입 & 자산 증식 결과 | 아이템 상점 구매 |
+| 💹 금융 상품 가입 &amp; 자산 증식 결과 | 🛒 아이템 상점 구매 |
 | :---: | :---: |
-| <img src="./gifs/금융_상품_선택_후_결과.gif" height="250" /> | <img src="./gifs/상점.gif" height="250" /> |
+| <img src="./gifs/금융_상품_선택_후_결과.gif" height="260" /> | <img src="./gifs/상점.gif" height="260" /> |
 
-| UFO 정비 (최종 목표) |
+| 🔧 UFO 정비 (최종 목표) |
 | :---: |
-| <img src="./gifs/UFO_정비.gif" height="250" /> |
+| <img src="./gifs/UFO_정비.gif" height="260" /> |
 
 </details>
 
----
-
-## 🛠 기술 스택 (Tech Stack)
-
-### Client (Unity)
-- **Engine**: Unity (WebGL Build 지원)
-- **Language**: C#
-- **Key Concepts**: Object Pooling, State Pattern (Animator), Raycast Ground Detection, Dynamic Sound Pitch Modulator, Custom REST API Communication (`APIManager`)
-
-### Backend (Spring Boot)
-- **Framework**: Spring Boot 3.5.11
-- **Language**: Java 17
-- **Database**: PostgreSQL (주 저장소), Redis (세션 및 캐싱)
-- **Security**: Spring Security (Session-based Auth), OAuth2 Resource Server, JWT
-- **Build Tool**: Gradle 8.x
-- **Documentation**: Swagger/OpenAPI 3 (Springdoc)
-
-### Frontend Showcase
-- **Framework**: React + Vite
-- **Styling**: Modern Vanilla CSS (Sleek Glassmorphism & Responsive Design)
-- **Icons**: Lucide React
+<br/>
 
 ---
 
-## 📂 디렉토리 구조 (Directory Structure)
+## 🛠️ &nbsp;기술 스택
+
+<table>
+  <tr>
+    <th width="140">분류</th>
+    <th>기술</th>
+  </tr>
+  <tr>
+    <td align="center"><b>🎮 Client</b></td>
+    <td>
+      <img src="https://img.shields.io/badge/Unity-WebGL-black?logo=unity" />
+      &nbsp;
+      <img src="https://img.shields.io/badge/C%23-239120?logo=csharp&logoColor=white" />
+      &nbsp; Object Pooling · Raycast Ground Detection · Dynamic Sound Pitch · Custom REST API (<code>APIManager.cs</code>)
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><b>⚙️ Backend</b></td>
+    <td>
+      <img src="https://img.shields.io/badge/Spring_Boot-3.5.11-6DB33F?logo=springboot&logoColor=white" />
+      &nbsp;
+      <img src="https://img.shields.io/badge/Java_17-ED8B00?logo=openjdk&logoColor=white" />
+      &nbsp;
+      <img src="https://img.shields.io/badge/Gradle-02303A?logo=gradle&logoColor=white" />
+      &nbsp; Spring Security · Session Auth · Swagger/OpenAPI 3
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><b>🗄️ Database</b></td>
+    <td>
+      <img src="https://img.shields.io/badge/PostgreSQL-17-336791?logo=postgresql&logoColor=white" />
+      &nbsp;
+      <img src="https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white" />
+      &nbsp; JPA · 세션 캐싱 · 실시간 리더보드
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><b>☁️ Infra</b></td>
+    <td>
+      <img src="https://img.shields.io/badge/AWS_EC2-FF9900?logo=amazonaws&logoColor=white" />
+      &nbsp;
+      <img src="https://img.shields.io/badge/Docker_Compose-2496ED?logo=docker&logoColor=white" />
+      &nbsp;
+      <img src="https://img.shields.io/badge/Nginx-009639?logo=nginx&logoColor=white" />
+      &nbsp; GitLab CI/CD · Let's Encrypt SSL
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><b>🤝 협업</b></td>
+    <td>
+      <img src="https://img.shields.io/badge/Jira-0052CC?logo=jira&logoColor=white" />
+      &nbsp;
+      <img src="https://img.shields.io/badge/Notion-000000?logo=notion&logoColor=white" />
+      &nbsp;
+      <img src="https://img.shields.io/badge/GitLab-FC6D26?logo=gitlab&logoColor=white" />
+      &nbsp; 주간 스프린트 · 백로그 관리 · 회의록 아카이빙
+    </td>
+  </tr>
+</table>
+
+<br/>
+
+---
+
+## 👥 &nbsp;팀 구성 및 역할 분담
+
+<table>
+  <tr>
+    <th width="80">역할</th>
+    <th width="100">이름</th>
+    <th>담당 내용</th>
+  </tr>
+  <tr>
+    <td align="center">🎮<br/><b>클라이언트</b></td>
+    <td align="center"><b>진준영</b><br/><sub>(본인)</sub></td>
+    <td>
+      <b>인게임 핵심 플레이 시스템 총괄</b><br/>
+      · <code>Rigidbody2D</code> + <code>Raycast</code> 혼합 1단/2단 점프 물리 설계 (<code>player.cs</code>)<br/>
+      · 1980/2000/2020년대 시대별 3개 맵 주행 필드 & 무한 러너 장애물 스포너 구현<br/>
+      · 피격 카메라 셰이크 & 무적 프레임 기믹으로 타격감 및 플레이 밸런싱<br/>
+      <br/>
+      <b>인게임 퀴즈 시스템 & 동적 연출</b><br/>
+      · 경제 군인 트리거 충돌 → 시간 정지 → 퀴즈 UI 모달 전환 흐름 제어<br/>
+      · 정답 시 부스터 & 쉴드 이펙트 / 오답 시 즉시 HP 유실 기믹<br/>
+      · 주행 속도 비례 오디오 가변 피치 모듈로 청각적 속도감 극대화<br/>
+      <br/>
+      <b>클라이언트 REST API 통신 모듈 단독 설계</b><br/>
+      · <code>UnityWebRequest</code> 기반 커스텀 HTTP 모듈 (<code>APIManager.cs</code>) 단독 설계<br/>
+      · 세션 기반 <code>runId</code> 발급, 코인 획득량 & 퀴즈 응답 로그 실시간 전송
+    </td>
+  </tr>
+  <tr>
+    <td align="center">🎨<br/><b>클라이언트</b></td>
+    <td align="center"><b>경민지</b></td>
+    <td>
+      <b>스테이지 선택 씬 & 금융 상품 선택 씬 구현</b><br/>
+      · 스테이지 선택 씬(<code>StageSelect.unity</code>) 구성 및 카드 UI (<code>StageCardUI.cs</code>, <code>StageSelectManager.cs</code>)<br/>
+      · 금융 상품 선택 씬(<code>FinanceSelect.unity</code>) 전 화면 개발<br/>
+      &nbsp;&nbsp;→ <code>FinanceSelectManager.cs</code> · <code>SavingOptionPanelUI.cs</code> · <code>InvestOptionPanelUI.cs</code> · <code>FinanceResultPanelUI.cs</code><br/>
+      <br/>
+      <b>2D 비주얼 에셋 직접 제작 (에셋 드로잉)</b><br/>
+      · 주인공 캐릭터(E.T.) & 시대별 배경 에셋 직접 드로잉 및 스프라이트 컷팅/패킹<br/>
+      · UI 패널 레이아웃 조정 & WebGL 템플릿용 비주얼 리소스 최적화
+    </td>
+  </tr>
+  <tr>
+    <td align="center">⚙️<br/><b>백엔드</b></td>
+    <td align="center"><b>홍정희</b></td>
+    <td>
+      <b>Spring Boot API 비즈니스 로직 전 영역 단독 구현</b><br/>
+      · 도메인(User · Game · Coin · Quiz · Shop) REST API 전 구간 설계 & 구현<br/>
+      &nbsp;&nbsp;→ <code>GameController</code> · <code>UserController</code> · <code>RankingController</code> · <code>QuizController</code><br/>
+      · KDB 금융 용어 공공데이터 CSV 파싱 배치 프로세서 (<code>QuizDataLoader</code>)<br/>
+      &nbsp;&nbsp;→ 동적 4지선다 객관식 퀴즈 자동 생성 알고리즘 설계<br/>
+      · Redis 실시간 게임 세션 캐싱/검증 & 리더보드 순위 집계 로직<br/>
+      · PostgreSQL JPA 엔티티 매핑 최적화 & 트랜잭션 전파 제어로 데이터 무결성 보장
+    </td>
+  </tr>
+  <tr>
+    <td align="center">☁️<br/><b>인프라</b><br/><b>클라이언트</b></td>
+    <td align="center"><b>김대연</b></td>
+    <td>
+      <b>아웃게임 메인페이지 & 핵심 거점 UI 구현</b><br/>
+      · 메인 로비 (<code>LobbyDirector.cs</code>) — 로그인/회원가입 세션 바인딩, UFO 불시착 시퀀스 제어<br/>
+      · <b>상점(Shop) 페이지</b> & <b>UFO 정비소(Garage/Repair) 시스템</b> UI & 거래 흐름 전체 구현<br/>
+      <br/>
+      <b>클라우드 인프라 구축 & 배포 최적화</b><br/>
+      · AWS EC2 환경 구축 & Docker Compose 기반 PostgreSQL/Redis 컨테이너 분산 배포<br/>
+      · Nginx 리버스 프록시 구성 & WebGL 프론트-백엔드 API 라우팅 연동<br/>
+      · WebGL 커스텀 빌드 템플릿 최적화 & Unity WebGL 클라이언트-서버 엔드포인트 연동
+    </td>
+  </tr>
+</table>
+
+<br/>
+
+---
+
+## 📂 &nbsp;디렉토리 구조
 
 ```text
 zabonzooET/
-├── Assets/                 # [Unity] 게임 클라이언트 에셋 및 C# 스크립트
-│   ├── Scripts/            # 게임 핵심 로직, API 연동, 퀴즈 및 오디오 제어
-│   ├── Sprites/            # 시대별 UI 및 캐릭터 스프라이트 리소스
-│   ├── Scenes/             # Lobby, StageSelect, GameStage, FinanceSelect 등
-│   └── WebGLTemplates/     # 브라우저 배포용 커스텀 WebGL 템플릿
-├── src/                    # [Spring Boot] 백엔드 애플리케이션 소스
-│   ├── main/
-│   │   ├── java/com/ssafy/amagetdon/
-│   │   │   ├── common/     # 글로벌 예외 처리, 웹 설정, 세션 인터셉터
-│   │   │   └── domain/     # domain 도메인 핵심 비즈니스 로직 (User, Game, Quiz, Coin)
-│   │   └── resources/      # application.yml 설정 및 초기 데이터 SQL
-├── portfolio/              # [React] 프로젝트 소개 및 포트폴리오 웹페이지
-│   ├── src/                # App.jsx 랜딩 페이지 컴포넌트 및 자산
-│   └── package.json        # Node.js 의존성 관리
-├── infra/                  # 배포 인프라 및 Docker Compose 환경 설정
-└── build.gradle            # Gradle 빌드 스크립트
+├── Assets/                       # 🎮 Unity 게임 클라이언트 에셋 & C# 스크립트
+│   ├── Scripts/
+│   │   ├── APIManager.cs         #   커스텀 HTTP 통신 모듈
+│   │   ├── player.cs             #   플레이어 물리 & 점프 시스템
+│   │   ├── GameManager.cs        #   인게임 전체 흐름 관리
+│   │   ├── QuizManager.cs        #   퀴즈 UI 모달 & 판정 로직
+│   │   ├── FinanceSelect/        #   금융 상품 선택 씬 스크립트
+│   │   └── StageSelect/          #   스테이지 선택 씬 스크립트
+│   ├── Scenes/                   #   Lobby · StageSelect · 1980s/2000s/2020s · FinanceSelect
+│   ├── Sprites/                  #   시대별 캐릭터 & UI 스프라이트
+│   └── WebGLTemplates/           #   브라우저 배포용 커스텀 WebGL 템플릿
+│
+├── src/main/java/                # ⚙️ Spring Boot 백엔드 소스
+│   └── com/ssafy/amagetdon/
+│       ├── common/               #   글로벌 예외처리 · 세션 인터셉터 · 웹 설정
+│       └── domain/               #   User · Game · Quiz · Coin 도메인 비즈니스 로직
+│
+├── infra/                        # ☁️ 배포 인프라 설정
+│   ├── docker-compose.prod.yml   #   프로덕션 컨테이너 구성
+│   ├── nginx.conf                #   리버스 프록시 & 라우팅
+│   └── scripts/                  #   EC2 초기화 · 배포 자동화 스크립트
+│
+├── portfolio/                    # 🌐 React 포트폴리오 소개 페이지
+└── build.gradle                  # Gradle 빌드 스크립트
 ```
+
+<br/>
 
 ---
 
-## 🚀 주요 기술적 도전 및 해결 (Technical Challenges)
+## 🚀 &nbsp;주요 기술적 도전 및 해결
 
-### 1. KDB 공공데이터 기반 동적 퀴즈 생성기 (`QuizDataLoader.java`)
-- **문제**: 게임 내 학습 효과를 위해 수많은 금융 용어 퀴즈가 필요했으나, 이를 DB에 수동으로 등록하는 것은 비효율적이었습니다.
-- **해결**: 한국산업은행(KDB) 공공데이터 CSV 파일을 파싱하는 **자동 배치 로더**를 구현했습니다. 서버 기동 시 용어 설명문과 정답 단어를 추출하고, 다른 용어 풀에서 무작위로 3개의 오답을 섞어(Shuffle) **4지선다형 객관식 퀴즈를 동적으로 자동 생성**하는 아키텍처를 도입했습니다.
+<br/>
 
-### 2. 게임 물리 및 연출 디테일링 (`player.cs`, `GameManager.cs`)
-- **입체적 점프**: `Rigidbody2D`와 `Raycast` 지면 판단 기술을 혼합하여 매끄러운 1단 및 2단 점프 피드백을 완성했습니다.
-- **가변 사운드 피치 구현**: 게임 플레이 중 가속도나 부스터 발동에 따른 주행 속도 변화에 맞춰, **달리는 발소리 오디오의 Pitch(재생 속도 및 높낮이)를 실시간 비례 연동**시켜 속도감을 청각적으로 극대화했습니다.
+### &nbsp;⚡ 1. KDB 공공데이터 기반 동적 퀴즈 자동 생성 &nbsp;`QuizDataLoader.java`
 
-### 3. 보안성 중심의 인프라 격리 설계
-- **무결성 유지**: 외부 노출 방지를 위해 `application.yml` 설정 파일 내부의 PostgreSQL, Redis 등의 인프라 계정 정보를 **환경 변수화(`${POSTGRES_PASSWORD}`)**하여 관리했습니다. 
-- **.gitignore 최적화**: Unity 에디터 캐시(`Library/`, `Temp/`), 의존성 파일, 그리고 인프라 로컬 비밀 키 파일(`.env`)을 완벽하게 격리 설정하여 **GitHub Public 공유 시 발생할 수 있는 보안 및 저작권 침해 우려를 원천 차단**했습니다.
+| | 내용 |
+|---|---|
+| **문제** | 금융 학습 효과를 위해 수백 개의 퀴즈가 필요했으나, DB 수동 등록은 비효율적 |
+| **해결** | KDB 금융 용어 공공데이터 CSV를 파싱하는 **자동 배치 로더** 구현 |
+| **방식** | 서버 기동 시 용어 설명문에서 정답을 추출하고, 전체 용어 풀에서 무작위 오답 3개를 Shuffle → **4지선다 객관식 퀴즈 동적 자동 생성** |
+
+<br/>
+
+### &nbsp;🎯 2. 게임 물리 & 연출 디테일링 &nbsp;`player.cs` · `GameManager.cs`
+
+| | 내용 |
+|---|---|
+| **1단/2단 점프** | `Rigidbody2D` 물리 연산 + `Raycast` 지면 감지를 혼합하여 매끄러운 점프 피드백 구현 |
+| **가변 사운드 피치** | 주행 속도 변화에 따라 달리기 오디오의 **Pitch를 실시간 비례 연동**, 청각적 속도감 극대화 |
+| **카메라 셰이크** | 피격 시 화면 흔들림 + 무적 프레임 기믹으로 타격감 & 밸런싱 동시 해결 |
+
+<br/>
+
+### &nbsp;🔒 3. 보안성 중심의 인프라 격리 설계
+
+| | 내용 |
+|---|---|
+| **환경 변수화** | `application.yml` 내 PostgreSQL · Redis 계정 정보를 모두 `${ENV_VAR}` 방식으로 외부화 |
+| **.gitignore 최적화** | Unity 에디터 캐시(`Library/`, `Temp/`), 인프라 시크릿(`.env`) 완벽 격리 → Public 저장소 보안 사고 원천 차단 |
+
+<br/>
+
+---
+
+<div align="center">
+
+**자본주E.T.** · SSAFY 공통 프로젝트 2기 핀테크 트랙
+
+</div>
