@@ -190,50 +190,21 @@ graph LR
 
 <table>
   <tr>
-    <th align="center">진준영</th>
-    <th align="center">경민지</th>
-    <th align="center">홍정희</th>
-    <th align="center">김대연</th>
-  </tr>
-  <tr>
-    <td align="center">
-      <a href="#">
-        <img src="https://github.com/identicons/junjunyoung.png" width="80" style="border-radius:50%"/><br/>
-        <sub><b>@GitHub</b></sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="#">
-        <img src="https://github.com/identicons/gyeongminji.png" width="80" style="border-radius:50%"/><br/>
-        <sub><b>@GitHub</b></sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="#">
-        <img src="https://github.com/identicons/hongjeonghee.png" width="80" style="border-radius:50%"/><br/>
-        <sub><b>@GitHub</b></sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="#">
-        <img src="https://github.com/identicons/kimdaeyeon.png" width="80" style="border-radius:50%"/><br/>
-        <sub><b>@GitHub</b></sub>
-      </a>
-    </td>
-  </tr>
-</table>
-
-<br/>
-
-<table>
-  <tr>
     <th width="80">역할</th>
-    <th width="100">이름</th>
+    <th width="130">팀원</th>
     <th>담당 내용</th>
   </tr>
+
   <tr>
     <td align="center">🎮<br/><b>클라이언트</b></td>
-    <td align="center"><b>진준영</b><br/><sub>(본인)</sub></td>
+    <td align="center">
+      <a href="#">
+        <img src="https://github.com/identicons/junjunyoung.png" width="70"/><br/>
+        <b>진준영</b><br/>
+        <sub>@GitHub</sub>
+      </a><br/>
+      <sub>(본인)</sub>
+    </td>
     <td>
       <b>인게임 핵심 플레이 시스템 총괄</b><br/>
       · <code>Rigidbody2D</code> + <code>Raycast</code> 혼합 1단/2단 점프 물리 설계 (<code>player.cs</code>)<br/>
@@ -250,9 +221,16 @@ graph LR
       · 세션 기반 <code>runId</code> 발급, 코인 획득량 & 퀴즈 응답 로그 실시간 전송
     </td>
   </tr>
+
   <tr>
     <td align="center">🎨<br/><b>클라이언트</b></td>
-    <td align="center"><b>경민지</b></td>
+    <td align="center">
+      <a href="#">
+        <img src="https://github.com/identicons/gyeongminji.png" width="70"/><br/>
+        <b>경민지</b><br/>
+        <sub>@GitHub</sub>
+      </a>
+    </td>
     <td>
       <b>스테이지 선택 씬 & 금융 상품 선택 씬 구현</b><br/>
       · 스테이지 선택 씬(<code>StageSelect.unity</code>) 구성 및 카드 UI (<code>StageCardUI.cs</code>, <code>StageSelectManager.cs</code>)<br/>
@@ -264,9 +242,16 @@ graph LR
       · UI 패널 레이아웃 조정 & WebGL 템플릿용 비주얼 리소스 최적화
     </td>
   </tr>
+
   <tr>
     <td align="center">⚙️<br/><b>백엔드</b></td>
-    <td align="center"><b>홍정희</b></td>
+    <td align="center">
+      <a href="#">
+        <img src="https://github.com/identicons/hongjeonghee.png" width="70"/><br/>
+        <b>홍정희</b><br/>
+        <sub>@GitHub</sub>
+      </a>
+    </td>
     <td>
       <b>Spring Boot API 비즈니스 로직 전 영역 단독 구현</b><br/>
       · 도메인(User · Game · Coin · Quiz · Shop) REST API 전 구간 설계 & 구현<br/>
@@ -277,9 +262,16 @@ graph LR
       · PostgreSQL JPA 엔티티 매핑 최적화 & 트랜잭션 전파 제어로 데이터 무결성 보장
     </td>
   </tr>
+
   <tr>
     <td align="center">☁️<br/><b>인프라</b><br/><b>클라이언트</b></td>
-    <td align="center"><b>김대연</b></td>
+    <td align="center">
+      <a href="#">
+        <img src="https://github.com/identicons/kimdaeyeon.png" width="70"/><br/>
+        <b>김대연</b><br/>
+        <sub>@GitHub</sub>
+      </a>
+    </td>
     <td>
       <b>아웃게임 메인페이지 & 핵심 거점 UI 구현</b><br/>
       · 메인 로비 (<code>LobbyDirector.cs</code>) — 로그인/회원가입 세션 바인딩, UFO 불시착 시퀀스 제어<br/>
@@ -291,10 +283,8 @@ graph LR
       · WebGL 커스텀 빌드 템플릿 최적화 & Unity WebGL 클라이언트-서버 엔드포인트 연동
     </td>
   </tr>
+
 </table>
-
-<br/>
-
 ---
 
 ## 📂 &nbsp;디렉토리 구조
