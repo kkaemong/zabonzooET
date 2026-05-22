@@ -190,100 +190,98 @@ graph LR
 
 <table>
   <tr>
-    <th width="80">역할</th>
-    <th width="130">팀원</th>
-    <th>담당 내용</th>
-  </tr>
-
-  <tr>
-    <td align="center">🎮<br/><b>클라이언트</b></td>
-    <td align="center">
+    <td align="center" width="25%">
       <a href="#">
-        <img src="https://github.com/identicons/junjunyoung.png" width="70"/><br/>
+        <img src="https://github.com/identicons/junjunyoung.png" width="80"/><br/>
         <b>진준영</b><br/>
+        <sub>🎮 클라이언트 · 본인</sub><br/>
         <sub>@GitHub</sub>
-      </a><br/>
-      <sub>(본인)</sub>
+      </a>
     </td>
-    <td>
+    <td align="center" width="25%">
+      <a href="#">
+        <img src="https://github.com/identicons/gyeongminji.png" width="80"/><br/>
+        <b>경민지</b><br/>
+        <sub>🎨 클라이언트</sub><br/>
+        <sub>@GitHub</sub>
+      </a>
+    </td>
+    <td align="center" width="25%">
+      <a href="#">
+        <img src="https://github.com/identicons/hongjeonghee.png" width="80"/><br/>
+        <b>홍정희</b><br/>
+        <sub>⚙️ 백엔드</sub><br/>
+        <sub>@GitHub</sub>
+      </a>
+    </td>
+    <td align="center" width="25%">
+      <a href="#">
+        <img src="https://github.com/identicons/kimdaeyeon.png" width="80"/><br/>
+        <b>김대연</b><br/>
+        <sub>☁️ 인프라 & 클라이언트</sub><br/>
+        <sub>@GitHub</sub>
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
       <b>인게임 핵심 플레이 시스템 총괄</b><br/>
       · <code>Rigidbody2D</code> + <code>Raycast</code> 혼합 1단/2단 점프 물리 설계 (<code>player.cs</code>)<br/>
-      · 1980/2000/2020년대 시대별 3개 맵 주행 필드 & 무한 러너 장애물 스포너 구현<br/>
-      · 피격 카메라 셰이크 & 무적 프레임 기믹으로 타격감 및 플레이 밸런싱<br/>
+      · 시대별 3개 맵 주행 필드 & 무한 러너 장애물 스포너 구현<br/>
+      · 피격 카메라 셰이크 & 무적 프레임 기믹<br/>
       <br/>
       <b>인게임 퀴즈 시스템 & 동적 연출</b><br/>
-      · 경제 군인 트리거 충돌 → 시간 정지 → 퀴즈 UI 모달 전환 흐름 제어<br/>
-      · 정답 시 부스터 & 쉴드 이펙트 / 오답 시 즉시 HP 유실 기믹<br/>
-      · 주행 속도 비례 오디오 가변 피치 모듈로 청각적 속도감 극대화<br/>
+      · 경제 군인 충돌 → 시간 정지 → 퀴즈 UI 모달 전환<br/>
+      · 정답 시 부스터 & 쉴드 / 오답 시 즉시 HP 유실<br/>
+      · 주행 속도 비례 오디오 가변 피치 모듈<br/>
       <br/>
-      <b>클라이언트 REST API 통신 모듈 단독 설계</b><br/>
-      · <code>UnityWebRequest</code> 기반 커스텀 HTTP 모듈 (<code>APIManager.cs</code>) 단독 설계<br/>
-      · 세션 기반 <code>runId</code> 발급, 코인 획득량 & 퀴즈 응답 로그 실시간 전송
+      <b>REST API 통신 모듈 단독 설계</b><br/>
+      · <code>APIManager.cs</code> 커스텀 HTTP 모듈 단독 설계<br/>
+      · <code>runId</code> 발급, 코인 & 퀴즈 로그 실시간 전송
     </td>
-  </tr>
-
-  <tr>
-    <td align="center">🎨<br/><b>클라이언트</b></td>
-    <td align="center">
-      <a href="#">
-        <img src="https://github.com/identicons/gyeongminji.png" width="70"/><br/>
-        <b>경민지</b><br/>
-        <sub>@GitHub</sub>
-      </a>
-    </td>
-    <td>
-      <b>스테이지 선택 씬 & 금융 상품 선택 씬 구현</b><br/>
-      · 스테이지 선택 씬(<code>StageSelect.unity</code>) 구성 및 카드 UI (<code>StageCardUI.cs</code>, <code>StageSelectManager.cs</code>)<br/>
-      · 금융 상품 선택 씬(<code>FinanceSelect.unity</code>) 전 화면 개발<br/>
-      &nbsp;&nbsp;→ <code>FinanceSelectManager.cs</code> · <code>SavingOptionPanelUI.cs</code> · <code>InvestOptionPanelUI.cs</code> · <code>FinanceResultPanelUI.cs</code><br/>
+    <td valign="top">
+      <b>스테이지 & 금융 상품 선택 씬 구현</b><br/>
+      · <code>StageSelect.unity</code> 씬 구성<br/>
+      · <code>StageCardUI.cs</code>, <code>StageSelectManager.cs</code><br/>
+      · <code>FinanceSelect.unity</code> 전 화면 개발<br/>
+      · <code>FinanceSelectManager.cs</code><br/>
+      · <code>SavingOptionPanelUI.cs</code><br/>
+      · <code>InvestOptionPanelUI.cs</code><br/>
+      · <code>FinanceResultPanelUI.cs</code><br/>
       <br/>
-      <b>2D 비주얼 에셋 직접 제작 (에셋 드로잉)</b><br/>
-      · 주인공 캐릭터(E.T.) & 시대별 배경 에셋 직접 드로잉 및 스프라이트 컷팅/패킹<br/>
-      · UI 패널 레이아웃 조정 & WebGL 템플릿용 비주얼 리소스 최적화
+      <b>2D 에셋 직접 드로잉</b><br/>
+      · 주인공(E.T.) & 시대별 배경 에셋 제작<br/>
+      · 스프라이트 컷팅/패킹 & UI 최적화
     </td>
-  </tr>
-
-  <tr>
-    <td align="center">⚙️<br/><b>백엔드</b></td>
-    <td align="center">
-      <a href="#">
-        <img src="https://github.com/identicons/hongjeonghee.png" width="70"/><br/>
-        <b>홍정희</b><br/>
-        <sub>@GitHub</sub>
-      </a>
-    </td>
-    <td>
-      <b>Spring Boot API 비즈니스 로직 전 영역 단독 구현</b><br/>
-      · 도메인(User · Game · Coin · Quiz · Shop) REST API 전 구간 설계 & 구현<br/>
-      &nbsp;&nbsp;→ <code>GameController</code> · <code>UserController</code> · <code>RankingController</code> · <code>QuizController</code><br/>
-      · KDB 금융 용어 공공데이터 CSV 파싱 배치 프로세서 (<code>QuizDataLoader</code>)<br/>
-      &nbsp;&nbsp;→ 동적 4지선다 객관식 퀴즈 자동 생성 알고리즘 설계<br/>
-      · Redis 실시간 게임 세션 캐싱/검증 & 리더보드 순위 집계 로직<br/>
-      · PostgreSQL JPA 엔티티 매핑 최적화 & 트랜잭션 전파 제어로 데이터 무결성 보장
-    </td>
-  </tr>
-
-  <tr>
-    <td align="center">☁️<br/><b>인프라</b><br/><b>클라이언트</b></td>
-    <td align="center">
-      <a href="#">
-        <img src="https://github.com/identicons/kimdaeyeon.png" width="70"/><br/>
-        <b>김대연</b><br/>
-        <sub>@GitHub</sub>
-      </a>
-    </td>
-    <td>
-      <b>아웃게임 메인페이지 & 핵심 거점 UI 구현</b><br/>
-      · 메인 로비 (<code>LobbyDirector.cs</code>) — 로그인/회원가입 세션 바인딩, UFO 불시착 시퀀스 제어<br/>
-      · <b>상점(Shop) 페이지</b> & <b>UFO 정비소(Garage/Repair) 시스템</b> UI & 거래 흐름 전체 구현<br/>
+    <td valign="top">
+      <b>Spring Boot API 전 영역 단독 구현</b><br/>
+      · User · Game · Coin · Quiz · Shop<br/>
+      &nbsp;&nbsp;도메인 REST API 전 구간 설계<br/>
+      · <code>GameController</code><br/>
+      · <code>UserController</code><br/>
+      · <code>RankingController</code><br/>
+      · <code>QuizController</code><br/>
       <br/>
-      <b>클라우드 인프라 구축 & 배포 최적화</b><br/>
-      · AWS EC2 환경 구축 & Docker Compose 기반 PostgreSQL/Redis 컨테이너 분산 배포<br/>
-      · Nginx 리버스 프록시 구성 & WebGL 프론트-백엔드 API 라우팅 연동<br/>
-      · WebGL 커스텀 빌드 템플릿 최적화 & Unity WebGL 클라이언트-서버 엔드포인트 연동
+      <b>퀴즈 & 데이터 설계</b><br/>
+      · KDB 공공데이터 CSV 파싱<br/>
+      &nbsp;&nbsp;<code>QuizDataLoader</code> — 4지선다 자동 생성<br/>
+      · Redis 세션 캐싱 & 리더보드<br/>
+      · PostgreSQL JPA 매핑 최적화
+    </td>
+    <td valign="top">
+      <b>아웃게임 메인페이지 & UI 구현</b><br/>
+      · 메인 로비 <code>LobbyDirector.cs</code><br/>
+      &nbsp;&nbsp;로그인/세션 바인딩, UFO 불시착 시퀀스<br/>
+      · <b>상점(Shop)</b> UI & 거래 흐름 구현<br/>
+      · <b>UFO 정비소(Garage)</b> 시스템 구현<br/>
+      <br/>
+      <b>클라우드 인프라 구축</b><br/>
+      · AWS EC2 & Docker Compose<br/>
+      &nbsp;&nbsp;PostgreSQL/Redis 컨테이너 배포<br/>
+      · Nginx 리버스 프록시 구성<br/>
+      · WebGL 빌드 템플릿 최적화
     </td>
   </tr>
-
 </table>
 ---
 
