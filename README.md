@@ -192,7 +192,7 @@ graph LR
   <tr>
     <td align="center" width="25%">
       <a href="https://github.com/kkaemong">
-        <img src="https://github.com/identicons/junjunyoung.png" width="80"/><br/>
+        <img src="https://github.com/kkaemong.png" width="80"/><br/>
         <b>진준영</b><br/>
         <sub>🎮 클라이언트 · 본인</sub><br/>
         <sub>@GitHub</sub>
