@@ -33,7 +33,7 @@ Unity · Spring Boot · AWS 풀스택 **2D 러너 금융 학습 게임** &nbsp;|
 ## 🔄 &nbsp;핵심 플레이 루프
 
 ```mermaid
-graph LR
+graph TD
     A(["🛸 Lobby<br/>E.T. 불시착 & 스테이지 선택"]) --> B(["🏃 Stage Run<br/>2D 달리기 & 코인 획득"])
     B --> C{"⚡ 돌발 경제 퀴즈"}
     C -->|"✅ 정답"| D(["🚀 가속 부스터<br/>& 방어막 획득"])
