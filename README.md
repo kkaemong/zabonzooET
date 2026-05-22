@@ -261,57 +261,43 @@ zabonzooET/
   <tr>
     <td align="center" width="25%">
       <a href="https://github.com/kkaemong">
-        <img src="https://github.com/kkaemong.png" width="80"/><br/>
+        <img src="https://github.com/kkaemong.png" width="80" style="border-radius:50%"/><br/><br/>
         <b>진준영</b><br/>
-        <sub>🎮 클라이언트 · 본인</sub><br/>
-        <sub>@GitHub</sub>
-      </a>
+        <sub>🎮 Unity 클라이언트 · 본인</sub>
+      </a><br/><br/>
+      <sub>🕹️ 물리 점프 & 무한 러너 시스템</sub><br/>
+      <sub>💬 퀴즈 모달 & 부스터/쉴드 연출</sub><br/>
+      <sub>🔌 <code>APIManager.cs</code> HTTP 모듈 단독 설계</sub>
     </td>
     <td align="center" width="25%">
       <a href="#">
-        <img src="https://github.com/identicons/gyeongminji.png" width="80"/><br/>
+        <img src="https://github.com/identicons/gyeongminji.png" width="80" style="border-radius:50%"/><br/><br/>
         <b>경민지</b><br/>
-        <sub>🎨 클라이언트</sub><br/>
-        <sub>@GitHub</sub>
-      </a>
+        <sub>🎨 Unity 클라이언트</sub>
+      </a><br/><br/>
+      <sub>🗂️ 스테이지 선택 & 금융 상품 씬 구현</sub><br/>
+      <sub>✏️ E.T. & 배경 2D 에셋 직접 드로잉</sub><br/>
+      <sub>🖼️ 스프라이트 패킹 & UI 최적화</sub>
     </td>
     <td align="center" width="25%">
       <a href="#">
-        <img src="https://github.com/identicons/hongjeonghee.png" width="80"/><br/>
+        <img src="https://github.com/identicons/hongjeonghee.png" width="80" style="border-radius:50%"/><br/><br/>
         <b>홍정희</b><br/>
-        <sub>⚙️ 백엔드</sub><br/>
-        <sub>@GitHub</sub>
-      </a>
+        <sub>⚙️ Spring Boot 백엔드</sub>
+      </a><br/><br/>
+      <sub>🛠️ 전 도메인 REST API 단독 구현</sub><br/>
+      <sub>🧠 KDB 기반 4지선다 퀴즈 자동 생성</sub><br/>
+      <sub>📦 Redis 캐싱 & 실시간 리더보드</sub>
     </td>
     <td align="center" width="25%">
       <a href="#">
-        <img src="https://github.com/identicons/kimdaeyeon.png" width="80"/><br/>
+        <img src="https://github.com/identicons/kimdaeyeon.png" width="80" style="border-radius:50%"/><br/><br/>
         <b>김대연</b><br/>
-        <sub>☁️ 인프라 & 클라이언트</sub><br/>
-        <sub>@GitHub</sub>
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td valign="top">
-      · 물리 기반 1단/2단 점프 & 무한 러너 시스템 설계 (<code>player.cs</code>)<br/>
-      · 경제 군인 충돌 → 퀴즈 모달 전환 & 부스터/쉴드 연출<br/>
-      · <code>APIManager.cs</code> 커스텀 HTTP 통신 모듈 단독 설계
-    </td>
-    <td valign="top">
-      · 스테이지 선택 & 금융 상품 선택 씬 전담 구현<br/>
-      · 주인공(E.T.) & 시대별 배경 2D 에셋 직접 드로잉<br/>
-      · 스프라이트 컷팅/패킹 & UI 최적화
-    </td>
-    <td valign="top">
-      · User · Game · Quiz · Shop 전 도메인 REST API 단독 구현<br/>
-      · KDB 공공데이터 기반 4지선다 퀴즈 자동 생성 (<code>QuizDataLoader</code>)<br/>
-      · Redis 세션 캐싱 & 실시간 리더보드
-    </td>
-    <td valign="top">
-      · 메인 로비 · 상점 · UFO 정비소 UI & 흐름 구현<br/>
-      · AWS EC2 + Docker Compose 인프라 구축 & 배포 자동화<br/>
-      · Nginx 리버스 프록시 & WebGL 빌드 템플릿 최적화
+        <sub>☁️ 인프라 & Unity 클라이언트</sub>
+      </a><br/><br/>
+      <sub>🏠 로비 · 상점 · UFO 정비소 UI 구현</sub><br/>
+      <sub>🚀 AWS EC2 + Docker Compose 배포</sub><br/>
+      <sub>🌐 Nginx 리버스 프록시 & WebGL 최적화</sub>
     </td>
   </tr>
 </table>
