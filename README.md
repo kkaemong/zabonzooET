@@ -15,22 +15,23 @@
 | :--- | :--- |
 | **진행 기간** | 2026.02.16 ~ 2026.04.03 (약 7주) |
 | **개요** | 플레이를 통해 실생활 금융/경제 개념을 자연스럽게 체득하는 2D 횡스크롤 러너 게임 |
-| **팀 구성** | **4인 개발 프로젝트** (유니티 클라이언트 1명, 백엔드/인프라 2명, 프론트엔드/백엔드 1명) |
+| **팀 구성** | **4인 개발 프로젝트** (클라이언트 2명, 백엔드 1명, 인프라/클라이언트 1명) |
 | **Tech Stack** | **FE**: Unity <br> **BE**: Spring Boot (Java 17) <br> **DB**: PostgreSQL, Redis <br> **Infra**: AWS EC2, Docker |
 | **협업 툴** | **Jira**: 매주 스프린트 및 백로그 관리를 통해 마일스톤 및 일정 수립 <br> **Notion**: 회의록 누적, 기획 요구사항 정의서 서면 합의 및 프로젝트 자료 아카이빙 |
 
 <br />
 
 ## 👥 팀원 소개 및 역할 분담 (R&R)
-* **진준영 (유니티 클라이언트 총괄 개발 - 본인)**
-  * **인게임 콘텐츠 전 영역 개발 총괄**:
+* **진준영 (유니티 클라이언트 개발 - 본인)**
+  * **인게임 콘텐츠 전 영역 주도 개발**:
     * 2D 플레이어 물리 물리 조작 및 1단/2단 점프 메커니즘 설계 (`player.cs`)
     * 1980년대(성장기), 2000년대(격변기), 2020년대(인플레이션기) 시대별 주행 필드 및 장애물 피격 연출(카메라 셰이크 기믹 등) 구현
     * 돌발 경제 퀴즈 씬 전환 및 퀴즈 정답 시 보호막/가속 부스터 획득 연출 구현 (`QuizManager.cs`)
     * 주행 속도 비례 가변 오디오 피치 변조 설계 등 청각적 속도감 극대화 연출 구현
     * REST API 통신 모듈(`APIManager.Instance`) 구현을 통한 백엔드 서버 실시간 통신 및 동기화 담당
-* **팀원 A / B / C (백엔드 및 프론트엔드)**
-  * 백엔드 API 서버 설계 및 배포 인프라 구축, 소개 페이지 웹 랜딩 페이지 개발 담당
+* **팀원 A (유니티 클라이언트 개발)**: 인게임 UI/Lobby 연출 및 아웃게임/로비 콘텐츠 연동 개발
+* **팀원 B (백엔드 개발)**: Spring Boot 기반 게임/퀴즈 도메인 API 설계 및 비즈니스 로직 구현
+* **팀원 C (인프라 & 클라이언트 개발)**: AWS EC2/Docker 배포 인프라 구축 및 클라이언트-서버 연동 네트워크 모듈 개발
 
 ---
 
@@ -71,7 +72,7 @@ graph TD
 
 | 로비 (메인 화면) | 스테이지 선택 |
 | :---: | :---: |
-| <img src="./메인페이지.gif" height="250" /> | <img src="./스테이지_선택.gif" height="250" /> |
+| <img src="./gifs/메인페이지.gif" height="250" /> | <img src="./gifs/스테이지_선택.gif" height="250" /> |
 
 </details>
 
@@ -85,11 +86,11 @@ graph TD
 
 | 1980년대 (대한민국 급성장기) | 2000년대 (IT 정보화 & 닷컴버블기) |
 | :---: | :---: |
-| <img src="./1980게임.gif" height="250" /> | <img src="./2000게임.gif" height="250" /> |
+| <img src="./gifs/1980게임.gif" height="250" /> | <img src="./gifs/2000게임.gif" height="250" /> |
 
 | 2020년대 (팬데믹 & 고인플레이션기) |
 | :---: |
-| <img src="./2020게임.gif" height="250" /> |
+| <img src="./gifs/2020게임.gif" height="250" /> |
 
 </details>
 
@@ -103,11 +104,11 @@ graph TD
 
 | 장애물 피격 (카메라 셰이크) | 돌발 경제 퀴즈 등장 |
 | :---: | :---: |
-| <img src="./부딪혔을때.gif" height="250" /> | <img src="./퀴즈.gif" height="250" /> |
+| <img src="./gifs/부딪혔을때.gif" height="250" /> | <img src="./gifs/퀴즈.gif" height="250" /> |
 
 | 퀴즈 정답 시 보호막 & 속도 부스트 | 게임 오버 (체력 유실) |
 | :---: | :---: |
-| <img src="./퀴즈_정답_후_방어막.gif" height="250" /> | <img src="./게임오버.gif" height="250" /> |
+| <img src="./gifs/퀴즈_정답_후_방어막.gif" height="250" /> | <img src="./gifs/게임오버.gif" height="250" /> |
 
 </details>
 
@@ -121,11 +122,11 @@ graph TD
 
 | 금융 상품 가입 & 자산 증식 결과 | 아이템 상점 구매 |
 | :---: | :---: |
-| <img src="./금융_상품_선택_후_결과.gif" height="250" /> | <img src="./상점.gif" height="250" /> |
+| <img src="./gifs/금융_상품_선택_후_결과.gif" height="250" /> | <img src="./gifs/상점.gif" height="250" /> |
 
 | UFO 정비 (최종 목표) |
 | :---: |
-| <img src="./UFO_정비.gif" height="250" /> |
+| <img src="./gifs/UFO_정비.gif" height="250" /> |
 
 </details>
 
@@ -190,39 +191,3 @@ zabonzooET/
 ### 3. 보안성 중심의 인프라 격리 설계
 - **무결성 유지**: 외부 노출 방지를 위해 `application.yml` 설정 파일 내부의 PostgreSQL, Redis 등의 인프라 계정 정보를 **환경 변수화(`${POSTGRES_PASSWORD}`)**하여 관리했습니다. 
 - **.gitignore 최적화**: Unity 에디터 캐시(`Library/`, `Temp/`), 의존성 파일, 그리고 인프라 로컬 비밀 키 파일(`.env`)을 완벽하게 격리 설정하여 **GitHub Public 공유 시 발생할 수 있는 보안 및 저작권 침해 우려를 원천 차단**했습니다.
-
----
-
-## 💻 실행 방법 (How to Run)
-
-### Prerequisites
-- JDK 17
-- Docker & Docker Compose
-- Unity Editor 2022.3 LTS 이상
-- Node.js 18+
-
-### 1. 백엔드 실행 (Spring Boot)
-`zabonzooET/` 루트 경로에서 실행:
-```bash
-# Docker 인프라 기동 (PostgreSQL, Redis)
-docker-compose -f docker-compose.yml up -d
-
-# Spring Boot 구동
-./gradlew bootRun
-```
-* 서버가 켜지면 `http://localhost:8080/swagger-ui.html`에서 API 명세서를 확인할 수 있습니다.
-
-### 2. 포트폴리오 웹페이지 실행 (React)
-`zabonzooET/portfolio/` 경로에서 실행:
-```bash
-# 패키지 설치
-npm install
-
-# 로컬 개발 서버 실행
-npm run dev
-```
-
-### 3. 유니티 클라이언트 실행
-1. Unity Hub에서 `zabonzooET/` 폴더를 프로젝트로 추가 및 로드합니다.
-2. `Assets/Scenes/Lobby.unity` 또는 `StageSelect.unity` 씬을 열고 **Play** 버튼을 누릅니다.
-3. WebGL로 빌드하여 `portfolio` 프론트엔드 프레임에 올려 인브라우저 플레이가 가능합니다.
