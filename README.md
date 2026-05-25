@@ -273,7 +273,6 @@ zabonzooET/
       <br/>
       <a href="https://github.com/kkaemong"><img src="./profiles/jinjuneyoung.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>진준영</h3>
-      <b>Unity 클라이언트 · 본인</b><br/><br/>
       <div align="left">
         <ul>
           <li>Unity를 활용하여 핵심 인게임 씬(Scene)을 구축하고, 중력 적용 및 캐릭터 애니메이션을 구현하여 역동적인 환경 조성</li>
