@@ -270,7 +270,8 @@ zabonzooET/
 <table>
   <tr>
     <td align="center" width="50%">
-      <a href="https://github.com/kkaemong"><img src="./profiles/jinjuneyoung.png" width="100" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
+      <br/>
+      <a href="https://github.com/kkaemong"><img src="./profiles/jinjuneyoung.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>진준영</h3>
       <b>Unity 클라이언트 · 본인</b><br/><br/>
       <div align="left">
@@ -283,7 +284,8 @@ zabonzooET/
       </div>
     </td>
     <td align="center" width="50%">
-      <a href="#"><img src="./profiles/gyeongminji.png" width="100" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
+      <br/>
+      <a href="#"><img src="./profiles/gyeongminji.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>경민지</h3>
       <b>Unity 클라이언트</b><br/><br/>
       <div align="left">
@@ -297,7 +299,8 @@ zabonzooET/
   </tr>
   <tr>
     <td align="center" width="50%">
-      <a href="#"><img src="./profiles/hongjeonghee.png" width="100" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
+      <br/>
+      <a href="#"><img src="./profiles/hongjeonghee.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>홍정희</h3>
       <b>Spring Boot 백엔드</b><br/><br/>
       <div align="left">
@@ -309,7 +312,8 @@ zabonzooET/
       </div>
     </td>
     <td align="center" width="50%">
-      <a href="#"><img src="./profiles/kimdaeyeon.png" width="100" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
+      <br/>
+      <a href="#"><img src="./profiles/kimdaeyeon.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>김대연</h3>
       <b>인프라 & Unity 클라이언트</b><br/><br/>
       <div align="left">
