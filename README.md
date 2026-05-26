@@ -333,6 +333,6 @@ zabonzooET/
 
 <div align="center">
 
-**자본주E.T.** · SSAFY 공통 프로젝트 2기 핀테크 트랙
+**자본주E.T.** · SSAFY  2학기 특화 프로젝트 핀테크 트랙
 
 </div>
