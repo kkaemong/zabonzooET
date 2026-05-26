@@ -271,7 +271,7 @@ zabonzooET/
   <tr>
     <td align="center" valign="top" width="50%">
       <br/><br/>
-      <a href="https://github.com/kkaemong"><img src="./profiles/jinjuneyoung.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
+      <a href="https://github.com/kkaemong"><img src="./profiles/jinjuneyoung.png" width="140" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>진준영</h3>
       <span style="font-size: 1.1em;"><b>Unity 클라이언트</b></span><br/><br/>
       <div align="left" style="font-size: 1.05em;">
