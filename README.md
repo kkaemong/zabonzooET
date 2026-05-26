@@ -269,7 +269,7 @@ zabonzooET/
 
 <table>
   <tr>
-    <td align="center" width="50%">
+    <td align="center" valign="top" width="50%">
       <br/><br/>
       <a href="https://github.com/kkaemong"><img src="./profiles/jinjuneyoung.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>진준영</h3>
@@ -283,7 +283,7 @@ zabonzooET/
         </ul>
       </div>
     </td>
-    <td align="center" width="50%">
+    <td align="center" valign="top" width="50%">
       <br/><br/>
       <a href="#"><img src="./profiles/gyeongminji.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>경민지</h3>
@@ -298,7 +298,7 @@ zabonzooET/
     </td>
   </tr>
   <tr>
-    <td align="center" width="50%">
+    <td align="center" valign="top" width="50%">
       <br/><br/>
       <a href="#"><img src="./profiles/hongjeonghee.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>홍정희</h3>
@@ -311,7 +311,7 @@ zabonzooET/
         </ul>
       </div>
     </td>
-    <td align="center" width="50%">
+    <td align="center" valign="top" width="50%">
       <br/><br/>
       <a href="#"><img src="./profiles/kimdaeyeon.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>김대연</h3>
