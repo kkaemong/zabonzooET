@@ -270,11 +270,11 @@ zabonzooET/
 <table>
   <tr>
     <td align="center" width="50%">
-      <br/>
+      <br/><br/>
       <a href="https://github.com/kkaemong"><img src="./profiles/jinjuneyoung.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>진준영</h3>
-      <b>Unity 클라이언트</b><br/><br/>
-      <div align="left">
+      <span style="font-size: 1.1em;"><b>Unity 클라이언트</b></span><br/><br/>
+      <div align="left" style="font-size: 1.05em;">
         <ul>
           <li>Unity를 활용하여 핵심 인게임 씬(Scene)을 구축하고, 중력 적용 및 캐릭터 애니메이션을 구현하여 역동적인 환경 조성</li>
           <li>Rigidbody2D 기반의 물리 점프 시스템 및 게임 내 재화(코인) 동적 생성 로직을 설계하여 핵심 게임 루프 완성</li>
@@ -284,11 +284,11 @@ zabonzooET/
       </div>
     </td>
     <td align="center" width="50%">
-      <br/>
+      <br/><br/>
       <a href="#"><img src="./profiles/gyeongminji.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>경민지</h3>
-      <b>Unity 클라이언트</b><br/><br/>
-      <div align="left">
+      <span style="font-size: 1.1em;"><b>Unity 클라이언트</b></span><br/><br/>
+      <div align="left" style="font-size: 1.05em;">
         <ul>
           <li>스테이지 선택 & 금융 상품 씬 구현</li>
           <li>E.T. & 배경 2D 에셋 직접 드로잉</li>
@@ -299,11 +299,11 @@ zabonzooET/
   </tr>
   <tr>
     <td align="center" width="50%">
-      <br/>
+      <br/><br/>
       <a href="#"><img src="./profiles/hongjeonghee.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>홍정희</h3>
-      <b>Spring Boot 백엔드</b><br/><br/>
-      <div align="left">
+      <span style="font-size: 1.1em;"><b>Spring Boot 백엔드</b></span><br/><br/>
+      <div align="left" style="font-size: 1.05em;">
         <ul>
           <li>전 도메인 REST API 단독 구현</li>
           <li>KDB 기반 4지선다 퀴즈 자동 생성</li>
@@ -312,11 +312,11 @@ zabonzooET/
       </div>
     </td>
     <td align="center" width="50%">
-      <br/>
+      <br/><br/>
       <a href="#"><img src="./profiles/kimdaeyeon.png" width="130" style="border-radius:50%" alt="프로필 이미지 삽입"/></a><br/><br/>
       <h3>김대연</h3>
-      <b>인프라 & Unity 클라이언트</b><br/><br/>
-      <div align="left">
+      <span style="font-size: 1.1em;"><b>인프라 & Unity 클라이언트</b></span><br/><br/>
+      <div align="left" style="font-size: 1.05em;">
         <ul>
           <li>로비 · 상점 · UFO 정비소 UI 구현</li>
           <li>AWS EC2 + Docker Compose 배포</li>
